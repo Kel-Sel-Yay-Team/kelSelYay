@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.7",
+    "lucide-react": "^0.485.0",
     "mapbox-gl": "^3.10.0",
     "next": "15.2.4",
     "react": "^19.0.0",
