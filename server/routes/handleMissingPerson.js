@@ -59,41 +59,59 @@ router.post('/', async (req, res) => {
     }
   });
 
-// edit (with reporterName check)
-router.put("/:id", async (req, res) => {
-  try {
-      const { reporterName, ...updateData } = req.body;
-
+  //edit (with reporterName validation)
+  router.put("/:id", async (req, res) => {
+    try {
+      const { reporterName, locationOfMissingPerson, ...updateData } = req.body;
+  
       if (!reporterName) {
-          return res.status(400).json({ success: false, error: "Reporter name is required to edit." });
+        return res.status(400).json({ success: false, error: "Reporter name is required to edit." });
       }
-
+  
       // step 1: Find the report
       const report = await MissingPerson.findById(req.params.id);
-
+  
       if (!report) {
-          return res.status(404).json({ success: false, error: "Report not found." });
+        return res.status(404).json({ success: false, error: "Report not found." });
       }
-
+  
       // step 2: Verify reporterName
       if (report.reporterName !== reporterName) {
-          return res.status(403).json({ success: false, error: "Reporter name does not match." });
+        return res.status(403).json({ success: false, error: "Reporter name does not match." });
       }
-
-      // step 3: Proceed to update
+  
+      // step 3: If location changed, re-geocode it
+      if (locationOfMissingPerson && locationOfMissingPerson !== report.locationOfMissingPerson) {
+        const query = encodeURIComponent(locationOfMissingPerson);
+        const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`;
+  
+        const geoRes = await fetch(url, { headers: { "User-Agent": "kelyay-app" } });
+        const geoData = await geoRes.json();
+  
+        if (!geoData.length) {
+          return res.status(404).json({ success: false, error: "Location could not be geocoded." });
+        }
+  
+        const { lat, lon } = geoData[0];
+        updateData.lat = parseFloat(lat);
+        updateData.lng = parseFloat(lon);
+        updateData.locationOfMissingPerson = locationOfMissingPerson;
+      }
+  
+      // step 4: Proceed with update
       const updatedReport = await MissingPerson.findByIdAndUpdate(
-          req.params.id,
-          updateData,
-          { new: true, runValidators: true }
+        req.params.id,
+        updateData,
+        { new: true, runValidators: true }
       );
-
+  
       res.status(200).json({ success: true, data: updatedReport });
-
-  } catch (err) {
+  
+    } catch (err) {
       res.status(500).json({ success: false, error: err.message });
-  }
-});
-
+    }
+  });
+  
 
 //input: reporterName, the id of the request
 router.delete('/:id', async (req, res) => {
