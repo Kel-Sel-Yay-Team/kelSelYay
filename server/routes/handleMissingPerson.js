@@ -29,6 +29,42 @@ router.post('/', async (req, res) => {
   }
 });
 
+// edit (with reporterName check)
+router.put("/:id", async (req, res) => {
+  try {
+      const { reporterName, ...updateData } = req.body;
+
+      if (!reporterName) {
+          return res.status(400).json({ success: false, error: "Reporter name is required to edit." });
+      }
+
+      // step 1: Find the report
+      const report = await MissingPerson.findById(req.params.id);
+
+      if (!report) {
+          return res.status(404).json({ success: false, error: "Report not found." });
+      }
+
+      // step 2: Verify reporterName
+      if (report.reporterName !== reporterName) {
+          return res.status(403).json({ success: false, error: "Reporter name does not match." });
+      }
+
+      // step 3: Proceed to update
+      const updatedReport = await MissingPerson.findByIdAndUpdate(
+          req.params.id,
+          updateData,
+          { new: true, runValidators: true }
+      );
+
+      res.status(200).json({ success: true, data: updatedReport });
+
+  } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+
 //input: reporterName, the id of the request
 router.delete('/:id', async (req, res) => {
   const { reporterName } = req.body;
