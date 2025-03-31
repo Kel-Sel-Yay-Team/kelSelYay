@@ -77,8 +77,8 @@ function Mapbox() {
         const map = new mapboxgl.Map({
             container: mapContainerRef.current,
             style: 'mapbox://styles/mapbox/dark-v11',
-            center: [-79.999732, 40.4374],
-            zoom: 11
+            center: [95.9560, 21.9162],
+            zoom: 5
         });
 
         map.on('load', () => {
