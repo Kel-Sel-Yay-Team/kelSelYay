@@ -2,10 +2,17 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import router from '../routes/handleMissingPerson.js';
-
+import cors from 'cors'
 dotenv.config(); //get mongo_uri
 const app = express();
 app.use(express.json());
+// In your server/index.js or server/app.js file
+// Enable CORS for all routes
+app.use(cors({
+  origin: 'http://localhost:3000', // Your Next.js client URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('✅ MongoDB Connected'))
