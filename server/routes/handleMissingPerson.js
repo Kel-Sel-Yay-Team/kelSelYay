@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
 });
 
 //input: reporterName, the id of the request
-app.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   const { reporterName } = req.body;
 
   if (!reporterName) {
