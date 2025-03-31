@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import DetailModal from "./DetailModal";
+import AddReportButton from "./AddReportButton";
 
 const test_data_detail = [
     {
@@ -161,6 +162,9 @@ function Mapbox() {
                     onClose={handleCloseModal}
                 />
             )}
+
+            {/* Floating button */}
+            <AddReportButton />
             
             {/* Add some basic styling for the markers */}
             <style jsx global>{`
