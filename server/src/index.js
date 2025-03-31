@@ -1,16 +1,15 @@
 import express from 'express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
-const app = express(); // Initialize the app using express
+dotenv.config();
+const app = express();
+app.use(express.json());
 
-app.use(express.json()); // Middleware to parse JSON
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('✅ MongoDB Connected'))
+    .catch((err) => console.error('❌ MongoDB connection error:', err));
 
-// Example route
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
-});
+app.get('/', (req, res) => res.send('API is working'));
 
-// Start the server
-const PORT = 4000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+app.listen(3001, () => console.log('Backend running on http://localhost:3001'));
