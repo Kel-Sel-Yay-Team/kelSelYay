@@ -17,17 +17,47 @@ router.get('/', async(req, res) => {
     }
 });
 
+// create route with geocoding functionality
+
 router.post('/', async (req, res) => {
-  try {
-    const report = new MissingPerson(req.body);
+    try {
+      const { locationOfMissingPerson, ...rest } = req.body;
+        
+      //if somehow it passed frontend validation
+      if (!locationOfMissingPerson) {
+        return res.status(400).json({ error: "Location is required." });
+      }
+  
+      // step 1: Geocode using Nominatim
+      const query = encodeURIComponent(locationOfMissingPerson);
+      const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`;
+  
+      const geoRes = await fetch(url, { headers: { "User-Agent": "kelyay-app" } });
+      const geoData = await geoRes.json();
+  
+      if (!geoData.length) {
+        return res.status(404).json({ error: "Location could not be geocoded." });
+        //need to handle error better
+      }
 
-    const saved = await report.save();
-    res.status(201).json(saved);
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+      const { lat, lon } = geoData[0];
+      console.log("lat and longs are " + lat + "," + lon )
+  
+      // step 2: Store full report with lat/lng
+      const report = new MissingPerson({
+        ...rest,
+        locationOfMissingPerson,
+        lat: parseFloat(lat),
+        lng: parseFloat(lon)
+      });
+  
+      const saved = await report.save();
+      res.status(201).json(saved);
+  
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
 
 // edit (with reporterName check)
 router.put("/:id", async (req, res) => {
