@@ -1,3 +1,4 @@
+'use client';
 import { useState } from 'react';
 
 function ImageUpload({ onUploadComplete }) {
@@ -8,6 +9,11 @@ function ImageUpload({ onUploadComplete }) {
   };
 
   const uploadToCloudinary = async () => {
+    if (!image) {
+      alert("Please select an image first.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', image);
     formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET); // your preset name
@@ -21,13 +27,15 @@ function ImageUpload({ onUploadComplete }) {
     const imageUrl = data.secure_url;
 
     console.log('Uploaded:', imageUrl);
-    onUploadComplete(imageUrl); // send this to your backend
+    onUploadComplete(imageUrl); // what we want to do with the imageURL - send this to your backend 
   };
 
   return (
     <div>
-      <input type="file" onChange={handleImageChange} />
+      <input type="file" accept="image/*" onChange={handleImageChange} />
       <button onClick={uploadToCloudinary}>Upload</button>
     </div>
   );
 }
+
+export default ImageUpload;
