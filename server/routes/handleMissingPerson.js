@@ -5,6 +5,18 @@ const router = express.Router();
 
 //CRUD
 
+router.get('/', async(req, res) => {
+
+    try {
+        const reports = await MissingPerson.find();
+
+        res.status(200).json(reports);
+        
+    } catch(e) {
+        res.status(500).json({ error : e.message });
+    }
+});
+
 router.post('/', async (req, res) => {
   try {
     const report = new MissingPerson(req.body);
