@@ -19,6 +19,8 @@ router.get('/', async(req, res) => {
 
 // create route with geocoding functionality
 
+// create route with geocoding functionality
+
 router.post('/', async (req, res) => {
     try {
       const { locationOfMissingPerson, ...rest } = req.body;
