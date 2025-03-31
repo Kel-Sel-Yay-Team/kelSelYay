@@ -24,8 +24,7 @@ body {
 }
 
 #map {
-  position: absolute;
-  top: 0;
-  bottom: 0;
+  position: relative; /* Ensure the map container is positioned correctly */
   width: 100%;
+  height: 100vh;      /* Full height of the viewport */
 }
