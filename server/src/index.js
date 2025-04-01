@@ -9,7 +9,7 @@ app.use(express.json());
 // In your server/index.js or server/app.js file
 // Enable CORS for all routes
 app.use(cors({
-  origin: 'http://localhost:3000', // Your Next.js client URL
+  origin: 'http://localhost:3001', // Your Next.js client URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
@@ -22,4 +22,4 @@ app.use('/api/reports', router);
 
 
 //host the server
-app.listen(3001, () => console.log('Backend running on http://localhost:3001'));
+app.listen(3002, () => console.log('Backend running on http://localhost:3002'));

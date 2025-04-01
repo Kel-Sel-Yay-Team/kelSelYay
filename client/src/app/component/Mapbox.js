@@ -4,63 +4,16 @@ import { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import DetailModal from "./DetailModal";
-
-// Keep test data as fallback
-const test_data_detail = [
-    /* your existing test data here */
-    {
-        id: 1,
-        missingPersonName: "Sarah Johnson",
-        phoneNumber: "412-555-0123",
-        missingPersonDescription: "18-year-old female, 5'6\", blonde hair, blue eyes. Last seen wearing a red hoodie and jeans.",
-        relationshipToReporter: "Sister",
-        locationOfMissingPerson: "Oakland area near University of Pittsburgh",
-        timeSinceMissing: "March 25, 2025 (6 days ago)",
-        imageUrl: "/missing-person-1.jpg",
-        coordinates: [-79.94606, 40.44961]
-      },
-      {
-        id: 2,
-        missingPersonName: "Michael Rodriguez",
-        phoneNumber: "412-555-0187",
-        missingPersonDescription: "32-year-old male, 6'0\", brown hair, brown eyes. Has a compass tattoo on right forearm.",
-        relationshipToReporter: "Friend",
-        locationOfMissingPerson: "Downtown Pittsburgh, near Point State Park",
-        timeSinceMissing: "March 28, 2025 (3 days ago)",
-        imageUrl: "/missing-person-2.jpg",
-        coordinates: [-79.99732, 40.4374]
-      },
-      {
-        id: 3,
-        missingPersonName: "Emily Chen",
-        phoneNumber: "412-555-0199",
-        missingPersonDescription: "25-year-old female, 5'4\", black hair with purple highlights. Wearing glasses and a gray jacket.",
-        relationshipToReporter: "Roommate",
-        locationOfMissingPerson: "Shadyside neighborhood",
-        timeSinceMissing: "March 29, 2025 (2 days ago)",
-        imageUrl: "/missing-person-3.jpg",
-        coordinates: [-79.93244, 40.43484]
-      },
-      {
-        id: 4,
-        missingPersonName: "David Williams",
-        phoneNumber: "412-555-0144",
-        missingPersonDescription: "45-year-old male, 5'11\", gray hair and beard. Has a limp in right leg.",
-        relationshipToReporter: "Son",
-        locationOfMissingPerson: "Strip District area",
-        timeSinceMissing: "March 27, 2025 (4 days ago)",
-        imageUrl: "/missing-person-4.jpg",
-        coordinates: [-79.97294, 40.40908]
-      }  
-];
+import AddReportButton from "./AddReportButton";
 
 const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 function Mapbox() {
     const mapContainerRef = useRef(null);
     const [selectedPerson, setSelectedPerson] = useState(null);
-    const [missingPeopleList, setMissingPeopleList] = useState([]);
     const mapRef = useRef(null); // Store map reference
+    const [missingPeople, setMissingPeople] = useState([]);
+    const markersRef = useRef(new Map()); // Store markers by ID
 
     // Function to handle marker click
     const handleMarkerClick = (person) => {
@@ -73,18 +26,55 @@ function Mapbox() {
         setSelectedPerson(null);
     };
 
-    // Generate coordinates from a location string (simple random coordinates for demo)
-    const generateCoordinates = (location) => {
-        // For a real app, you would use a geocoding service here
-        // For now, we'll generate random coordinates around Pittsburgh
-        const baseLat = 40.44; // Pittsburgh
-        const baseLng = -79.99;
+    // Handle successful update from modal
+    const handleDetailUpdate = (updatedPerson) => {
+        console.log("Person updated:", updatedPerson);
         
-        // Add some randomness to spread markers around
-        const lat = baseLat + (Math.random() - 0.5) * 0.1;
-        const lng = baseLng + (Math.random() - 0.5) * 0.1;
+        // Update the person in the local state
+        setMissingPeople(prevPeople => 
+            prevPeople.map(person => 
+                (person._id || person.id) === (updatedPerson._id || updatedPerson.id) 
+                    ? updatedPerson 
+                    : person
+            )
+        );
         
-        return [lng, lat]; // Mapbox expects [longitude, latitude]
+        // Update the selected person so modal shows updated data
+        setSelectedPerson(updatedPerson);
+        
+        // Update the marker
+        const personId = updatedPerson._id || updatedPerson.id;
+        const marker = markersRef.current.get(personId);
+        
+        if (marker && marker.getElement()) {
+            // Update the marker's image
+            let imgUrl = updatedPerson.imageUrl;
+            if(!imgUrl || imgUrl === 'https://example.com/image.jpg' || imgUrl === 'https://example.com/updated-image.jpg'){
+                imgUrl = '/testPic.png';
+            }
+            
+            const el = marker.getElement();
+            el.style.backgroundImage = `url(${imgUrl})`;
+        }
+    };
+    
+    // Handle successful deletion from modal
+    const handleDetailDelete = (deletedId) => {
+        console.log("Person deleted:", deletedId);
+        
+        // Remove the person from local state
+        setMissingPeople(prevPeople => 
+            prevPeople.filter(person => 
+                (person._id || person.id) !== deletedId
+            )
+        );
+        
+        // Remove the marker from the map
+        const marker = markersRef.current.get(deletedId);
+        if (marker) {
+            marker.remove();
+            markersRef.current.delete(deletedId);
+        }
     };
 
     // Format time to match test data format
@@ -104,7 +94,7 @@ function Mapbox() {
 
     const fetchMissingPeople = async() => {
         try {
-            const response = await fetch("http://localhost:3001/api/reports", {
+            const response = await fetch("http://localhost:3002/api/reports", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -119,25 +109,9 @@ function Mapbox() {
             
             const data = await response.json();
             console.log("API data:", data);
+            setMissingPeople(data); // Store fetched people in state
             
-            // Transform data to include coordinates
-            const transformedData = data.map(person => ({
-                id: person._id, // MongoDB _id as the id
-                missingPersonName: person.missingPersonName,
-                phoneNumber: person.phoneNumber || "N/A",
-                missingPersonDescription: person.missingPersonDescription || "No description provided",
-                relationshipToReporter: person.relationshipToReporter || "Unknown",
-                locationOfMissingPerson: person.locationOfMissingPerson,
-                timeSinceMissing: formatTimeSinceMissing(person.timeSinceMissing),
-                imageUrl: person.imageUrl || "/testPic.png", // Use default image if none provided
-                coordinates: generateCoordinates(person.locationOfMissingPerson),
-                reporterName: person.reporterName,
-                found: person.found
-            }));
-            
-            console.log("Transformed data:", transformedData);
-            setMissingPeopleList(transformedData);
-            return transformedData;
+            return data;
         } catch (error) {
             console.error("Error fetching missing people:", error);
             return [];
@@ -146,14 +120,28 @@ function Mapbox() {
 
     // Function to add markers to the map
     const addMarkersToMap = (map, people) => {
-        // Clear existing markers (if implementing refresh functionality)
+        console.log(`Adding ${people.length} markers to map`);
+        
+        // Clear existing markers
+        markersRef.current.forEach(marker => marker.remove());
+        markersRef.current.clear();
+        
+        // Keep track of coordinates to avoid exact overlaps
+        const usedCoordinates = new Map();
         
         // Add markers for missing persons
-        people.forEach((person) => {
+        people.forEach((person, index) => {
+            console.log(`Processing marker ${index + 1}:`, person);
+            
             // Create custom marker element
+            let imgUrl = person.imageUrl;
+            if(!imgUrl || imgUrl === 'https://example.com/image.jpg' || imgUrl === 'https://example.com/updated-image.jpg'){
+                imgUrl = '/testPic.png';
+            }
+
             const el = document.createElement('div');
             el.className = 'missing-person-marker';
-            el.style.backgroundImage = `url(${person.imageUrl})`;
+            el.style.backgroundImage = `url(${imgUrl})`;
             el.style.backgroundSize = 'cover';
             el.style.backgroundPosition = 'center';
             el.style.width = '40px';
@@ -164,22 +152,53 @@ function Mapbox() {
             el.style.cursor = 'pointer';
             
             // Add data attribute for identification
-            el.dataset.personId = person.id;
+            el.dataset.personId = person._id || person.id;
             
-            // Create marker
-            const marker = new mapboxgl.Marker(el)
-                .setLngLat(person.coordinates)
-                .addTo(map);
+            // Get coordinates with offset to prevent exact overlaps
+            let lat = person.lat ? person.lat : 21.9162;
+            let lng = person.lng ? person.lng : 95.9560;
             
-            // Add click event
-            el.addEventListener('click', () => {
-                handleMarkerClick(person);
-            });
+            // Create a unique key for these coordinates
+            const coordKey = `${lat},${lng}`;
+            
+            // If these exact coordinates are already used, offset slightly
+            if (usedCoordinates.has(coordKey)) {
+                const offset = usedCoordinates.get(coordKey) * 0.001; // Small offset
+                lat += offset;
+                lng += offset;
+                usedCoordinates.set(coordKey, usedCoordinates.get(coordKey) + 1);
+            } else {
+                usedCoordinates.set(coordKey, 1);
+            }
+            
+            console.log(`Marker ${index + 1} coordinates:`, [lng, lat]);
+            
+            try {
+                // Create marker
+                const marker = new mapboxgl.Marker(el)
+                    .setLngLat([lng, lat])
+                    .addTo(map);
+                
+                // Store marker reference by person ID for later updates
+                markersRef.current.set(person._id || person.id, marker);
+                
+                // Add click event
+                el.addEventListener('click', () => {
+                    // Make a deep copy to avoid reference issues
+                    const personData = {...person};
+                    // Ensure the Modal has all needed fields
+                    personData.id = personData._id || personData.id;
+                    handleMarkerClick(personData);
+                });
+                
+                console.log(`Successfully added marker ${index + 1}`);
+            } catch (error) {
+                console.error(`Error adding marker ${index + 1}:`, error);
+            }
         });
     };
 
     useEffect(() => {
-        if (typeof window === 'undefined') return;
 
         // Initialize map
         mapboxgl.accessToken = mapbox_accesstoken;
@@ -198,18 +217,14 @@ function Mapbox() {
                 // Fetch missing people data from API
                 const peopleData = await fetchMissingPeople();
                 
-                // Use API data if available, otherwise use test data
-                const peopleToDisplay = peopleData.length > 0 ? peopleData : test_data_detail;
-                
                 // Add markers to map
-                addMarkersToMap(map, peopleToDisplay);
+                addMarkersToMap(map, peopleData);
                 
             } catch (error) {
                 console.error("Error loading data:", error);
-                // Fall back to test data if there's an error
-                addMarkersToMap(map, test_data_detail);
+                // Fall back to empty data if there's an error
+                addMarkersToMap(map, []);
             }
-
         });
 
         // Add geolocation control
@@ -235,8 +250,13 @@ function Mapbox() {
                 <DetailModal 
                     detail={selectedPerson}
                     onClose={handleCloseModal}
+                    onUpdateSuccess={handleDetailUpdate}
+                    onDeleteSuccess={handleDetailDelete}
                 />
             )}
+
+            {/* Floating button */}
+            <AddReportButton />
             
             {/* Add some basic styling for the markers */}
             <style jsx global>{`
