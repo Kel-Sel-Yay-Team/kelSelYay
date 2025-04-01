@@ -77,6 +77,10 @@ function Mapbox() {
         }
     };
 
+    const handleNewReport = (newReport) => {
+        setMissingPeople(prev => [...prev, newReport]);
+    }
+
     // Format time to match test data format
     const formatTimeSinceMissing = (hours) => {
         if (!hours && hours !== 0) return "Unknown";
@@ -247,6 +251,8 @@ function Mapbox() {
         }
     }, [missingPeople]);
 
+
+
     return (
         <>
             <div id="map" ref={mapContainerRef} style={{ width: '100%', height: '100vh' }} />
@@ -258,11 +264,12 @@ function Mapbox() {
                     onClose={handleCloseModal}
                     onUpdateSuccess={handleDetailUpdate}
                     onDeleteSuccess={handleDetailDelete}
+
                 />
             )}
 
             {/* Floating button */}
-            <AddReportButton />
+            <AddReportButton onReportSubmitted={handleNewReport}/>
             
             {/* Add some basic styling for the markers */}
             <style jsx global>{`

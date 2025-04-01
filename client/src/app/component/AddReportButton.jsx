@@ -5,8 +5,17 @@ import ReportMissingPerson from "./ReportMissingPerson";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile, faPlus } from "@fortawesome/free-solid-svg-icons";
 
-export default function AddReportButton() {
+export default function AddReportButton({ onReportSubmitted }) {
   const [isOpen, setIsOpen] = useState(false);
+
+
+  const handleReportSuccess=(newReport) => {
+    setIsOpen(false);
+
+    if(onReportSubmitted){
+      onReportSubmitted(newReport)
+    }
+  }
 
   return (
     <>
@@ -23,7 +32,10 @@ export default function AddReportButton() {
         </span>
       </button>
 
-      {isOpen && <ReportMissingPerson onClose={() => setIsOpen(false)} />}
+      {isOpen && <ReportMissingPerson 
+                    onClose={() => setIsOpen(false)} 
+                    onSubmitSuccess={handleReportSuccess}
+                  />}
 
       <style jsx>{`
         .add-report-button {
