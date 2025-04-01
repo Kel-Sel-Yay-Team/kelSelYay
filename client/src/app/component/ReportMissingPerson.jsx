@@ -5,12 +5,14 @@ import { X } from "lucide-react";
 
 export default function ReportMissingPerson({ onClose }) {
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    location: "",
-    missingSince: "",
-    relationship: "",
-    phone: "",
+    reporterName: "",
+    missingPersonName: "",
+    phoneNumber: "",
+    missingPersonDescription: "",
+    relationshipToReporter: "",
+    locationOfMissingPerson: "",
+    timeSinceMissing: "",
+    imageUrl: "", // optional, use imagePreview if needed
   });
 
   const [imageFile, setImageFile] = useState(null);
@@ -27,23 +29,54 @@ export default function ReportMissingPerson({ onClose }) {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImageFile(file);
+
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
+        setFormData((prev) => ({
+          ...prev,
+          imageUrl: reader.result, // store preview as imageUrl (or later replace with Cloudinary URL)
+        }));
       };
       reader.readAsDataURL(file);
     } else {
       setImagePreview(null);
+      setFormData((prev) => ({ ...prev, imageUrl: "" }));
     }
   };
 
-  const handleSubmit = () => {
-    console.log("Submitted data:", {
-      ...formData,
-      imageFile,
-    });
-    onClose();
+  // const handleSubmit = () => {
+  //   console.log("Submitted data:", formData);
+  //   onClose();
+  // };
+  const handleSubmit = async () => {
+    try {
+      // Prepare final payload
+      const payload = {
+        ...formData,
+        imageUrl: "https://picsum.photos/200/300", // hardcoded override
+      };
+  
+      const response = await fetch("http://localhost:3002/api/reports", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.error || "Something went wrong");
+      }
+  
+      console.log("✅ Report submitted successfully:", data);
+      onClose(); // close modal if successful
+    } catch (error) {
+      console.error("🚨 Error submitting report:", error.message);
+    }
   };
 
   return (
@@ -76,34 +109,78 @@ export default function ReportMissingPerson({ onClose }) {
                   onChange={handleImageChange}
                   style={{ display: "none" }}
                 />
+                {/* Only visible on mobile */}
+                <div className="time-mobile-wrapper">
+                  <input
+                    name="timeSinceMissing"
+                    value={formData.timeSinceMissing}
+                    onChange={handleChange}
+                    placeholder="Time Missing (e.g. 24)"
+                    className="form-input time-mobile"
+                    type="number"
+                  />
+                </div>
               </div>
-                
+
               <div className="input-column">
-                <input name="name" value={formData.name} onChange={handleChange} placeholder="Full Name" className="form-input" />
-                <input name="phone" value={formData.phone} onChange={handleChange} placeholder="Contact Number" className="form-input" />
-                <input name="relationship" value={formData.relationship} onChange={handleChange} placeholder="Reported By" className="form-input" />
-                <input name="missingSince" value={formData.missingSince} onChange={handleChange} placeholder="Missing Since (e.g. 2025-03-29)" className="form-input" />
+                <input
+                  name="missingPersonName"
+                  value={formData.missingPersonName}
+                  onChange={handleChange}
+                  placeholder="Missing Person's Name"
+                  className="form-input"
+                />
+                <input
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  placeholder="Contact Number"
+                  className="form-input"
+                />
+                <input
+                  name="reporterName"
+                  value={formData.reporterName}
+                  onChange={handleChange}
+                  placeholder="Reported By"
+                  className="form-input"
+                />
+                <input
+                  name="relationshipToReporter"
+                  value={formData.relationshipToReporter}
+                  onChange={handleChange}
+                  placeholder="Relation to Reporter"
+                  className="form-input"
+                />
+                {/* Only visible on desktop */}
+                <input
+                  name="timeSinceMissing"
+                  value={formData.timeSinceMissing}
+                  onChange={handleChange}
+                  placeholder="Time Since Missing (e.g. 24)"
+                  className="form-input time-desktop"
+                  type="number"
+                />
               </div>
             </div>
-                
+
             <input
-              name="location"
-              value={formData.location}
+              name="locationOfMissingPerson"
+              value={formData.locationOfMissingPerson}
               onChange={handleChange}
               placeholder="Last Known Location"
               className="form-input"
             />
 
             <textarea
-              name="description"
-              value={formData.description}
+              name="missingPersonDescription"
+              value={formData.missingPersonDescription}
               onChange={handleChange}
               placeholder="Description"
               rows="4"
               className="form-input"
             />
           </div>
-          
+
           {/* Buttons */}
           <div className="modal-footer">
             <button onClick={handleSubmit} className="action-button">
@@ -219,7 +296,7 @@ export default function ReportMissingPerson({ onClose }) {
         flex: 2;
         display: flex;
         flex-direction: column;
-        gap: 0.1rem;
+        gap: 0.05rem;
         min-width: 200px;
       }
 
@@ -233,12 +310,16 @@ export default function ReportMissingPerson({ onClose }) {
         width: 100%;
       }
 
+      .input-column .form-input{
+        padding: 0.5rem;
+      }
+
       .form-input.textarea {
         min-height: 1000px;
       }
 
       input.form-input {
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
       }
 
       .modal-footer {
@@ -264,6 +345,14 @@ export default function ReportMissingPerson({ onClose }) {
         background: rgba(100, 108, 255, 0.3);
       }
 
+      .time-mobile-wrapper {
+        display: none;
+      }
+
+      .time-desktop {
+        display: block;
+      }
+
       @media (max-width: 767px) {
       .modal-content {
         max-height: 95vh;
@@ -278,13 +367,16 @@ export default function ReportMissingPerson({ onClose }) {
       .photo-and-inputs {
         display: flex;
         flex-direction: row;
-        gap: 0.75rem;
+        gap: 0.5rem;
         flex-wrap: nowrap;
       }
           
       .image-upload-container {
         width: 40%;
         min-width: 120px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
           
       .upload-box {
@@ -328,6 +420,30 @@ export default function ReportMissingPerson({ onClose }) {
         padding: 0.6rem;
         font-size: 0.9rem;
       }
+      
+      .time-desktop {
+        display: none;
+      }
+          
+      .time-mobile-wrapper {
+        display: block;
+        margin-top: 1.70rem;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .time-mobile-wrapper input::placeholder {
+        font-size: 0.65rem; /* or whatever size you want */
+      }
+          
+      .time-mobile {
+        width: 100%;
+        max-width: 160px;
+        height: 40px;
+        font-size: 0.75rem;
+        padding: 0.2rem 0.2rem;
+      }
     }
     @media (max-width: 424px) {
       .photo-and-inputs {
@@ -361,12 +477,28 @@ export default function ReportMissingPerson({ onClose }) {
         font-size: 0.85rem;
         padding: 0.5rem;
       }
+      
+      .time-mobile-wrapper input::placeholder {
+        font-size: 0.58rem; /* or whatever size you want */
+      }
+      
+      .time-mobile-wrapper {
+        margin-top: 1.1rem;
+      }
+
     }
       
     @media (max-width: 320px) {
       .modal-title {
         font-size: 1.2rem; /* or try 1.1rem if needed */
         line-height: 1.4;
+      }
+      .time-mobile-wrapper input::placeholder {
+        font-size: 0.58rem; /* or whatever size you want */
+      }
+      
+      .time-mobile-wrapper {
+        margin-top: 1.05rem;
       }
     }
     `}</style>
