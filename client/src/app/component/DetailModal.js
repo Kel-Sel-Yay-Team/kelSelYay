@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react"
 
 function DetailModal({ detail, onClose }) {    
@@ -10,7 +10,21 @@ function DetailModal({ detail, onClose }) {
     const [relationship, setRelationship] = useState(detail.relationshipToReporter);
     const [location, setLocation] = useState(detail.locationOfMissingPerson);
     const [time, setTime] = useState(detail.timeSinceMissing);
-    const [imageUrl, setImageUrl] = useState(detail.imageUrl);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageError, setImageError] = useState(false);
+    
+    useEffect(() => {
+        let imgUrl = detail.imageUrl;
+        if(!imgUrl || imgUrl === 'https://example.com/image.jpg' || imgUrl === 'https://example.com/updated-image.jpg'){
+            imgUrl = '/testPic.png';
+        }
+        setImageUrl(imgUrl)
+    }, [detail.imageUrl]);
+    
+    const handleImageError = () => {
+        console.log("Image failed to load:", imageUrl);
+        setImageError(true);
+    };
 
     return (
         <div className="modal-overlay">
@@ -24,11 +38,12 @@ function DetailModal({ detail, onClose }) {
                 <div className="modal-body">
                     <div className="image-section">
                         <div className="image-container">
-                            {imageUrl ? (
+                            {imageUrl && !imageError ? (
                                 <img 
                                     src={imageUrl} 
-                                    alt={`${name}`} 
-                                    className="person-image" 
+                                    alt={`${name || 'Missing Person'}`} 
+                                    className="person-image"
+                                    onError={handleImageError}
                                 />
                             ) : (
                                 <div className="image-placeholder">
