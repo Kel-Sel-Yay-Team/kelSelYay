@@ -204,9 +204,9 @@ function Mapbox() {
         mapboxgl.accessToken = mapbox_accesstoken;
         const map = new mapboxgl.Map({
             container: mapContainerRef.current,
-            style: 'mapbox://styles/mapbox/dark-v11',
-            center: [95.9560, 21.9162],
-            zoom: 5
+            style: 'mapbox://styles/mapbox/streets-v12',
+            center: [96.0891, 21.9588],
+            zoom: 13
         });
         
         // Store map reference
@@ -234,7 +234,7 @@ function Mapbox() {
                     enableHighAccuracy: true
                 },
                 trackUserLocation: true,
-                showUserHeading: true
+                showUserHeading: true,
             })
         );
 
