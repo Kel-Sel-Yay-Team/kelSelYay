@@ -18,8 +18,8 @@ export default function OnboardingModal({ onFinish }) {
 
                 {step === 1 && (
                     <>
-                        <h2 className="text-2xl font-bold">Welcome to Kel Sel Yay</h2>
-                        <img src="/your-image-1.png" alt="Intro" className="w-full h-48 object-cover rounded-lg" />
+                        <h2 className="text-2xl font-bold">Welcome to Kel Sel Yay 1</h2>
+                        <img src="/testPic.png" alt="Intro" className="w-full h-48 object-cover rounded-lg" />
                         <p>This app helps you report missing people and supply needs during emergencies.</p>
                         <button 
                             onClick={nextStep} 
@@ -32,8 +32,38 @@ export default function OnboardingModal({ onFinish }) {
 
                 {step === 2 && (
                     <>
+                        <h2 className="text-2xl font-bold">Welcome to Kel Sel Yay 2</h2>
+                        <img src="/testPic.png" alt="Intro" className="w-full h-48 object-cover rounded-lg" />
+                        <p>This app helps you report missing people and supply needs during emergencies.</p>
+                        <button 
+                            onClick={nextStep} 
+                            className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
+                        >
+                            Next
+                        </button>
+                    </>
+                )}
+
+                {step === 3 && (
+                    <>
+                        <h2 className="text-2xl font-bold">Welcome to Kel Sel Yay 3</h2>
+                        <img src="/testPic.png" alt="Intro" className="w-full h-48 object-cover rounded-lg" />
+                        <p>This app helps you report missing people and supply needs during emergencies.</p>
+                        <button 
+                            onClick={nextStep} 
+                            className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
+                        >
+                            Next
+                        </button>
+                    </>
+                )}
+
+                
+
+                {step === 4 && (
+                    <>
                         <h2 className="text-2xl font-bold">Safety Notice</h2>
-                        <img src="/your-image-2.png" alt="Safety" className="w-full h-48 object-cover rounded-lg" />
+                        <img src="/testPic.png" alt="Safety" className="w-full h-48 object-cover rounded-lg" />
                         <p>No account is needed. Your reports are anonymous and only visible to aid workers.</p>
                         <button 
                             onClick={finish} 
