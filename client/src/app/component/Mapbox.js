@@ -273,9 +273,15 @@ function Mapbox() {
             })
         );
         
+        //for testing in development
+        /** 
         if (process.env.NODE_ENV === 'development') {
             setShowOnboarding(true); // always show in dev
         } else if (!localStorage.getItem("hasSeenOnboarding")) {
+            setShowOnboarding(true);
+        }**/
+
+        if (!localStorage.getItem("hasSeenOnboarding")) {
             setShowOnboarding(true);
         }
 
