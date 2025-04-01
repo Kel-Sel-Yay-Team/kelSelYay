@@ -166,18 +166,48 @@ function Mapbox() {
                 imgUrl = '/testPic.png';
             }
 
+
+            /* Marker CSS DO NOT TOUCH */
             const el = document.createElement('div');
-            el.className = 'missing-person-marker';
-            el.style.backgroundImage = `url(${imgUrl})`;
-            el.style.backgroundSize = 'cover';
-            el.style.backgroundPosition = 'center';
-            el.style.width = '40px';
-            el.style.height = '40px';
-            el.style.borderRadius = '50%';
-            el.style.border = '3px solid red'; // Add red border
-            el.style.boxSizing = 'border-box'; // Ensure border is included in width/height
-            el.style.cursor = 'pointer';
+            el.className = 'relative';
+
+            // Create the circular part with the image
+            const circle = document.createElement('div');
+            circle.className = 'w-10 h-10 rounded-full overflow-hidden border-2 border-red-500';
+            circle.style.backgroundImage = `url(${imgUrl})`;
+            circle.style.backgroundSize = 'cover';
+            circle.style.backgroundPosition = 'center';
+
+            // Create the teardrop point
+            const point = document.createElement('div');
+            point.className = 'absolute left-1/2 w-0 h-0';
+            point.style.transform = 'translateX(-50%)';
+            point.style.bottom = '-8px';
+            point.style.borderLeft = '6px solid transparent';
+            point.style.borderRight = '6px solid transparent';
+            point.style.borderTop = '10px solid #ef4444'; // red-500 color
+            point.style.zIndex = '-1'; // Place behind the circle
+
+            // Add a small connecting piece between the circle and point to avoid a gap
+            const connector = document.createElement('div');
+            connector.className = 'absolute left-1/2 w-4 h-2 bg-red-500';
+            connector.style.transform = 'translateX(-50%)';
+            connector.style.bottom = '-1px';
+            connector.style.zIndex = '-1'; // Place behind the circle
+
+            // Assemble the components
+            el.appendChild(circle);
+            el.appendChild(connector);
+            el.appendChild(point);
+
+            // Add any additional styling like drop shadow
+            el.style.filter = 'drop-shadow(0 3px 3px rgba(0, 0, 0, 0.3))';
+
+            // Append to the desired parent element
+            document.body.appendChild(el);
             
+            /* Marker CSS ENDS HERE DO NOT TOUCH */
+
             // Add data attribute for identification
             el.dataset.personId = person._id || person.id;
             
