@@ -48,6 +48,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
         setShowNameValidation(true);
         setInputReporterName('');
         setValidationError('');
+    };
 
     const toggleReportSighting = () => {
         setIsReportingSighting(true);
@@ -56,7 +57,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
         setValidationError('');
     };
 
-    const validateReporterName = (inputName) => {
+    const validateReporterName = async (inputName) => {
         if (!reporterName) {
             setShowNameValidation(false);
             isReportingSighting ? await handleMarkAsFound() : setIsEditing(true);
