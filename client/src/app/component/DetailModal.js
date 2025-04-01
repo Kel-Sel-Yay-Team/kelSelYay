@@ -137,8 +137,8 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 }
                 
                 formData.append('upload_preset', uploadPreset);
+                formData.append('folder', 'Missing People Pictures');
                 
-          
                 const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
                     method: 'POST',
                     body: formData,
