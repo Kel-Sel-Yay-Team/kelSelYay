@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 
-export default function ReportMissingPerson({ onClose }) {
+export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
   const [formData, setFormData] = useState({
     reporterName: "",
     missingPersonName: "",
@@ -87,6 +87,11 @@ export default function ReportMissingPerson({ onClose }) {
       }
 
       console.log("✅ Report submitted successfully:", data);
+
+      if(onSubmitSuccess){
+        onSubmitSuccess(data)
+      }
+      
       onClose();
     } catch (error) {
       console.error("🚨 Error submitting report:", error.message);
