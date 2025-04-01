@@ -31,3 +31,5 @@ function ImageUpload({ onUploadComplete }) {
     </div>
   );
 }
+
+export default ImageUpload;
