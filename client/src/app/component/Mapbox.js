@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import DetailModal from "./DetailModal";
+import AddReportButton from "./AddReportButton";
 
 
 const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -56,7 +57,7 @@ function Mapbox() {
 
     const fetchMissingPeople = async() => {
         try {
-            const response = await fetch("http://localhost:3001/api/reports", {
+            const response = await fetch("http://localhost:3002/api/reports", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -171,6 +172,9 @@ function Mapbox() {
                     onClose={handleCloseModal}
                 />
             )}
+
+            {/* Floating button */}
+            <AddReportButton />
             
             {/* Add some basic styling for the markers */}
             <style jsx global>{`
