@@ -17,6 +17,7 @@ export default function ReportMissingPerson({ onClose }) {
 
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,55 +28,70 @@ export default function ReportMissingPerson({ onClose }) {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setImageFile(file);
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-        setFormData((prev) => ({
-          ...prev,
-          imageUrl: reader.result, // store preview as imageUrl (or later replace with Cloudinary URL)
-        }));
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setImagePreview(null);
-      setFormData((prev) => ({ ...prev, imageUrl: "" }));
+    const file = e.target.files[0]
+    if (file)
+    {
+      setImageFile(file);
+      const objectUrl = URL.createObjectURL(file);
+      setImagePreview(objectUrl);
     }
   };
 
-  // const handleSubmit = () => {
-  //   console.log("Submitted data:", formData);
-  //   onClose();
-  // };
   const handleSubmit = async () => {
     try {
-      // Prepare final payload
-      const payload = {
-        ...formData,
-        imageUrl: "https://picsum.photos/200/300", // hardcoded override
-      };
-  
+      setIsSaving(true);
+      let finalImageUrl = "";
+
+      if (imageFile) {
+        const formDataUpload = new FormData();
+        formDataUpload.append("file", imageFile);
+
+        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
+        if (!uploadPreset || !cloudName) {
+          throw new Error("Missing Cloudinary config");
+        }
+
+        formDataUpload.append("upload_preset", uploadPreset);
+        formDataUpload.append("folder", "Missing People Pictures");
+
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+          method: "POST",
+          body: formDataUpload,
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.error?.message || "Failed to upload image");
+        }
+
+        const cloudinaryData = await res.json();
+        finalImageUrl = cloudinaryData.secure_url;
+      } else {
+        finalImageUrl = "https://picsum.photos/200/300";
+      }
+
+      const payload = { ...formData, imageUrl: finalImageUrl };
+
       const response = await fetch("http://localhost:3002/api/reports", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         throw new Error(data.error || "Something went wrong");
       }
-  
+
       console.log("✅ Report submitted successfully:", data);
-      onClose(); // close modal if successful
+      onClose();
     } catch (error) {
       console.error("🚨 Error submitting report:", error.message);
+    } finally {
+      setIsSaving(false);
     }
   };
 
