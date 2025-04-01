@@ -14,7 +14,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
     timeSinceMissing: "",
     imageUrl: "", // optional, use imagePreview if needed
   });
-
+  
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
