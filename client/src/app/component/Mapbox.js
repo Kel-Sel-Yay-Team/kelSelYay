@@ -5,54 +5,6 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import DetailModal from "./DetailModal";
 
-// Keep test data as fallback
-const test_data_detail = [
-    /* your existing test data here */
-    {
-        id: 1,
-        missingPersonName: "Sarah Johnson",
-        phoneNumber: "412-555-0123",
-        missingPersonDescription: "18-year-old female, 5'6\", blonde hair, blue eyes. Last seen wearing a red hoodie and jeans.",
-        relationshipToReporter: "Sister",
-        locationOfMissingPerson: "Oakland area near University of Pittsburgh",
-        timeSinceMissing: "March 25, 2025 (6 days ago)",
-        imageUrl: "/missing-person-1.jpg",
-        coordinates: [-79.94606, 40.44961]
-      },
-      {
-        id: 2,
-        missingPersonName: "Michael Rodriguez",
-        phoneNumber: "412-555-0187",
-        missingPersonDescription: "32-year-old male, 6'0\", brown hair, brown eyes. Has a compass tattoo on right forearm.",
-        relationshipToReporter: "Friend",
-        locationOfMissingPerson: "Downtown Pittsburgh, near Point State Park",
-        timeSinceMissing: "March 28, 2025 (3 days ago)",
-        imageUrl: "/missing-person-2.jpg",
-        coordinates: [-79.99732, 40.4374]
-      },
-      {
-        id: 3,
-        missingPersonName: "Emily Chen",
-        phoneNumber: "412-555-0199",
-        missingPersonDescription: "25-year-old female, 5'4\", black hair with purple highlights. Wearing glasses and a gray jacket.",
-        relationshipToReporter: "Roommate",
-        locationOfMissingPerson: "Shadyside neighborhood",
-        timeSinceMissing: "March 29, 2025 (2 days ago)",
-        imageUrl: "/missing-person-3.jpg",
-        coordinates: [-79.93244, 40.43484]
-      },
-      {
-        id: 4,
-        missingPersonName: "David Williams",
-        phoneNumber: "412-555-0144",
-        missingPersonDescription: "45-year-old male, 5'11\", gray hair and beard. Has a limp in right leg.",
-        relationshipToReporter: "Son",
-        locationOfMissingPerson: "Strip District area",
-        timeSinceMissing: "March 27, 2025 (4 days ago)",
-        imageUrl: "/missing-person-4.jpg",
-        coordinates: [-79.97294, 40.40908]
-      }  
-];
 
 const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -120,24 +72,7 @@ function Mapbox() {
             const data = await response.json();
             console.log("API data:", data);
             
-            // Transform data to include coordinates
-            const transformedData = data.map(person => ({
-                id: person._id, // MongoDB _id as the id
-                missingPersonName: person.missingPersonName,
-                phoneNumber: person.phoneNumber || "N/A",
-                missingPersonDescription: person.missingPersonDescription || "No description provided",
-                relationshipToReporter: person.relationshipToReporter || "Unknown",
-                locationOfMissingPerson: person.locationOfMissingPerson,
-                timeSinceMissing: formatTimeSinceMissing(person.timeSinceMissing),
-                imageUrl: person.imageUrl || "/testPic.png", // Use default image if none provided
-                coordinates: generateCoordinates(person.locationOfMissingPerson),
-                reporterName: person.reporterName,
-                found: person.found
-            }));
-            
-            console.log("Transformed data:", transformedData);
-            setMissingPeopleList(transformedData);
-            return transformedData;
+            return data;
         } catch (error) {
             console.error("Error fetching missing people:", error);
             return [];
@@ -165,10 +100,11 @@ function Mapbox() {
             
             // Add data attribute for identification
             el.dataset.personId = person.id;
-            
+            const lat = person.lat ? person.lat : 21.9162;
+            const lng = person.lng ? person.lng : 95.9560;
             // Create marker
             const marker = new mapboxgl.Marker(el)
-                .setLngLat(person.coordinates)
+                .setLngLat([lng, lat])
                 .addTo(map);
             
             // Add click event
@@ -198,11 +134,9 @@ function Mapbox() {
                 // Fetch missing people data from API
                 const peopleData = await fetchMissingPeople();
                 
-                // Use API data if available, otherwise use test data
-                const peopleToDisplay = peopleData.length > 0 ? peopleData : test_data_detail;
                 
                 // Add markers to map
-                addMarkersToMap(map, peopleToDisplay);
+                addMarkersToMap(map, peopleData);
                 
             } catch (error) {
                 console.error("Error loading data:", error);
