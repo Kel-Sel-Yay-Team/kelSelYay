@@ -5,6 +5,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import DetailModal from "./DetailModal";
 import AddReportButton from "./AddReportButton";
+import OnboardingModal from './OnboardingModal';
 import { useRouter } from "next/router";
 
 const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -16,6 +17,9 @@ function Mapbox() {
     const [missingPeople, setMissingPeople] = useState([]);
     const markersRef = useRef(new Map()); // Store markers by ID
 
+    //for tutorial Box
+    const [showOnboarding, setShowOnboarding] = useState(false);
+
     // Function to handle marker click
     const handleMarkerClick = (person) => {
         console.log("Marker clicked:", person);
@@ -25,6 +29,10 @@ function Mapbox() {
     // Function to close modal
     const handleCloseModal = () => {
         setSelectedPerson(null);
+    };
+
+    const handleOnboardingFinish = () => {
+        setShowOnboarding(false);
     };
 
     // Handle successful update from modal
@@ -264,6 +272,12 @@ function Mapbox() {
                 showUserHeading: true,
             })
         );
+        
+        if (process.env.NODE_ENV === 'development') {
+            setShowOnboarding(true); // always show in dev
+        } else if (!localStorage.getItem("hasSeenOnboarding")) {
+            setShowOnboarding(true);
+        }
 
         return () => map.remove();
     }, []);
@@ -279,6 +293,8 @@ function Mapbox() {
     return (
         <>
             <div id="map" ref={mapContainerRef} style={{ width: '100%', height: '100vh' }} />
+
+            {showOnboarding && <OnboardingModal onFinish={handleOnboardingFinish} />}
             
             {/* Render modal when a person is selected */}
             {selectedPerson && (
