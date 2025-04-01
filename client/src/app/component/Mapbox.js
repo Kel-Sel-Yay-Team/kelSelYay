@@ -199,7 +199,6 @@ function Mapbox() {
     };
 
     useEffect(() => {
-        if (typeof window === 'undefined') return;
 
         // Initialize map
         mapboxgl.accessToken = mapbox_accesstoken;
