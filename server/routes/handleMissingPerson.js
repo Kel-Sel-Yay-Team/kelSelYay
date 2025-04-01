@@ -17,6 +17,17 @@ router.get('/', async(req, res) => {
     }
 });
 
+
+//GET, only for rendering (only not-found people)
+router.get('/notfound', async (req, res) => {
+  try {
+      const reports = await MissingPerson.find({ found: false });
+      res.status(200).json(reports);
+  } catch (e) {
+      res.status(500).json({ error: e.message });
+  }
+});
+
 // create route with geocoding functionality
 
 // create route with geocoding functionality
