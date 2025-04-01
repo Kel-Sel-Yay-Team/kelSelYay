@@ -5,8 +5,11 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import ImageUpload from "./ImageUpload";
 import ValidationModal from "./ValidationModal";
+import DetailRow from "./DetailRow";
+import ImageSection from "./ImageSection";
 
-function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {    
+function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
+
     const [reporterName, setReporterName] = useState(detail.reporterName);
     const [name, setName] = useState(detail.missingPersonName);
     const [phoneNumber, setPhoneNumber] = useState(detail.phoneNumber);
@@ -25,6 +28,15 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
     const [newImageFile, setNewImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [isReportingSighting, setIsReportingSighting] = useState(false); // 💡 this decides which flow we're doing
+    
+    const [detailSection, setDetailSection] = useState([
+        { label: 'Name', key: 'missingPersonName', stateSetter: setName, stateValue: name, isTextarea: false },
+        { label: 'Description', key: 'missingPersonDescription', stateSetter: setDescription, stateValue: description, isTextarea: true },
+        { label: 'Last Known Location', key: 'locationOfMissingPerson', stateSetter: setLocation, stateValue: location, isTextarea: false },
+        { label: 'Missing Since', key: 'timeSinceMissing', stateSetter: setTime, stateValue: time, isTextarea: false },
+        { label: 'Reported By', key: 'relationshipToReporter', stateSetter: setRelationship, stateValue: relationship, isTextarea: false },
+        { label: 'Contact Number', key: 'phoneNumber', stateSetter: setPhoneNumber, stateValue: phoneNumber, isTextarea: false },
+    ]);
 
     useEffect(() => {
         let imgUrl = detail.imageUrl;
@@ -33,6 +45,18 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
         }
         setImageUrl(imgUrl)
     }, [detail.imageUrl]);
+
+    useEffect(() => {
+        setDetailSection([
+            { label: 'Name', key: 'missingPersonName', stateSetter: setName, stateValue: name, isTextarea: false },
+            { label: 'Description', key: 'missingPersonDescription', stateSetter: setDescription, stateValue: description, isTextarea: true },
+            { label: 'Last Known Location', key: 'locationOfMissingPerson', stateSetter: setLocation, stateValue: location, isTextarea: false },
+            { label: 'Missing Since', key: 'timeSinceMissing', stateSetter: setTime, stateValue: time, isTextarea: false },
+            { label: 'Reported By', key: 'relationshipToReporter', stateSetter: setRelationship, stateValue: relationship, isTextarea: false },
+            { label: 'Contact Number', key: 'phoneNumber', stateSetter: setPhoneNumber, stateValue: phoneNumber, isTextarea: false },
+        ]);
+    }, [name, description, location, time, relationship, phoneNumber]);
+
 
     const handleImageError = () => {
         setImageError(true);
@@ -278,128 +302,28 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 </h1>
                 
                 <div className="modal-body">
-                    <div className="image-section">
-                        <div className="image-container">
-                            {(imagePreview && isEditing) ? (
-                                <img 
-                                    src={imagePreview} 
-                                    alt={`${name || 'Missing Person'} (Preview)`} 
-                                    className="person-image"
-                                />
-                            ) : (imageUrl && !imageError) ? (
-                                <img 
-                                    src={imageUrl} 
-                                    alt={`${name || 'Missing Person'}`} 
-                                    className="person-image"
-                                    onError={handleImageError}
-                                />
-                            ) : (
-                                <div className="image-placeholder">
-                                    No Image Available
-                                </div>
-                            )}
-                        </div>
-                        {isEditing ? (
-                            <ImageUpload onUploadComplete={handleImageUpload}></ImageUpload>
-                        ): <div></div>}
-                    </div>
+                    <ImageSection
+                        imagePreview={imagePreview}
+                        isEditing={isEditing}
+                        imageError={imageError}
+                        imageUrl={imageUrl}
+                        handleImageError={handleImageError}
+                        handleImageUpload={handleImageUpload}
+                        name={name}
+                    />
                     
                     <div className="details-section">
-                        <div className="detail-row">
-                            <h3>Name</h3>
-                            {isEditing ? (
-                                <input 
-                                    type="text" 
-                                    value={name || ""} 
-                                    onChange={(e) => setName(e.target.value)}
-                                    className="edit-input"
-                                    placeholder="Name" 
-                                    autoFocus
-                                />
-                            ) : (
-                                <p>{name || "Unknown"}</p>
-                            )}
-                        </div>
-                        
-                        <div className="detail-row">
-                            <h3>Description</h3>
-                            {isEditing ? (
-                                <textarea 
-                                    value={description || ""} 
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    className="edit-input"
-                                    rows={3}
-                                    placeholder="Description" 
-                                    autoFocus
-                                />
-                            ) : (
-                                <p>{description || "No description provided"}</p>
-                            )}
-                        </div>
-                        
-                        <div className="detail-row">
-                            <h3>Last Known Location</h3>
-                            {isEditing ? (
-                                <input 
-                                    type="text" 
-                                    value={location || ""} 
-                                    onChange={(e) => setLocation(e.target.value)}
-                                    className="edit-input"
-                                    placeholder="Location" 
-                                    autoFocus
-                                />
-                            ) : (
-                                <p>{location || "Unknown"}</p>
-                            )}
-                        </div>
-                        
-                        <div className="detail-row">
-                            <h3>Missing Since</h3>
-                            {isEditing ? (
-                                <input 
-                                    type="text" 
-                                    value={time || ""} 
-                                    onChange={(e) => setTime(e.target.value)}
-                                    className="edit-input"
-                                    placeholder="Time since missing" 
-                                    autoFocus
-                                />
-                            ) : (
-                                <p>{time || "Unknown"}</p>
-                            )}
-                        </div>
-                        
-                        <div className="detail-row">
-                            <h3>Reported By</h3>
-                            {isEditing ? (
-                                <input 
-                                    type="text" 
-                                    value={relationship || ""} 
-                                    onChange={(e) => setRelationship(e.target.value)}
-                                    className="edit-input"
-                                    placeholder="Relationship" 
-                                    autoFocus
-                                />
-                            ) : (
-                                <p>{relationship || "Unknown"}</p>
-                            )}
-                        </div>
-                        
-                        <div className="detail-row">
-                            <h3>Contact Number</h3>
-                            {isEditing ? (
-                                <input 
-                                    type="text" 
-                                    value={phoneNumber || ""} 
-                                    onChange={(e) => setPhoneNumber(e.target.value)}
-                                    className="edit-input"
-                                    placeholder="Phone number" 
-                                    autoFocus
-                                />
-                            ) : (
-                                <p>{phoneNumber || "No contact number provided"}</p>
-                            )}
-                        </div>
+                        {detailSection.map((section, index) => (
+                            <DetailRow
+                                key={index}
+                                label={section.label}
+                                value={section.stateValue}
+                                isEditing={isEditing}
+                                onChange={section.stateSetter}
+                                placeholder={`Enter ${section.label}`}
+                                isTextarea={section.isTextarea}
+                            />
+                        ))}
                     </div>
                 </div>
                 
@@ -513,74 +437,12 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     }
                 }
                 
-                .image-section {
-                    display: flex;
-                    justify-content: center;
-                    align-items: flex-start;
-                }
-                
-                .image-container {
-                    width: 100%;
-                    aspect-ratio: 3/4;
-                    border-radius: 8px;
-                    overflow: hidden;
-                    background-color: rgba(255, 255, 255, 0.05);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-                }
-                
-                .person-image {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
-                
-                .image-placeholder {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100%;
-                    width: 100%;
-                    color: rgba(255, 255, 255, 0.4);
-                    text-align: center;
-                    font-size: 0.9rem;
-                }
-                
                 .details-section {
                     display: flex;
                     flex-direction: column;
                     gap: 1rem;
                 }
                 
-                .detail-row {
-                    padding: 0.75rem;
-                    border-radius: 8px;
-                    background: rgba(255, 255, 255, 0.05);
-                    transition: all 0.3s ease;
-                }
-                
-                .detail-row:hover {
-                    background: rgba(255, 255, 255, 0.1);
-                    transform: translateY(-2px);
-                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-                }
-                
-                .detail-row h3 {
-                    margin: 0;
-                    font-size: 0.8rem;
-                    font-weight: 600;
-                    color: rgba(255, 255, 255, 0.7);
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                }
-                
-                .detail-row p {
-                    margin: 0.5rem 0 0;
-                    font-size: 1rem;
-                    color: white;
-                }
                 
                 .modal-footer {
                     margin-top: 2rem;
@@ -606,126 +468,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     transform: translateY(-2px);
                     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
                 }
-
-                .validation-modal {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0, 0, 0, 0.8);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 1100;
-                    backdrop-filter: blur(10px);
-                }
-                
-                .validation-content {
-                    width: 90%;
-                    max-width: 500px;
-                    background: rgba(30, 30, 30, 0.9);
-                    border-radius: 16px;
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    padding: 2rem;
-                    color: #fff;
-                }
-                
-                .validation-content h2 {
-                    margin-top: 0;
-                    font-size: 1.5rem;
-                    margin-bottom: 1rem;
-                    text-align: center;
-                    color: #646cff;
-                }
-                
-                .input-group {
-                    margin: 1.5rem 0;
-                }
-                
-                .reporter-input {
-                    width: 100%;
-                    background-color: rgba(255, 255, 255, 0.1);
-                    border: 1px solid rgba(255, 255, 255, 0.2);
-                    border-radius: 8px;
-                    color: white;
-                    padding: 12px 16px;
-                    font-size: 1rem;
-                    transition: all 0.3s ease;
-                }
-                
-                .reporter-input:focus {
-                    outline: none;
-                    border-color: #646cff;
-                    box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.2);
-                }
-                
-                .validation-error {
-                    color: #ff6b6b;
-                    margin-top: 0.5rem;
-                    font-size: 0.9rem;
-                }
-                
-                .validation-actions {
-                    display: flex;
-                    justify-content: center;
-                    gap: 1rem;
-                    margin-top: 1.5rem;
-                }
-                
-                .verify-button {
-                    background: rgba(22, 163, 74, 0.2);
-                    color: #16a34a;
-                    border: 1px solid rgba(22, 163, 74, 0.4);
-                }
-                
-                .verify-button:hover {
-                    background: rgba(22, 163, 74, 0.3);
-                }
-
-                .edit-input {
-                    width: 100%;
-                    background-color: rgba(255, 255, 255, 0.15); /* Slightly brighter background */
-                    border: 2px solid rgba(100, 108, 255, 0.5); /* More visible border with brand color */
-                    border-radius: 4px;
-                    color: white;
-                    padding: 8px 12px;
-                    font-size: 0.95rem;
-                    margin-top: 0.5rem;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 0 8px rgba(100, 108, 255, 0.2); /* Subtle glow effect */
-                }
-                
-                .edit-input:focus {
-                    outline: none;
-                    border-color: #646cff;
-                    background-color: rgba(255, 255, 255, 0.2); /* Brighten more on focus */
-                    box-shadow: 0 0 12px rgba(100, 108, 255, 0.4); /* Enhanced glow on focus */
-                }
-                
-                /* Add a subtle pulse animation for new inputs */
-                @keyframes pulse-border {
-                    0% { border-color: rgba(100, 108, 255, 0.3); }
-                    50% { border-color: rgba(100, 108, 255, 0.8); }
-                    100% { border-color: rgba(100, 108, 255, 0.3); }
-                }
-                
-                /* Apply animation to new inputs when edit mode is first enabled */
-                .detail-row.just-editable .edit-input {
-                    animation: pulse-border 2s ease-in-out;
-                }
-                
-                textarea.edit-input {
-                    resize: vertical;
-                    min-height: 80px;
-                }
-                
-                /* Make the edit mode row more distinct */
-                .detail-row.editing {
-                    background: rgba(100, 108, 255, 0.1);
-                    border-left: 3px solid #646cff;
-                }
-
             `}</style>
         </div>
     );
