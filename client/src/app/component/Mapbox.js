@@ -30,6 +30,28 @@ function Mapbox() {
     // Handle successful update from modal
     const handleDetailUpdate = (updatedPerson) => {
         console.log("Person updated:", updatedPerson);
+
+        //special case if found / reportSighting was updated
+        if (updatedPerson.found) {
+            // ✅ REMOVE from missingPeople immediately
+            setMissingPeople(prevPeople => 
+                prevPeople.filter(person => 
+                    (person._id || person.id) !== (updatedPerson._id || updatedPerson.id)
+                )
+            );
+    
+            // ✅ Optionally remove the marker too
+            const personId = updatedPerson._id || updatedPerson.id;
+            const marker = markersRef.current.get(personId);
+            if (marker) {
+                marker.remove();
+                markersRef.current.delete(personId);
+            }
+    
+            // ✅ Close the modal
+            setSelectedPerson(null);
+            return; // stop here since we don't need to update the marker visuals
+        }
         
         // Update the person in the local state
         setMissingPeople(prevPeople => 
@@ -78,6 +100,10 @@ function Mapbox() {
         }
     };
 
+    const handleNewReport = (newReport) => {
+        setMissingPeople(prev => [...prev, newReport]);
+    }
+
     // Format time to match test data format
     const formatTimeSinceMissing = (hours) => {
         if (!hours && hours !== 0) return "Unknown";
@@ -95,7 +121,7 @@ function Mapbox() {
 
     const fetchMissingPeople = async() => {
         try {
-            const response = await fetch("http://localhost:3002/api/reports", {
+            const response = await fetch("http://localhost:3002/api/reports/notfound", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -205,9 +231,9 @@ function Mapbox() {
         mapboxgl.accessToken = mapbox_accesstoken;
         const map = new mapboxgl.Map({
             container: mapContainerRef.current,
-            style: 'mapbox://styles/mapbox/dark-v11',
-            center: [95.9560, 21.9162],
-            zoom: 5
+            style: 'mapbox://styles/mapbox/streets-v12',
+            center: [96.0891, 21.9588],
+            zoom: 13
         });
         
         // Store map reference
@@ -235,12 +261,20 @@ function Mapbox() {
                     enableHighAccuracy: true
                 },
                 trackUserLocation: true,
-                showUserHeading: true
+                showUserHeading: true,
             })
         );
 
         return () => map.remove();
     }, []);
+
+    useEffect(() => {
+        if (mapRef.current) {
+            addMarkersToMap(mapRef.current, missingPeople);
+        }
+    }, [missingPeople]);
+
+
 
     return (
         <>
@@ -253,11 +287,12 @@ function Mapbox() {
                     onClose={handleCloseModal}
                     onUpdateSuccess={handleDetailUpdate}
                     onDeleteSuccess={handleDetailDelete}
+
                 />
             )}
 
             {/* Floating button */}
-            <AddReportButton />
+            <AddReportButton onReportSubmitted={handleNewReport}/>
             
             {/* Add some basic styling for the markers */}
             <style jsx global>{`
