@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import ImageUpload from "./ImageUpload";
+import ValidationModal from "./ValidationModal";
 
 function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {    
     const [reporterName, setReporterName] = useState(detail.reporterName);
@@ -47,7 +48,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
         setShowNameValidation(true);
         setInputReporterName('');
         setValidationError('');
-    };
 
     const toggleReportSighting = () => {
         setIsReportingSighting(true);
@@ -56,14 +56,15 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
         setValidationError('');
     };
 
-    const validateReporterName = async () => {
+    const validateReporterName = (inputName) => {
         if (!reporterName) {
             setShowNameValidation(false);
             isReportingSighting ? await handleMarkAsFound() : setIsEditing(true);
             return;
-        }
+        }        
+        if (inputName.trim() === reporterName.trim()) {
+            // Names match, allow editing
 
-        if (inputReporterName.trim() === reporterName.trim()) {
             setShowNameValidation(false);
             isReportingSighting ? await handleMarkAsFound() : setIsEditing(true);
         } else {
@@ -252,40 +253,16 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
         <div className="modal-overlay">
             {/* Validation Modal */}
             {showNameValidation && (
-                <div className="validation-modal">
-                    <div className="validation-content">
-                        <h2>Verify Reporter Identity</h2>
-                        <p>Please enter the name of the person who originally reported this case:</p>
-                        
-                        <div className="input-group">
-                            <input 
-                                type="text"
-                                value={inputReporterName}
-                                onChange={(e) => setInputReporterName(e.target.value)}
-                                placeholder="Reporter name"
-                                className="reporter-input"
-                            />
-                            {validationError && (
-                                <div className="validation-error">{validationError}</div>
-                            )}
-                        </div>
-                        
-                        <div className="validation-actions">
-                            <button 
-                                className="action-button verify-button"
-                                onClick={validateReporterName}
-                            >
-                                Verify
-                            </button>
-                            <button 
-                                className="action-button cancel-button"
-                                onClick={() => setShowNameValidation(false)}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <ValidationModal 
+                    isOpen={showNameValidation}
+                    onClose={() => setShowNameValidation(false)}
+                    onValidate={validateReporterName}
+                    title="Verify Reporter Identity"
+                    message="Please enter the name of the person who originally reported this case:"
+                    placeholder="Reporter name"
+                    errorMessage={validationError}
+                    buttonText="Verify"
+                />
             )}
 
         
