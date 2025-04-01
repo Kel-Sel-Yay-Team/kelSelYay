@@ -11,7 +11,6 @@ const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 function Mapbox() {
     const mapContainerRef = useRef(null);
     const [selectedPerson, setSelectedPerson] = useState(null);
-    const [missingPeopleList, setMissingPeopleList] = useState([]);
     const mapRef = useRef(null); // Store map reference
 
     // Function to handle marker click
@@ -23,20 +22,6 @@ function Mapbox() {
     // Function to close modal
     const handleCloseModal = () => {
         setSelectedPerson(null);
-    };
-
-    // Generate coordinates from a location string (simple random coordinates for demo)
-    const generateCoordinates = (location) => {
-        // For a real app, you would use a geocoding service here
-        // For now, we'll generate random coordinates around Pittsburgh
-        const baseLat = 40.44; // Pittsburgh
-        const baseLng = -79.99;
-        
-        // Add some randomness to spread markers around
-        const lat = baseLat + (Math.random() - 0.5) * 0.1;
-        const lng = baseLng + (Math.random() - 0.5) * 0.1;
-        
-        return [lng, lat]; // Mapbox expects [longitude, latitude]
     };
 
     // Format time to match test data format
@@ -80,15 +65,26 @@ function Mapbox() {
     };
 
     // Function to add markers to the map
+    // Function to add markers to the map
     const addMarkersToMap = (map, people) => {
-        // Clear existing markers (if implementing refresh functionality)
+        console.log(`Adding ${people.length} markers to map`);
+        
+        // Keep track of coordinates to avoid exact overlaps
+        const usedCoordinates = new Map();
         
         // Add markers for missing persons
-        people.forEach((person) => {
+        people.forEach((person, index) => {
+            console.log(`Processing marker ${index + 1}:`, person);
+            
             // Create custom marker element
+            let imgUrl = person.imageUrl;
+            if(!imgUrl || imgUrl === 'https://example.com/image.jpg' || imgUrl === 'https://example.com/updated-image.jpg'){
+                imgUrl = '/testPic.png';
+            }
+
             const el = document.createElement('div');
             el.className = 'missing-person-marker';
-            el.style.backgroundImage = `url(${person.imageUrl})`;
+            el.style.backgroundImage = `url(${imgUrl})`;
             el.style.backgroundSize = 'cover';
             el.style.backgroundPosition = 'center';
             el.style.width = '40px';
@@ -99,18 +95,46 @@ function Mapbox() {
             el.style.cursor = 'pointer';
             
             // Add data attribute for identification
-            el.dataset.personId = person.id;
-            const lat = person.lat ? person.lat : 21.9162;
-            const lng = person.lng ? person.lng : 95.9560;
-            // Create marker
-            const marker = new mapboxgl.Marker(el)
-                .setLngLat([lng, lat])
-                .addTo(map);
+            el.dataset.personId = person._id || person.id;
             
-            // Add click event
-            el.addEventListener('click', () => {
-                handleMarkerClick(person);
-            });
+            // Get coordinates with offset to prevent exact overlaps
+            let lat = person.lat ? person.lat : 21.9162;
+            let lng = person.lng ? person.lng : 95.9560;
+            
+            // Create a unique key for these coordinates
+            const coordKey = `${lat},${lng}`;
+            
+            // If these exact coordinates are already used, offset slightly
+            if (usedCoordinates.has(coordKey)) {
+                const offset = usedCoordinates.get(coordKey) * 0.001; // Small offset
+                lat += offset;
+                lng += offset;
+                usedCoordinates.set(coordKey, usedCoordinates.get(coordKey) + 1);
+            } else {
+                usedCoordinates.set(coordKey, 1);
+            }
+            
+            console.log(`Marker ${index + 1} coordinates:`, [lng, lat]);
+            
+            try {
+                // Create marker
+                const marker = new mapboxgl.Marker(el)
+                    .setLngLat([lng, lat])
+                    .addTo(map);
+                
+                // Add click event
+                el.addEventListener('click', () => {
+                    // Make a deep copy to avoid reference issues
+                    const personData = {...person};
+                    // Ensure the Modal has all needed fields
+                    personData.id = personData._id || personData.id;
+                    handleMarkerClick(personData);
+                });
+                
+                console.log(`Successfully added marker ${index + 1}`);
+            } catch (error) {
+                console.error(`Error adding marker ${index + 1}:`, error);
+            }
         });
     };
 
