@@ -1,3 +1,4 @@
+// Full Component (Fixed & Ready)
 "use client"
 
 import { useState, useEffect } from "react";
@@ -16,14 +17,15 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
     const [imageUrl, setImageUrl] = useState(null);
     const [imageError, setImageError] = useState(false);
     const [isEditing, setIsEditing] = useState(false); 
-    const [isSaving, setIsSaving] = useState(false)
+    const [isSaving, setIsSaving] = useState(false);
     const [showNameValidation, setShowNameValidation] = useState(false);
-    const [inputReporterName, setInputReporterName] = useState('')
-    const [validationError, setValidationError] = useState('')
+    const [inputReporterName, setInputReporterName] = useState('');
+    const [validationError, setValidationError] = useState('');
     const [newImageUrl, setNewImageUrl] = useState(null);
     const [newImageFile, setNewImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
-    
+    const [isReportingSighting, setIsReportingSighting] = useState(false); // 💡 this decides which flow we're doing
+
     useEffect(() => {
         let imgUrl = detail.imageUrl;
         if(!imgUrl || imgUrl === 'https://example.com/image.jpg' || imgUrl === 'https://example.com/updated-image.jpg'){
@@ -31,41 +33,69 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
         }
         setImageUrl(imgUrl)
     }, [detail.imageUrl]);
-    
+
     const handleImageError = () => {
-        console.log("Image failed to load:", imageUrl);
         setImageError(true);
     };
 
     const handleImageUpload = (imageData) => {
-        // Store both the file object for later upload and preview URL for immediate display
         setNewImageFile(imageData.file);
         setImagePreview(imageData.previewUrl);
     };
-      
+
     const toggleEditMode = () => {
+        setIsReportingSighting(false);
         setShowNameValidation(true);
         setInputReporterName('');
         setValidationError('');
-    }
+
+    const toggleReportSighting = () => {
+        setIsReportingSighting(true);
+        setShowNameValidation(true);
+        setInputReporterName('');
+        setValidationError('');
+    };
 
     const validateReporterName = (inputName) => {
         if (!reporterName) {
-            // If no reporter name is stored, allow editing
             setShowNameValidation(false);
-            setIsEditing(true);
+            isReportingSighting ? await handleMarkAsFound() : setIsEditing(true);
             return;
-        }
-        
+        }        
         if (inputName.trim() === reporterName.trim()) {
             // Names match, allow editing
+
             setShowNameValidation(false);
-            setIsEditing(true);
+            isReportingSighting ? await handleMarkAsFound() : setIsEditing(true);
         } else {
-            // Names don't match, show error
             setValidationError('Reporter name does not match our records. Please try again.');
         }
-    }
+    };
+
+    const handleMarkAsFound = async () => {
+        try {
+            setIsSaving(true);
+
+            const response = await fetch(`http://localhost:3002/api/reports/${detail._id || detail.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reporterName, found: true })
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error('Failed to mark as found');
+
+            if (onUpdateSuccess) onUpdateSuccess({ ...detail, found: true });
+            alert('Sighting reported successfully!');
+            onClose();
+
+        } catch (error) {
+            console.error('Error marking as found:', error);
+            alert('Failed to mark as found.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const handleCancel = () => {
         // Reset form values to original data
@@ -235,6 +265,8 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 />
             )}
 
+        
+
             <div className="modal-content">
                 <button className="close-button" onClick={onClose}>
                     <X size={24} />
@@ -401,7 +433,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                             >
                                 Edit
                             </button>
-                            <button className="action-button">Report Sighting</button>
+                            <button className="action-button" onClick={toggleReportSighting}>Report Sighting</button>
                             <button className="action-button" onClick={onClose}>Close</button>
                         </>
                     )}
