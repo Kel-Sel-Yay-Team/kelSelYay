@@ -241,6 +241,12 @@ function Mapbox() {
         return () => map.remove();
     }, []);
 
+    useEffect(() => {
+        if (mapRef.current) {
+            addMarkersToMap(mapRef.current, missingPeople);
+        }
+    }, [missingPeople]);
+
     return (
         <>
             <div id="map" ref={mapContainerRef} style={{ width: '100%', height: '100vh' }} />
