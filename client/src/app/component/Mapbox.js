@@ -29,6 +29,28 @@ function Mapbox() {
     // Handle successful update from modal
     const handleDetailUpdate = (updatedPerson) => {
         console.log("Person updated:", updatedPerson);
+
+        //special case if found / reportSighting was updated
+        if (updatedPerson.found) {
+            // ✅ REMOVE from missingPeople immediately
+            setMissingPeople(prevPeople => 
+                prevPeople.filter(person => 
+                    (person._id || person.id) !== (updatedPerson._id || updatedPerson.id)
+                )
+            );
+    
+            // ✅ Optionally remove the marker too
+            const personId = updatedPerson._id || updatedPerson.id;
+            const marker = markersRef.current.get(personId);
+            if (marker) {
+                marker.remove();
+                markersRef.current.delete(personId);
+            }
+    
+            // ✅ Close the modal
+            setSelectedPerson(null);
+            return; // stop here since we don't need to update the marker visuals
+        }
         
         // Update the person in the local state
         setMissingPeople(prevPeople => 
@@ -98,7 +120,7 @@ function Mapbox() {
 
     const fetchMissingPeople = async() => {
         try {
-            const response = await fetch("http://localhost:3002/api/reports", {
+            const response = await fetch("http://localhost:3002/api/reports/notfound", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
