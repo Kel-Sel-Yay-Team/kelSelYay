@@ -6,13 +6,14 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import DetailModal from "./DetailModal";
 import AddReportButton from "./AddReportButton";
 
-
 const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 function Mapbox() {
     const mapContainerRef = useRef(null);
     const [selectedPerson, setSelectedPerson] = useState(null);
     const mapRef = useRef(null); // Store map reference
+    const [missingPeople, setMissingPeople] = useState([]);
+    const markersRef = useRef(new Map()); // Store markers by ID
 
     // Function to handle marker click
     const handleMarkerClick = (person) => {
@@ -23,6 +24,57 @@ function Mapbox() {
     // Function to close modal
     const handleCloseModal = () => {
         setSelectedPerson(null);
+    };
+
+    // Handle successful update from modal
+    const handleDetailUpdate = (updatedPerson) => {
+        console.log("Person updated:", updatedPerson);
+        
+        // Update the person in the local state
+        setMissingPeople(prevPeople => 
+            prevPeople.map(person => 
+                (person._id || person.id) === (updatedPerson._id || updatedPerson.id) 
+                    ? updatedPerson 
+                    : person
+            )
+        );
+        
+        // Update the selected person so modal shows updated data
+        setSelectedPerson(updatedPerson);
+        
+        // Update the marker
+        const personId = updatedPerson._id || updatedPerson.id;
+        const marker = markersRef.current.get(personId);
+        
+        if (marker && marker.getElement()) {
+            // Update the marker's image
+            let imgUrl = updatedPerson.imageUrl;
+            if(!imgUrl || imgUrl === 'https://example.com/image.jpg' || imgUrl === 'https://example.com/updated-image.jpg'){
+                imgUrl = '/testPic.png';
+            }
+            
+            const el = marker.getElement();
+            el.style.backgroundImage = `url(${imgUrl})`;
+        }
+    };
+    
+    // Handle successful deletion from modal
+    const handleDetailDelete = (deletedId) => {
+        console.log("Person deleted:", deletedId);
+        
+        // Remove the person from local state
+        setMissingPeople(prevPeople => 
+            prevPeople.filter(person => 
+                (person._id || person.id) !== deletedId
+            )
+        );
+        
+        // Remove the marker from the map
+        const marker = markersRef.current.get(deletedId);
+        if (marker) {
+            marker.remove();
+            markersRef.current.delete(deletedId);
+        }
     };
 
     // Format time to match test data format
@@ -57,6 +109,7 @@ function Mapbox() {
             
             const data = await response.json();
             console.log("API data:", data);
+            setMissingPeople(data); // Store fetched people in state
             
             return data;
         } catch (error) {
@@ -66,9 +119,12 @@ function Mapbox() {
     };
 
     // Function to add markers to the map
-    // Function to add markers to the map
     const addMarkersToMap = (map, people) => {
         console.log(`Adding ${people.length} markers to map`);
+        
+        // Clear existing markers
+        markersRef.current.forEach(marker => marker.remove());
+        markersRef.current.clear();
         
         // Keep track of coordinates to avoid exact overlaps
         const usedCoordinates = new Map();
@@ -123,6 +179,9 @@ function Mapbox() {
                     .setLngLat([lng, lat])
                     .addTo(map);
                 
+                // Store marker reference by person ID for later updates
+                markersRef.current.set(person._id || person.id, marker);
+                
                 // Add click event
                 el.addEventListener('click', () => {
                     // Make a deep copy to avoid reference issues
@@ -159,16 +218,14 @@ function Mapbox() {
                 // Fetch missing people data from API
                 const peopleData = await fetchMissingPeople();
                 
-                
                 // Add markers to map
                 addMarkersToMap(map, peopleData);
                 
             } catch (error) {
                 console.error("Error loading data:", error);
-                // Fall back to test data if there's an error
-                addMarkersToMap(map, test_data_detail);
+                // Fall back to empty data if there's an error
+                addMarkersToMap(map, []);
             }
-
         });
 
         // Add geolocation control
@@ -194,6 +251,8 @@ function Mapbox() {
                 <DetailModal 
                     detail={selectedPerson}
                     onClose={handleCloseModal}
+                    onUpdateSuccess={handleDetailUpdate}
+                    onDeleteSuccess={handleDetailDelete}
                 />
             )}
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import ImageUpload from "./ImageUpload";
 
-function DetailModal({ detail, onClose }) {    
+function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {    
     const [reporterName, setReporterName] = useState(detail.reporterName);
     const [name, setName] = useState(detail.missingPersonName);
     const [phoneNumber, setPhoneNumber] = useState(detail.phoneNumber);
@@ -42,7 +42,6 @@ function DetailModal({ detail, onClose }) {
         setImagePreview(imageData.previewUrl);
     };
       
-
     const toggleEditMode = () => {
         setShowNameValidation(true);
         setInputReporterName('');
@@ -78,6 +77,42 @@ function DetailModal({ detail, onClose }) {
         setTime(detail.timeSinceMissing);
         setIsEditing(false);
     };
+
+    const handleRemove = async () => {
+        try {
+            setIsSaving(true);
+            if (!confirm("Are you sure you want to delete this report? This action cannot be undone.")) {
+                setIsSaving(false);
+                return;
+            }
+            const response = await fetch(`http://localhost:3002/api/reports/${detail._id || detail.id}`, {
+                method: "DELETE",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reporterName })
+            })
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error('Failed to delete record');
+            }
+            console.log("Remove successful:", result);
+            // Notify parent component about successful deletion
+            if (onDeleteSuccess) {
+                onDeleteSuccess(detail._id || detail.id);
+            }
+            
+            // Close the modal
+            onClose();
+        } catch (error) {
+            console.error('Error deleting record:', error);
+            alert('Failed to delete report. Please try again.');
+        } finally {
+            setIsSaving(false);
+        }
+    }
 
     const handleSave = async () => {
         try {
@@ -117,8 +152,8 @@ function DetailModal({ detail, onClose }) {
                 const data = await res.json();
                 updatedImageUrl = data.secure_url;
                 console.log("Image uploaded successfully:", updatedImageUrl);
-              } else if (newImageUrl) {
-                    updatedImageUrl = newImageUrl;
+            } else if (newImageUrl) {
+                updatedImageUrl = newImageUrl;
             }
             
             // Create updated data object
@@ -134,7 +169,7 @@ function DetailModal({ detail, onClose }) {
             };
             
             // Send update to server
-            const response = await fetch(`http://localhost:3001/api/reports/${detail._id || detail.id}`, {
+            const response = await fetch(`http://localhost:3002/api/reports/${detail._id || detail.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -155,6 +190,23 @@ function DetailModal({ detail, onClose }) {
             setNewImageUrl(null);
             setImageError(false);
             
+            // Create updated person object to pass back to parent
+            const updatedPerson = {
+                ...detail,
+                reporterName: reporterName,
+                missingPersonName: name,
+                phoneNumber: phoneNumber,
+                missingPersonDescription: description,
+                relationshipToReporter: relationship,
+                locationOfMissingPerson: location,
+                timeSinceMissing: time,
+                imageUrl: updatedImageUrl
+            };
+            
+            // Call the onUpdateSuccess callback with the updated person
+            if (onUpdateSuccess) {
+                onUpdateSuccess(updatedPerson);
+            }
 
             // Exit edit mode
             setIsEditing(false);
@@ -205,7 +257,6 @@ function DetailModal({ detail, onClose }) {
                     </div>
                 </div>
             )}
-
 
             <div className="modal-content">
                 <button className="close-button" onClick={onClose}>
@@ -344,12 +395,19 @@ function DetailModal({ detail, onClose }) {
                 
                 <div className="modal-footer">
                     {isEditing ? (
-                        <>
+                        <>  
+                            <button 
+                                className="action-button save-button" 
+                                onClick={handleRemove}
+                            >
+                                Remove Report
+                            </button>
                             <button 
                                 className="action-button save-button" 
                                 onClick={handleSave}
                                 disabled={isSaving}
-                            >                                {isSaving ? 'Saving...' : 'Save Changes'}
+                            >
+                                {isSaving ? 'Saving...' : 'Save Changes'}
                             </button>
                             <button 
                                 className="action-button cancel-button" 
@@ -372,7 +430,6 @@ function DetailModal({ detail, onClose }) {
                     )}
                 </div>
             </div>
-
             <style jsx>{`
                 .modal-overlay {
                     position: fixed;
