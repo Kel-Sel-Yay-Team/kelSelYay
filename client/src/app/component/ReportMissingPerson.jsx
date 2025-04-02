@@ -111,7 +111,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
         </button>
 
         {/* Title */}
-        <h2 className="modal-title">Report Missing Person</h2>
+        <h2 className="modal-title">{t("Report Missing Person")}</h2>
 
         {/* Form */}
         <div className="modal-body">
@@ -261,7 +261,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
         font-size: 1.8rem;
         font-weight: 600;
         margin-bottom: 1.5rem;
-        background: linear-gradient(90deg, #646cff, #9089fc);
+        background: linear-gradient(90deg,rgb(247, 247, 247),rgb(246, 246, 250));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
@@ -353,8 +353,8 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       }
 
       .action-button {
-        background: rgba(100, 108, 255, 0.2);
-        color: #646cff;
+        background: red;
+        color: white;
         border: 1px solid rgba(100, 108, 255, 0.4);
         border-radius: 8px;
         padding: 0.75rem 1.5rem;
