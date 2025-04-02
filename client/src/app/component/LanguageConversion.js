@@ -48,6 +48,18 @@ const burmese = {
     // Image related
     'No Image Available': 'ပုံ မရရှိနိုင်ပါ',
     'Upload': 'တင်ပို့ရန်',
+
+    //report missing person card
+    'Missing Person\'s Name' : 'ပျောက်ဆုံးသူ၏အမည်',
+    'Contact Number':'ဆက်သွယ်ရန်နံပါတ်',
+    'Click to upload photo' : 'ဓာတ်ပုံတင်ရန် နှိပ်ပါ',
+    'Reported By' :'သတင်းပေးပို့သူ',
+    'Relation to Reporter' : 'သတင်းထောက်နှင့်စပ်လျဉ်း',
+    'Time Since Missing (e.g. 24)' : 'ပျောက်ဆုံးနေသည့်အချိန်',
+    'Last Known Location' : 'နောက်ဆုံးသိထားသောတည်နေရာ',
+    'Description' : 'ဖော်ပြချက်',
+    'Submit':'တင်မည်',
+    'Close':'ပိတ်မည်'
   };
   
   const english = {
