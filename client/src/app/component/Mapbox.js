@@ -7,6 +7,7 @@ import DetailModal from "./DetailModal";
 import AddReportButton from "./AddReportButton";
 import OnboardingModal from './OnboardingModal';
 import { useRouter } from "next/router";
+import LanguageToggle from "./LanguageToggleButton";
 
 const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -329,7 +330,7 @@ function Mapbox() {
     return (
         <>
             <div id="map" ref={mapContainerRef} style={{ width: '100%', height: '100vh' }} />
-
+            <LanguageToggle/>
             {showOnboarding && <OnboardingModal onFinish={handleOnboardingFinish} />}
             
             {/* Render modal when a person is selected */}

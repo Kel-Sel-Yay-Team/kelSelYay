@@ -1,14 +1,14 @@
-// Full Component (Fixed & Ready)
 "use client"
 
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import ImageUpload from "./ImageUpload";
 import ValidationModal from "./ValidationModal";
 import DetailRow from "./DetailRow";
 import ImageSection from "./ImageSection";
+import { useLanguage } from "../context/LanguageContext";
 
 function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
+    const { t } = useLanguage();
 
     const [reporterName, setReporterName] = useState(detail.reporterName);
     const [name, setName] = useState(detail.missingPersonName);
@@ -282,11 +282,11 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     isOpen={showNameValidation}
                     onClose={() => setShowNameValidation(false)}
                     onValidate={validateReporterName}
-                    title="Verify Reporter Identity"
-                    message="Please enter the name of the person who originally reported this case:"
-                    placeholder="Reporter name"
-                    errorMessage={validationError}
-                    buttonText="Verify"
+                    title={t("Verify Reporter Identity")}
+                    message={t("Please enter the name of the person who originally reported this case:")}
+                    placeholder={t("Reporter name")}
+                    errorMessage={validationError ? t(validationError) : ''}
+                    buttonText={t("Verify")}
                 />
             )}
 
@@ -298,7 +298,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 </button>
                 
                 <h1 className="modal-title">
-                    {isEditing ? "Edit Missing Person Details" : "Missing Person Details"}
+                    {isEditing ? t("Edit Missing Person Details") : t("Missing Person Details")}
                 </h1>
                 
                 <div className="modal-body">
@@ -316,11 +316,11 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                         {detailSection.map((section, index) => (
                             <DetailRow
                                 key={index}
-                                label={section.label}
-                                value={section.stateValue}
+                                label={t(section.label)}
+                                value={t(section.stateValue)}
                                 isEditing={isEditing}
                                 onChange={section.stateSetter}
-                                placeholder={`Enter ${section.label}`}
+                                placeholder={t(`Enter ${section.label}`)}
                                 isTextarea={section.isTextarea}
                             />
                         ))}
@@ -334,20 +334,20 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                                 className="action-button save-button" 
                                 onClick={handleRemove}
                             >
-                                Remove Report
+                                {t('Remove Report')}
                             </button>
                             <button 
                                 className="action-button save-button" 
                                 onClick={handleSave}
                                 disabled={isSaving}
                             >
-                                {isSaving ? 'Saving...' : 'Save Changes'}
+                                {isSaving ? t('Saving...') : t('Save Changes')}
                             </button>
                             <button 
                                 className="action-button cancel-button" 
                                 onClick={handleCancel}
                             >
-                                Cancel
+                                {t("Cancel")}
                             </button>
                         </>
                     ) : (
@@ -356,10 +356,10 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                                 className="action-button edit-button" 
                                 onClick={toggleEditMode}
                             >
-                                Edit
+                                {t("Edit")}
                             </button>
-                            <button className="action-button" onClick={toggleReportSighting}>Report Sighting</button>
-                            <button className="action-button" onClick={onClose}>Close</button>
+                            <button className="action-button" onClick={toggleReportSighting}>{t("Report Sighting")}</button>
+                            <button className="action-button" onClick={onClose}>{t("Close")}</button>
                         </>
                     )}
                 </div>
