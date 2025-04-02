@@ -7,6 +7,17 @@ import DetailRow from "./DetailRow";
 import ImageSection from "./ImageSection";
 import { useLanguage } from "../context/LanguageContext";
 
+//using Nominatim for geocoding
+const getCoordinates = async (query) => {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.length > 0) {
+      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+    }
+    return null;
+  };
+
 function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
     const { t } = useLanguage();
 
@@ -211,18 +222,29 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             } else if (newImageUrl) {
                 updatedImageUrl = newImageUrl;
             }
-            
-            // Create updated data object
+
+            // Nominatim - Geocode the updated location
+            const coords = await getCoordinates(location);
+            if (!coords) {
+                alert("Invalid location. Please enter a valid place.");
+                setIsSaving(false);
+                return;
+            }
+
+            // Nominatim - Include lat, lng into payload
             const updateData = {
-                reporterName: reporterName, // Required by server for validation
+                reporterName: reporterName,
                 locationOfMissingPerson: location,
+                lat: coords.lat,
+                lng: coords.lng,
                 missingPersonName: name,
                 phoneNumber: phoneNumber,
                 missingPersonDescription: description,
                 relationshipToReporter: relationship,
                 timeSinceMissing: time,
-                imageUrl: updatedImageUrl,  // Use the new image URL here!
+                imageUrl: updatedImageUrl,
             };
+        
             
             // Send update to server
             const response = await fetch(`http://localhost:3002/api/reports/${detail._id || detail.id}`, {
