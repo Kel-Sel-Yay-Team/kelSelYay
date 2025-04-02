@@ -55,51 +55,52 @@ router.get('/geocode', async (req, res) => {
   }
 });
 
-// create route with geocoding functionality
+  // create route with geocoding functionality (Google Maps version)
 router.post('/', async (req, res) => {
     try {
-      const { locationOfMissingPerson, ...rest } = req.body;
-        
-      //if somehow it passed frontend validation
-      if (!locationOfMissingPerson) {
-        return res.status(400).json({ error: "Location is required." });
-      }
-  
-      // step 1: Geocode using Nominatim
-      const query = encodeURIComponent(locationOfMissingPerson);
-      const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`;
-  
-      const geoRes = await fetch(url, { headers: { "User-Agent": "kelyay-app" } });
-      const geoData = await geoRes.json();
-  
-      if (!geoData.length) {
-        return res.status(404).json({ error: "Location could not be geocoded." });
-        //need to handle error better
-      }
+        const { locationOfMissingPerson, ...rest } = req.body;
 
-      const { lat, lon } = geoData[0];
-      console.log("lat and longs are " + lat + "," + lon )
-  
-      // step 2: Store full report with lat/lng
-      const report = new MissingPerson({
-        ...rest,
-        locationOfMissingPerson,
-        lat: parseFloat(lat),
-        lng: parseFloat(lon)
-      });
-  
-      const saved = await report.save();
-      res.status(201).json(saved);
-  
+        // Frontend should have validated this, but double-check
+        if (!locationOfMissingPerson) {
+            return res.status(400).json({ error: "Location is required." });
+        }
+
+        //Step 1: Geocode using Google Maps API
+        const query = encodeURIComponent(locationOfMissingPerson);
+        const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&region=MM&key=${apiKey}`;
+        
+        const geoRes = await fetch(url);
+        const geoData = await geoRes.json();
+
+        if (!geoData.results || !geoData.results.length) {
+            return res.status(404).json({ error: "Location could not be geocoded." });
+        }
+
+        const { lat, lng } = geoData.results[0].geometry.location;
+        console.log("lat and lng are", lat, lng);
+
+        // Step 2: Store full report with lat/lng
+        const report = new MissingPerson({
+            ...rest,
+            locationOfMissingPerson,
+            lat: parseFloat(lat),
+            lng: parseFloat(lng),
+        });
+
+        const saved = await report.save();
+        res.status(201).json(saved);
+
     } catch (err) {
-      res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message });
     }
-  });
+});
 
 
 
   //edit (with reporterName validation)
-  router.put("/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
     try {
       const { reporterName, locationOfMissingPerson, ...updateData } = req.body;
   

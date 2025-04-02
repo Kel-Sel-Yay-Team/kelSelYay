@@ -4,17 +4,6 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 
-//using Nominatim for geocoding
-const getCoordinates = async (query) => {
-  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
-  const res = await fetch(url);
-  const data = await res.json();
-  if (data.length > 0) {
-    return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-  }
-  return null;
-};
-
 export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
   const [formData, setFormData] = useState({
     reporterName: "",
@@ -84,21 +73,8 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       } else {
         finalImageUrl = "https://picsum.photos/200/300";
       }
-      //geocode user's location with nominatim
-      const coords = await getCoordinates(formData.locationOfMissingPerson);
-
-      if (!coords) {
-          alert("❌ Invalid location. Please enter a valid city name or landmark.");
-          setIsSaving(false);
-          return;
-      }
-
-      const payload = { 
-          ...formData, 
-          imageUrl: finalImageUrl,
-          lat: coords.lat,
-          lng: coords.lng
-      };
+      
+      const payload = { ...formData, imageUrl: finalImageUrl };
 
       const response = await fetch("http://localhost:3002/api/reports", {
         method: "POST",
