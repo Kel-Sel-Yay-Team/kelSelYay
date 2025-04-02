@@ -87,12 +87,12 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       const objectUrl = URL.createObjectURL(file);
       setImagePreview(objectUrl);
 
-      const updatedErrors = {
-        ...fieldErrors,
-        missingImage: false
-      };
+      // const updatedErrors = {
+      //   ...fieldErrors,
+      //   missingImage: false
+      // };
       
-      clearError(updatedErrors);
+      // clearError(updatedErrors);
     }
   };
 
@@ -117,12 +117,12 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       }
     })
 
-    if (!imageFile) {
-      newFieldErrors.missingImage = true;
-      hasErrors = true;
-    } else {
-      newFieldErrors.missingImage = false;
-    }
+    // if (!imageFile) {
+    //   newFieldErrors.missingImage = true;
+    //   hasErrors = true;
+    // } else {
+    //   newFieldErrors.missingImage = false;
+    // }
     setFieldErrors(newFieldErrors);
     setMissingInput(hasErrors);
 
@@ -238,18 +238,19 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                     <span className="upload-placeholder">{t("Click to upload photo")}</span>
                   )}
                 </label>
-                {fieldErrors.missingImage && (
+                {/* {fieldErrors.missingImage && (
                   <div className="field-error-message">{t("Please upload a photo")}</div>
-                )}
+                )} */}
                 <input
                   type="file"
                   id="imageUpload"
                   accept="image/*"
                   onChange={handleImageChange}
                   style={{ display: "none" }}
-                  className={`form-input ${fieldErrors.missingImage ? 'input-error' : ''}`}
-
+                  className={`form-input`}
                 />
+
+
                 {/* Only visible on mobile */}
                 {/* <div className="time-mobile-wrapper">
                   <input
