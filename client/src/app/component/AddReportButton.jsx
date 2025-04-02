@@ -4,9 +4,11 @@ import { useState } from "react";
 import ReportMissingPerson from "./ReportMissingPerson";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function AddReportButton({ onReportSubmitted }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useLanguage();
 
 
   const handleReportSuccess=(newReport) => {
@@ -25,7 +27,7 @@ export default function AddReportButton({ onReportSubmitted }) {
     aria-label="Add Report"
   >
     <FontAwesomeIcon icon={faUser} className="icon" />
-    <span className="label">Report Missing Person</span>
+    <span className="label">{t("Report Missing Person")}</span> 
   </button>
 
   {isOpen && <ReportMissingPerson 
