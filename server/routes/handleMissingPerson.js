@@ -28,17 +28,7 @@ router.get('/notfound', async (req, res) => {
   }
 });
 
-
-//GET, only for rendering (only not-found people)
-router.get('/notfound', async (req, res) => {
-  try {
-      const reports = await MissingPerson.find({ found: false });
-      res.status(200).json(reports);
-  } catch (e) {
-      res.status(500).json({ error: e.message });
-  }
-});
-
+//testing geocoding purposes
 router.get('/geocode', async (req, res) => {
   const { address } = req.query;
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
