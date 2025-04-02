@@ -3,6 +3,9 @@ const burmese = {
     'Missing Person Details': 'ပျောက်ဆုံးသူ အချက်အလက်များ',
     'Edit Missing Person Details': 'ပျောက်ဆုံးသူ အသေးစိတ်အချက်အလက်များကို တည်းဖြတ်ပါ',
     'Verify Reporter Identity': 'သတင်းပေးပို့သူ၏ ကိုယ်ရေးအချက်အလက်များကို အတည်ပြုပါ',
+
+    // Missing Person Button
+    'Report Missing Person': 'လူပျောက်ကြေညာရန်',
     
     // Person Details
     'Name': 'အမည်',
