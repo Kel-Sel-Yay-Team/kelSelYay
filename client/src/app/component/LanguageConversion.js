@@ -58,6 +58,8 @@ const burmese = {
     'Time Since Missing (e.g. 24)' : 'ပျောက်ဆုံးနေသည့်အချိန်',
     'Last Known Location' : 'နောက်ဆုံးသိထားသောတည်နေရာ',
     'Description' : 'ဖော်ပြချက်',
+    'Submit':'တင်မည်',
+    'Close':'ပိတ်မည်'
   };
   
   const english = {

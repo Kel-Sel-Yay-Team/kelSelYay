@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
   const [formData, setFormData] = useState({
@@ -18,6 +19,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const {t} = useLanguage();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -120,7 +122,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                   {imagePreview ? (
                     <img src={imagePreview} alt="Preview" className="image-preview" />
                   ) : (
-                    <span className="upload-placeholder">Click to upload photo</span>
+                    <span className="upload-placeholder">{t("Click to upload photo")}</span>
                   )}
                 </label>
                 <input
@@ -148,28 +150,28 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                   name="missingPersonName"
                   value={formData.missingPersonName}
                   onChange={handleChange}
-                  placeholder="Missing Person's Name"
+                  placeholder={t("Missing Person's Name")}
                   className="form-input"
                 />
                 <input
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
-                  placeholder="Contact Number"
+                  placeholder={t("Contact Number")}
                   className="form-input"
                 />
                 <input
                   name="reporterName"
                   value={formData.reporterName}
                   onChange={handleChange}
-                  placeholder="Reported By"
+                  placeholder={t("Reported By")}
                   className="form-input"
                 />
                 <input
                   name="relationshipToReporter"
                   value={formData.relationshipToReporter}
                   onChange={handleChange}
-                  placeholder="Relation to Reporter"
+                  placeholder={t("Relation to Reporter")}
                   className="form-input"
                 />
                 {/* Only visible on desktop */}
@@ -177,7 +179,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                   name="timeSinceMissing"
                   value={formData.timeSinceMissing}
                   onChange={handleChange}
-                  placeholder="Time Since Missing (e.g. 24)"
+                  placeholder={t("Time Since Missing (e.g. 24)")}
                   className="form-input time-desktop"
                   type="number"
                 />
@@ -188,7 +190,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
               name="locationOfMissingPerson"
               value={formData.locationOfMissingPerson}
               onChange={handleChange}
-              placeholder="Last Known Location"
+              placeholder={t("Last Known Location")}
               className="form-input"
             />
 
@@ -196,7 +198,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
               name="missingPersonDescription"
               value={formData.missingPersonDescription}
               onChange={handleChange}
-              placeholder="Description"
+              placeholder={t("Description")}
               rows="4"
               className="form-input"
             />
@@ -205,10 +207,10 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
           {/* Buttons */}
           <div className="modal-footer">
             <button onClick={handleSubmit} className="action-button">
-              Submit
+              {t("Submit")}
             </button>
             <button onClick={onClose} className="action-button">
-              Close
+              {t("Close")}
             </button>
           </div>
         </div>
