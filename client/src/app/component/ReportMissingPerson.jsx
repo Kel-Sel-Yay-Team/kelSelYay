@@ -26,18 +26,57 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
     timeSinceMissing: "",
     imageUrl: "", // optional, use imagePreview if needed
   });
+
+  const [fieldErrors, setFieldErrors] = useState({
+    reporterName: false,
+    missingPersonName: false,
+    phoneNumber: false,
+    locationOfMissingPerson: false,
+    missingImage: false,
+    timeSinceMissing: false
+  });
   
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [missingInput, setMissingInput] = useState(false);
   const {t} = useLanguage();
+
+
+  const clearError = (updatedErrors) => {
+    setFieldErrors(updatedErrors);
+      
+    // Check if any fields still have errors
+    let hasErrors = false;
+    for (const key in updatedErrors) {
+      if (updatedErrors[key] === true) { // Look for TRUE (meaning errors)
+        hasErrors = true;
+        break;
+      }
+    }
+    setMissingInput(hasErrors);
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Update form data
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+  
+    // Clear error for this field if it has a value
+    if (value.trim() !== '') {
+      // Update field errors with the new value for this field
+      const updatedErrors = {
+        ...fieldErrors,
+        [name]: false
+      };
+      
+      clearError(updatedErrors);
+      
+    }
   };
 
   const handleImageChange = (e) => {
@@ -47,12 +86,58 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       setImageFile(file);
       const objectUrl = URL.createObjectURL(file);
       setImagePreview(objectUrl);
+
+      const updatedErrors = {
+        ...fieldErrors,
+        missingImage: false
+      };
+      
+      clearError(updatedErrors);
     }
   };
+
+  const checkEmpty = () => {
+    const requiredFields = [
+      'reporterName', 
+      'missingPersonName', 
+      'phoneNumber', 
+      'locationOfMissingPerson',
+      `timeSinceMissing`
+    ];
+
+    let hasErrors = false;
+    const newFieldErrors = {}
+
+    requiredFields.forEach(field => {
+      if(!formData[field] || formData[field].trim() === ''){
+        newFieldErrors[field] = true;
+        hasErrors = true
+      } else {
+        newFieldErrors[field] = false;
+      }
+    })
+
+    if (!imageFile) {
+      newFieldErrors.missingImage = true;
+      hasErrors = true;
+    } else {
+      newFieldErrors.missingImage = false;
+    }
+    setFieldErrors(newFieldErrors);
+    setMissingInput(hasErrors);
+
+    return !hasErrors
+  }
 
   const handleSubmit = async () => {
     try {
       setIsSaving(true);
+      
+      if(!checkEmpty()){
+        setIsSaving(false)
+        return
+      }
+
       let finalImageUrl = "";
 
       if (imageFile) {
@@ -88,7 +173,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       const coords = await getCoordinates(formData.locationOfMissingPerson);
 
       if (!coords) {
-          alert("❌ Invalid location. Please enter a valid city name or landmark.");
+          alert(`❌ Invalid location. Please enter a valid city name or landmark.`);
           setIsSaving(false);
           return;
       }
@@ -136,7 +221,11 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
 
         {/* Title */}
         <h2 className="modal-title">{t("Report Missing Person")}</h2>
-
+        {missingInput && (
+          <div className="error-message">
+            {t("Please fill in all required fields")}
+          </div>
+        )}
         {/* Form */}
         <div className="modal-body">
           <div className="form-section">
@@ -149,12 +238,17 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                     <span className="upload-placeholder">{t("Click to upload photo")}</span>
                   )}
                 </label>
+                {fieldErrors.missingImage && (
+                  <div className="field-error-message">{t("Please upload a photo")}</div>
+                )}
                 <input
                   type="file"
                   id="imageUpload"
                   accept="image/*"
                   onChange={handleImageChange}
                   style={{ display: "none" }}
+                  className={`form-input ${fieldErrors.missingImage ? 'input-error' : ''}`}
+
                 />
                 {/* Only visible on mobile */}
                 <div className="time-mobile-wrapper">
@@ -167,30 +261,41 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                     type="number"
                   />
                 </div>
+                
               </div>
-
+              
               <div className="input-column">
-                <input
+              <input
                   name="missingPersonName"
                   value={formData.missingPersonName}
                   onChange={handleChange}
                   placeholder={t("Missing Person's Name")}
-                  className="form-input"
+                  className={`form-input ${fieldErrors.missingPersonName ? 'input-error' : ''}`}
                 />
+                {fieldErrors.missingPersonName && (
+                  <div className="field-error-message">{t("Name is required")}</div>
+                )}
+
                 <input
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
                   placeholder={t("Contact Number")}
-                  className="form-input"
+                  className={`form-input ${fieldErrors.phoneNumber ? 'input-error' : ''}`}
                 />
+                {fieldErrors.phoneNumber && (
+                  <div className="field-error-message">{t("Phone number is required")}</div>
+                )}
                 <input
                   name="reporterName"
                   value={formData.reporterName}
                   onChange={handleChange}
                   placeholder={t("Reported By")}
-                  className="form-input"
+                  className={`form-input ${fieldErrors.reporterName ? 'input-error' : ''}`}
                 />
+                {fieldErrors.reporterName && (
+                  <div className="field-error-message">{t("Reporter name is required")}</div>
+                )}
                 <input
                   name="relationshipToReporter"
                   value={formData.relationshipToReporter}
@@ -215,8 +320,8 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
               value={formData.locationOfMissingPerson}
               onChange={handleChange}
               placeholder={t("Last Known Location")}
-              className="form-input"
-            />
+              className={`form-input ${fieldErrors.locationOfMissingPerson ? 'input-error' : ''}`}
+              />
 
             <textarea
               name="missingPersonDescription"
@@ -239,6 +344,16 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
           </div>
         </div>
       </div>
+
+      {/* Add this right after opening <div className="modal-content"> */}
+      {isSaving && (
+        <div className="loading-overlay">
+          <div className="loading-content">
+            <div className="spinner"></div>
+            <p>{t("Submitting report...")}</p>
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
       .modal-overlay {
@@ -548,6 +663,45 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
         margin-top: 1.05rem;
       }
     }
+
+      .input-error {
+        border: 2px solid #ff4d4d;
+        background: rgba(255, 77, 77, 0.1);
+      }
+      
+      .error-message {
+        color: #ff4d4d;
+        text-align: center;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        background: rgba(255, 77, 77, 0.15);
+        border-radius: 8px;
+        font-size: 0.9rem;
+      }
+      
+      /* Shake animation for error fields */
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+      }
+      
+      .input-error {
+        animation: shake 0.6s;
+      }
+      .field-error-message {
+        color: #ff4d4d;
+        font-size: 0.75rem;
+        margin-top: -0.3rem;
+        margin-bottom: 0.3rem;
+        padding-left: 0.5rem;
+      }
+
+      /* For the image upload error */
+      .image-upload-container .field-error-message {
+        text-align: center;
+        margin-top: 0.3rem;
+      }
     `}</style>
 
     </div>
