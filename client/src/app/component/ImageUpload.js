@@ -2,52 +2,32 @@ import { useState } from 'react';
 
 function ImageUpload({ onUploadComplete }) {
   const [image, setImage] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-      // Create a preview URL for the selected image
-      const objectUrl = URL.createObjectURL(file);
-      setPreviewUrl(objectUrl);
-      
-      // Pass both the file and preview URL to parent component
-      onUploadComplete({ file, previewUrl: objectUrl });
-    }
+    setImage(e.target.files[0]);
+  };
+
+  const uploadToCloudinary = async () => {
+    const formData = new FormData();
+    formData.append('file', image);
+    formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET); // your preset name
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await res.json();
+    const imageUrl = data.secure_url;
+
+    console.log('Uploaded:', imageUrl);
+    onUploadComplete(imageUrl); // send this to your backend
   };
 
   return (
-    <div style={{ backgroundColor: '#000', color: '#fff', padding: '20px', borderRadius: '8px', textAlign: 'center' }}>
-      <div style={{ marginBottom: '15px' }}>
-        <input
-          type="file"
-          onChange={handleImageChange}
-          style={{
-            backgroundColor: '#333',
-            color: '#fff',
-            border: '1px solid #555',
-            padding: '10px',
-            borderRadius: '4px',
-            cursor: 'pointer',
-          }}
-        />
-      </div>
-      
-      {previewUrl && (
-        <div style={{ marginTop: '15px', maxWidth: '100%' }}>
-          <img 
-            src={previewUrl} 
-            alt="Preview" 
-            style={{ 
-              maxWidth: '100%', 
-              maxHeight: '200px', 
-              borderRadius: '4px',
-              border: '1px solid #555'
-            }} 
-          />
-        </div>
-      )}
+    <div>
+      <input type="file" onChange={handleImageChange} />
+      <button onClick={uploadToCloudinary}>Upload</button>
     </div>
   );
 }
