@@ -276,7 +276,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
 
     return (
         <div className="modal-overlay">
-            {/* Validation Modal */}
             {showNameValidation && (
                 <ValidationModal 
                     isOpen={showNameValidation}
@@ -290,11 +289,9 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 />
             )}
 
-        
-
             <div className="modal-content">
                 <button className="close-button" onClick={onClose}>
-                    <X size={24} />
+                    <X size={20} />
                 </button>
                 
                 <h1 className="modal-title">
@@ -317,7 +314,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                             <DetailRow
                                 key={index}
                                 label={t(section.label)}
-                                value={t(section.stateValue)}
+                                value={section.stateValue}
                                 isEditing={isEditing}
                                 onChange={section.stateSetter}
                                 placeholder={t(`Enter ${section.label}`)}
@@ -331,10 +328,16 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     {isEditing ? (
                         <>  
                             <button 
-                                className="action-button save-button" 
+                                className="action-button remove-button" 
                                 onClick={handleRemove}
                             >
                                 {t('Remove Report')}
+                            </button>
+                            <button 
+                                className="action-button cancel-button" 
+                                onClick={handleCancel}
+                            >
+                                {t("Cancel")}
                             </button>
                             <button 
                                 className="action-button save-button" 
@@ -343,132 +346,22 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                             >
                                 {isSaving ? t('Saving...') : t('Save Changes')}
                             </button>
-                            <button 
-                                className="action-button cancel-button" 
-                                onClick={handleCancel}
-                            >
-                                {t("Cancel")}
-                            </button>
                         </>
                     ) : (
                         <>
-                            <button 
-                                className="action-button edit-button" 
-                                onClick={toggleEditMode}
-                            >
+                            <button className="action-button cancel-button" onClick={onClose}>
+                                {t("Close")}
+                            </button>
+                            <button className="action-button save-button" onClick={toggleReportSighting}>
+                                {t("Report Sighting")}
+                            </button>
+                            <button className="action-button edit-button" onClick={toggleEditMode}>
                                 {t("Edit")}
                             </button>
-                            <button className="action-button" onClick={toggleReportSighting}>{t("Report Sighting")}</button>
-                            <button className="action-button" onClick={onClose}>{t("Close")}</button>
                         </>
                     )}
                 </div>
             </div>
-            <style jsx>{`
-                .modal-overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0, 0, 0, 0.75);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 1000;
-                    backdrop-filter: blur(8px);
-                }
-                
-                .modal-content {
-                    width: 80%;
-                    max-width: 800px;
-                    max-height: 90vh;
-                    overflow-y: auto;
-                    background: rgba(20, 20, 20, 0.8);
-                    border-radius: 16px;
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-                    backdrop-filter: blur(10px);
-                    padding: 2rem;
-                    color: #fff;
-                    position: relative;
-                }
-                
-                .close-button {
-                    position: absolute;
-                    top: 1rem;
-                    right: 1rem;
-                    background: transparent;
-                    border: none;
-                    color: rgba(255, 255, 255, 0.7);
-                    cursor: pointer;
-                    transition: color 0.3s ease;
-                    padding: 0.5rem;
-                    border-radius: 50%;
-                }
-                
-                .close-button:hover {
-                    color: white;
-                    background: rgba(255, 255, 255, 0.1);
-                }
-                
-                .modal-title {
-                    margin-top: 0;
-                    font-size: 1.8rem;
-                    font-weight: 600;
-                    margin-bottom: 1.5rem;
-                    text-align: center;
-                    background: linear-gradient(90deg, #646cff, #9089fc);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                    text-fill-color: transparent;
-                }
-                
-                .modal-body {
-                    display: grid;
-                    grid-template-columns: 1fr 2fr;
-                    gap: 2rem;
-                }
-                
-                @media (max-width: 768px) {
-                    .modal-body {
-                        grid-template-columns: 1fr;
-                    }
-                }
-                
-                .details-section {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1rem;
-                }
-                
-                
-                .modal-footer {
-                    margin-top: 2rem;
-                    display: flex;
-                    justify-content: flex-end;
-                    gap: 1rem;
-                }
-                
-                .action-button {
-                    background: rgba(100, 108, 255, 0.2);
-                    color: #646cff;
-                    border: 1px solid rgba(100, 108, 255, 0.4);
-                    border-radius: 8px;
-                    padding: 0.75rem 1.5rem;
-                    font-size: 0.9rem;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                }
-                
-                .action-button:hover {
-                    background: rgba(100, 108, 255, 0.3);
-                    transform: translateY(-2px);
-                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-                }
-            `}</style>
         </div>
     );
 }
