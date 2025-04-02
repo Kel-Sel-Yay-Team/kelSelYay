@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ReportMissingPerson from "./ReportMissingPerson";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFile, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 
 export default function AddReportButton({ onReportSubmitted }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,79 +19,74 @@ export default function AddReportButton({ onReportSubmitted }) {
 
   return (
     <>
-      <button
-        className="add-report-button"
-        onClick={() => setIsOpen(true)}
-        aria-label="Add Report"
-      >
-        <span className="icon-stack">
-          <FontAwesomeIcon icon={faFile} className="base-icon" />
-          <span className="plus-icon-wrapper">
-            <FontAwesomeIcon icon={faPlus} className="plus-icon" />
-          </span>
-        </span>
-      </button>
+        <button
+    className="add-report-button"
+    onClick={() => setIsOpen(true)}
+    aria-label="Add Report"
+  >
+    <FontAwesomeIcon icon={faUser} className="icon" />
+    <span className="label">Report Missing Person</span>
+  </button>
 
-      {isOpen && <ReportMissingPerson 
+  {isOpen && <ReportMissingPerson 
                     onClose={() => setIsOpen(false)} 
                     onSubmitSuccess={handleReportSuccess}
                   />}
 
-      <style jsx>{`
-        .add-report-button {
-          position: fixed;
-          bottom: 1.5rem;
-          right: 1.5rem;
-          background-color: #4f46e5;
-          color: white;
-          border: none;
-          border-radius: 9999px;
-          width: 56px;
-          height: 56px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-          cursor: pointer;
-          z-index: 999;
-          transition: background-color 0.3s ease;
-        }
+  <style jsx>{`
+    .add-report-button {
+      position: fixed;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 9999px;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;  /* ✅ proper spacing */
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      z-index: 999;
+      transition: background-color 0.3s ease;
+      width: 80%;
+      max-width: 240px;
+    }
 
-        .add-report-button:hover {
-          background-color: #4338ca;
-        }
+    @media (min-width: 640px) {
+      .add-report-button {
+        padding: 0.7rem 1.4rem;
+        font-size: 1.05rem;
+        max-width: 260px;
+      }
+    }
 
-        .icon-stack {
-          position: relative;
-          display: inline-block;
-          width: 24px;
-          height: 24px;
-        }
+    @media (min-width: 1024px) {
+      .add-report-button {
+        padding: 0.8rem 1.6rem;
+        font-size: 1.1rem;
+        max-width: 280px;
+      }
+    }
 
-        .base-icon {
-          font-size: 24px;
-          position: relative;
-        }
+    .add-report-button:hover {
+      background-color: darkred;
+    }
 
-        .plus-icon-wrapper {
-          position: absolute;
-          bottom: -5px;
-          right: -4px;
-          background-color: ;
-          border-radius: 9999px;
-          width: 14px;
-          height: 14px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 13px;
-        }
+    .icon {
+      font-size: 1.1rem;
+    }
 
-        .plus-icon {
-          font-size: 10px;
-          color: #4f46e5;
-        }
-      `}</style>
+    .label {
+      line-height: 1;
+    }
+  `}</style>
+
     </>
   );
 }
