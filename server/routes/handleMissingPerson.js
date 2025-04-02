@@ -39,7 +39,21 @@ router.get('/notfound', async (req, res) => {
   }
 });
 
-// create route with geocoding functionality
+router.get('/geocode', async (req, res) => {
+  const { address } = req.query;
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+
+  if (!address) return res.status(400).json({ error: "Missing address" });
+
+  try {
+      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&region=MM&key=${apiKey}`);
+      const data = await response.json();
+      res.json(data);
+  } catch (error) {
+      console.error("Geocoding Error:", error);
+      res.status(500).json({ error: "Failed to geocode" });
+  }
+});
 
 // create route with geocoding functionality
 router.post('/', async (req, res) => {
