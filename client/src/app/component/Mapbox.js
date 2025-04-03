@@ -9,6 +9,7 @@ import OnboardingModal from './OnboardingModal';
 import { useRouter } from "next/router";
 import LanguageToggle from "./LanguageToggleButton";
 import DonateButton from "./DonateButton";
+import HelpButton from "./HelpButton";
 
 const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -306,12 +307,12 @@ function Mapbox() {
         );
         
         //for testing in development
-        /** 
+        
         if (process.env.NODE_ENV === 'development') {
             setShowOnboarding(true); // always show in dev
         } else if (!localStorage.getItem("hasSeenOnboarding")) {
             setShowOnboarding(true);
-        }**/
+        }
 
         if (!localStorage.getItem("hasSeenOnboarding")) {
             setShowOnboarding(true);
@@ -345,6 +346,8 @@ function Mapbox() {
                 />
             )}
             <DonateButton />
+            <HelpButton/>
+            
             {/* Floating button */}
             <AddReportButton onReportSubmitted={handleNewReport}/>
             {/* Add some basic styling for the markers */}
