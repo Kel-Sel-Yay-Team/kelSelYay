@@ -291,7 +291,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                         name={name}
                     />
                     
-                    <div className="details-section">
+                    <div className={`details-section ${isEditing ? 'editing' : ''}`}>
                         {detailSection.map((section, index) => (
                             <DetailRow
                                 key={index}
@@ -684,6 +684,24 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     .modal-title-text {
                         font-size: 1.0rem;
                     }
+                }
+                :global(.editing .detail-row input),
+                :global(.editing .detail-row textarea) {
+                    border: 1px solid #ccc;
+                    border-radius: 6px;
+                    padding: 8px;
+                    background-color: #fff;
+                    color: #333;
+                    width: 100%;
+                    resize: vertical;
+                }
+
+                /* Optional focus */
+                :global(.editing .detail-row input:focus),
+                :global(.editing .detail-row textarea:focus) {
+                    border: 1px solid #d93025;
+                    outline: none;
+                    box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.2);
                 }
             `}</style>
         </div>
