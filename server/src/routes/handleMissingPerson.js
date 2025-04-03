@@ -1,10 +1,10 @@
 import express from 'express';
-import MissingPerson from '../src/models/MissingPerson.js';
+import MissingPerson from '../models/MissingPerson.js';
 
 const router = express.Router();
 
 //CRUD
-
+//GET everyone from the database
 router.get('/', async(req, res) => {
 
     try {
@@ -18,7 +18,7 @@ router.get('/', async(req, res) => {
 });
 
 
-//GET, only for rendering (only not-found people)
+//GET, not-found people (for rendering on mapbox)
 router.get('/notfound', async (req, res) => {
   try {
       const reports = await MissingPerson.find({ found: false });
@@ -28,23 +28,7 @@ router.get('/notfound', async (req, res) => {
   }
 });
 
-//testing geocoding purposes
-router.get('/geocode', async (req, res) => {
-  const { address } = req.query;
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-
-  if (!address) return res.status(400).json({ error: "Missing address" });
-
-  try {
-      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&region=MM&key=${apiKey}`);
-      const data = await response.json();
-      res.json(data);
-  } catch (error) {
-      res.status(500).json({ error: "Failed to geocode" });
-  }
-});
-
-  // create route with geocoding functionality (Google Maps version)
+//GET route with geocoding functionality (Google Maps version)
 router.post('/', async (req, res) => {
     try {
         const { locationOfMissingPerson, ...rest } = req.body;
@@ -87,7 +71,7 @@ router.post('/', async (req, res) => {
 
 
 
-  //edit (with reporterName validation)
+//EDIT (with reporterName validation)
 router.put("/:id", async (req, res) => {
     try {
       const { reporterName, locationOfMissingPerson, ...updateData } = req.body;

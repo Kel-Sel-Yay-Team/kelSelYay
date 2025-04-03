@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import router from '../routes/handleMissingPerson.js';
+import router from './routes/handleMissingPerson.js';
 import cors from 'cors'
 dotenv.config(); //get mongo_uri
 const app = express();
