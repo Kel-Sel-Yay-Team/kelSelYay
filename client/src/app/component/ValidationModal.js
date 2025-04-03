@@ -73,11 +73,11 @@ function ValidationModal({
         .validation-content {
           width: 90%;
           max-width: 500px;
-          background: rgba(30, 30, 30, 0.9);
+          background: white;
           border-radius: 16px;
           border: 1px solid rgba(255, 255, 255, 0.1);
           padding: 2rem;
-          color: #fff;
+          color: black;
         }
         
         .validation-content h2 {
@@ -85,7 +85,7 @@ function ValidationModal({
           font-size: 1.5rem;
           margin-bottom: 1rem;
           text-align: center;
-          color: #646cff;
+          color: #d93025;
         }
         
         .input-group {
@@ -94,10 +94,10 @@ function ValidationModal({
         
         .reporter-input {
           width: 100%;
-          background-color: rgba(255, 255, 255, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          background-color: rgba(198, 189, 189, 0.32);
+          border: 1px solid rgba(11, 11, 11, 0.89);
           border-radius: 8px;
-          color: white;
+          color: black;
           padding: 12px 16px;
           font-size: 1rem;
           transition: all 0.3s ease;
@@ -105,12 +105,12 @@ function ValidationModal({
         
         .reporter-input:focus {
           outline: none;
-          border-color: #646cff;
-          box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.2);
+          border-color:rgb(4, 4, 4);
+          box-shadow: 0 0 0 2px rgba(2, 1, 1, 0.2);
         }
         
         .validation-error {
-          color: #ff6b6b;
+          color: #d93025;
           margin-top: 0.5rem;
           font-size: 0.9rem;
         }
@@ -123,9 +123,9 @@ function ValidationModal({
         }
         
         .action-button {
-          background: rgba(100, 108, 255, 0.2);
-          color: #646cff;
-          border: 1px solid rgba(100, 108, 255, 0.4);
+          background: #d93025;
+          color: white;
+          border: 1px solid rgba(255, 100, 100, 0.4);
           border-radius: 8px;
           padding: 0.75rem 1.5rem;
           font-size: 0.9rem;
@@ -135,7 +135,7 @@ function ValidationModal({
         }
         
         .action-button:hover {
-          background: rgba(100, 108, 255, 0.3);
+          background: rgba(255, 100, 100, 0.3);
           transform: translateY(-2px);
           box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
