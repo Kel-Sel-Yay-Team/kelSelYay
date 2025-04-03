@@ -28,7 +28,7 @@ export default function OnboardingModal({ onFinish }) {
                             alt="Map Overview"
                             width={800}
                             height={300}
-                            className="w-full h-48 object-cover rounded-lg"
+                            className="w-full h-48 object-contain rounded-lg"
                         />
                         <p>
                             <ul>
@@ -55,7 +55,7 @@ export default function OnboardingModal({ onFinish }) {
                             alt="Report Form"
                             width={800}
                             height={300}
-                            className="w-full h-48 object-cover rounded-lg"
+                            className="w-full h-48 object-contain rounded-lg"
                         />
                         <p>
                             <ul>
@@ -79,7 +79,7 @@ export default function OnboardingModal({ onFinish }) {
                             alt="Update Reports"
                             width={800}
                             height={300}
-                            className="w-full h-48 object-cover rounded-lg"
+                            className="w-full h-48 object-contain rounded-lg"
                         />
                         <p>
                             <ul>
@@ -106,7 +106,7 @@ export default function OnboardingModal({ onFinish }) {
                             alt="Safety Notice"
                             width={800}
                             height={300}
-                            className="w-full h-48 object-cover rounded-lg"
+                            className="w-full h-48 object-contain rounded-lg"
                         />
                         </div>
                         <p>
