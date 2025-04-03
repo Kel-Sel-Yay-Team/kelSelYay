@@ -27,6 +27,7 @@ const burmese = {
     'Saving...': 'သိမ်းဆည်းနေသည်...',
     'Report Sighting': 'တွေ့မြင်မှုကို သတင်းပို့ရန်',
     'Remove Report': 'သတင်းပို့ချက်ကို ဖယ်ရှားရန်',
+    'Donate' : 'လှူရန်',
     
     // Form placeholders & labels & units
     'Enter Name': 'အမည်ထည့်သွင်းပါ',
@@ -64,6 +65,11 @@ const burmese = {
 
     //units
     'Days' : 'ရက်',
+
+    //onBoarding
+    'Step 1 — Map Overview': 'အဆင့် 1 — မြေပုံအကျဉ်းချုပ်',
+    
+    
   };
   
   const english = {

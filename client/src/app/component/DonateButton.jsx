@@ -2,6 +2,7 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHandHoldingDollar } from "@fortawesome/free-solid-svg-icons";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function DonateButton() {
   const handleClick = () => {
@@ -11,10 +12,12 @@ export default function DonateButton() {
     );
   };
 
+  const {t} = useLanguage();
+
   return (
     <div className="donate-button" onClick={handleClick} role="button" tabIndex={0}>
       <FontAwesomeIcon icon={faHandHoldingDollar} className="donate-icon" />
-      <span className="donate-text">Donate</span>
+      <span className="donate-text">{t("Donate")}</span>
 
       <style jsx>{`
         .donate-button {

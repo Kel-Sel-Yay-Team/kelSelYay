@@ -1,9 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useLanguage } from "../context/LanguageContext";
 
 export default function OnboardingModal({ onFinish }) {
     const [step, setStep] = useState(1);
+
+    const {t} = useLanguage();
 
     const nextStep = () => setStep(step + 1);
 
@@ -18,7 +21,7 @@ export default function OnboardingModal({ onFinish }) {
 
                 {step === 1 && (
                     <>
-                        <h2 className="text-2xl font-bold">Step 1 — Map Overview</h2>
+                        <h2 className="text-2xl font-bold">{t('Step 1 — Map Overview')}</h2>
                         <img src="/map2.jpeg" alt="Map Overview" className="w-full h-48 object-cover rounded-lg" />
                         <p>The pointers on the map show reports of <b>missing people</b> and <b>supply needs</b>. Each dot represents someone who needs help.</p>
                         <button 
