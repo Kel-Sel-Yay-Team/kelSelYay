@@ -237,8 +237,9 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                     type="number"
                   />
                 </div> */}
+                {/* Mobile version */}
                 <div className="time-mobile-wrapper">
-                  <div className="form-input input-with-unit time-mobile-wrapper-box">
+                  <div className={`form-input input-with-unit time-mobile-wrapper-box ${fieldErrors.timeSinceMissing ? 'input-error' : ''}`}>
                     <input
                       name="timeSinceMissing"
                       value={formData.timeSinceMissing}
@@ -249,8 +250,10 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                     />
                     <span className="unit-label">{t("Days")}</span>
                   </div>
+                  {fieldErrors.timeSinceMissing && (
+                    <div className="field-error-message">{t("Time since missing is required")}</div>
+                  )}
                 </div>
-                
               </div>
               
               <div className="input-column">
@@ -301,17 +304,20 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                   className="form-input time-desktop"
                   type="number"
                 /> */}
-                <div className="form-input input-with-unit time-desktop-wrapper">
+                <div className={`form-input input-with-unit time-desktop-wrapper ${fieldErrors.timeSinceMissing ? 'input-error' : ''}`}>
                   <input
                     name="timeSinceMissing"
                     value={formData.timeSinceMissing}
                     onChange={handleChange}
                     placeholder={t("Time Since Missing (e.g. 24)")}
-                    className="inner-time-input"
+                    className={`inner-time-input`}
                     type="number"
                   />
                   <span className="unit-label">{t("Days")}</span>
                 </div>
+                {fieldErrors.timeSinceMissing && (
+                  <div className="field-error-message">{t("Time since missing is required")}</div>
+                )}  
               </div>
             </div>
 
@@ -508,11 +514,26 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       .action-button:hover {
         background: rgba(100, 108, 255, 0.3);
       }
-
       .time-mobile-wrapper {
-        display: none;
+        display: None; /* Changed from block+flex to just flex */
+        flex-direction: column; /* Stack items vertically */
+        align-items: center; /* Center items horizontally */
+        margin-top: 1.70rem;
+        width: 100%;
       }
-
+      
+      .time-mobile-wrapper-box {
+        width: 100%;
+        max-width: 160px;
+      }
+      
+      /* Keep error message below the input */
+      .time-mobile-wrapper .field-error-message {
+        width: 100%;
+        max-width: 160px; /* Match the width of the input box */
+        text-align: center;
+        margin-top: 0.3rem;
+      }
       .time-desktop {
         display: block;
       }
