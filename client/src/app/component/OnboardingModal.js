@@ -22,7 +22,7 @@ export default function OnboardingModal({ onFinish }) {
 
                 {step === 1 && (
                     <>
-                        <h2 className="text-2xl font-bold">{t('Step 1 — Map Overview')}</h2>
+                        <h2 className="text-2xl font-bold">{t('Step 1. How to Use Our App?')}</h2>
                         <Image
                             src="/map2.jpeg"
                             alt="Map Overview"
@@ -30,7 +30,7 @@ export default function OnboardingModal({ onFinish }) {
                             height={300}
                             className="w-full h-48 object-cover rounded-lg"
                         />
-                        <p>The pointers on the map show reports of <b>missing people</b> and <b>supply needs</b>. Each dot represents someone who needs help.</p>
+                        <p>The pointers on the map show reports of missing people and supply needs. Each dot represents someone who needs help.</p>
                         <button 
                             onClick={nextStep} 
                             className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
@@ -50,7 +50,7 @@ export default function OnboardingModal({ onFinish }) {
                             height={300}
                             className="w-full h-48 object-cover rounded-lg"
                         />
-                        <p>Click the <b>Report</b> button to submit a new report. You can share information about missing people or what supplies are urgently needed in your area.</p>
+                        <p>Click the Report button to submit a new report. You can share information about missing people or what supplies are urgently needed in your area.</p>
                         <button 
                             onClick={nextStep} 
                             className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
@@ -70,7 +70,7 @@ export default function OnboardingModal({ onFinish }) {
                             height={300}
                             className="w-full h-48 object-cover rounded-lg"
                         />
-                        <p>You or other aid workers can <b>edit</b> reports to mark people as <i>found</i> or update supply statuses when situations change.</p>
+                        <p>You or other aid workers can edit reports to mark people as found or update supply statuses when situations change.</p>
                         <button 
                             onClick={nextStep} 
                             className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
