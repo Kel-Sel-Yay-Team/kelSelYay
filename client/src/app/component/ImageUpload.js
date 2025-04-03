@@ -15,40 +15,97 @@ function ImageUpload({ onUploadComplete }) {
       // Pass both the file and preview URL to parent component
       onUploadComplete({ file, previewUrl: objectUrl });
     }
-
   };
 
   return (
-    <div style={{ backgroundColor: '#000', color: '#fff', padding: '20px', borderRadius: '8px', textAlign: 'center' }}>
-      <div style={{ marginBottom: '15px' }}>
+    <div className="image-upload-container">
+      <div className="upload-input-wrapper">
         <input
           type="file"
           onChange={handleImageChange}
-          style={{
-            backgroundColor: '#333',
-            color: '#fff',
-            border: '1px solid #555',
-            padding: '10px',
-            borderRadius: '4px',
-            cursor: 'pointer',
-          }}
+          className="file-input"
+          accept="image/*"
         />
       </div>
       
       {previewUrl && (
-        <div style={{ marginTop: '15px', maxWidth: '100%' }}>
+        <div className="preview-container">
           <img 
             src={previewUrl} 
             alt="Preview" 
-            style={{ 
-              maxWidth: '100%', 
-              maxHeight: '200px', 
-              borderRadius: '4px',
-              border: '1px solid #555'
-            }} 
+            className="image-preview"
           />
         </div>
       )}
+
+      <style jsx>{`
+        .image-upload-container {
+          background-color: #f5f5f5;
+          padding: 15px;
+          border-radius: 8px;
+          text-align: center;
+          border: 1px solid #eaeaea;
+          width: 100%;
+          margin-bottom: 10px;
+        }
+
+        .upload-input-wrapper {
+          margin-bottom: 12px;
+        }
+
+        .file-input {
+          width: 100%;
+          padding: 8px;
+          border: 1px solid #d93025;
+          border-radius: 4px;
+          cursor: pointer;
+          background-color: white;
+          color: #333;
+        }
+
+        .preview-container {
+          margin-top: 12px;
+          max-width: 100%;
+        }
+
+        .image-preview {
+          max-width: 100%;
+          max-height: 180px;
+          border-radius: 4px;
+          border: 1px solid #d93025;
+          object-fit: contain;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+          .image-upload-container {
+            padding: 10px;
+          }
+          
+          .file-input {
+            font-size: 14px;
+            padding: 6px;
+          }
+          
+          .image-preview {
+            max-height: 150px;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .image-upload-container {
+            padding: 8px;
+          }
+          
+          .file-input {
+            padding: 5px;
+          }
+          
+          .image-preview {
+            max-height: 120px;
+          }
+        }
+      `}</style>
     </div>
   );
 }
