@@ -6,117 +6,84 @@ import Image from 'next/image';
 
 export default function OnboardingModal({ onFinish }) {
     const [step, setStep] = useState(1);
-
-    const {t} = useLanguage();
+    const { t } = useLanguage();
 
     const nextStep = () => setStep(step + 1);
-
     const finish = () => {
         localStorage.setItem("hasSeenOnboarding", "true");
         onFinish();
     };
 
+    const steps = [
+        {
+            title: t('Step 1. How to Use Our App?'),
+            image: '/step1.png',
+            list: [
+                t('No Login Required*'),
+                t('1. Click here to view Missing People.'),
+                t('2. Click here to Report Missing Person.'),
+                t('3. Click here to change language.')
+            ]
+        },
+        {
+            title: t('Step 2. Reporting'),
+            image: '/step2.png',
+            list: [
+                t('1. Make sure to save Reporter Name*.')
+            ]
+        },
+        {
+            title: t('Step 3. Update Reports'),
+            image: '/step3.png',
+            list: [
+                t('1. You can edit information or report found/not found.'),
+                t('2. Use original reporter name* you saved to make changes.')
+            ]
+        },
+        {
+            title: t('Step 4. Stay Safe'),
+            image: '/step4.jpg',
+            list: [
+                t('1. Click here to review this tutorial again.'),
+                t('2. Click here to donate through Better Burma.'),
+                t('Our thoughts are with all friends and families. Stay strong.🇲🇲')
+            ]
+        }
+    ];
+
+    const isFinalStep = step === steps.length;
+
     return (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-sm">
-            <div className="bg-white bg-opacity-90 rounded-2xl p-8 w-[90%] max-w-2xl text-center space-y-6 shadow-2xl">
-
-                {step === 1 && (
-                    <>
-                        <h2 className="text-2xl font-bold">{t('Step 1. How to Use Our App?')}</h2>
+            <div className="bg-white rounded-xl p-4 w-[95%] max-w-lg shadow-xl flex flex-col justify-between h-[90vh] max-h-[600px] max-[426px]:max-h-[450px] max-[321px]:max-h-[400px]">
+                <h2 className="text-lg font-semibold text-center">{steps[step - 1].title}</h2>
+                
+                <div className="flex-1 flex items-center justify-between gap-4 pt-4">
+                    <div className="w-1/2">
                         <Image
-                            src="/step1.png"
-                            alt="Map Overview"
-                            width={800}
+                            src={steps[step - 1].image}
+                            alt={`Step ${step}`}
+                            width={300}
                             height={300}
-                            className="w-full h-48 object-contain rounded-lg"
+                            className="w-full h-auto object-contain rounded-md"
                         />
-                            <ul>
-                                <li>{t('No Login Required*')}</li>
-                                <li>{t('1. Click here to view Missing People.')}</li>
-                                <li>{t('2. Click here to Report Missing Person.')}</li>
-                                <li>{t('3. Click here to change language.')}</li>
-                            </ul>
-                        <button 
-                            onClick={nextStep} 
-                            className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
-                        >
-                            Next
-                        </button>
-                    </>
-                )}
+                    </div>
 
-                {step === 2 && (
-                    <>
-                        <h2 className="text-2xl font-bold">{t('Step 2. Reporting')}</h2>
-                        <Image
-                            src="/step2.png"
-                            alt="Report Form"
-                            width={800}
-                            height={300}
-                            className="w-full h-48 object-contain rounded-lg"
-                        />
-                            <ul>
-                                <li>{t('1. Make sure to save Reporter Name*.')}</li>
-                            </ul>
-                        <button 
-                            onClick={nextStep} 
-                            className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
-                        >
-                            Next
-                        </button>
-                    </>
-                )}
+                    <ul className="text-sm text-left list-disc list-inside w-1/2 space-y-4 list-none">
+                        {steps[step - 1].list.map((item, index) => (
+                            <li key={index}>{item}</li>
+                        ))}
+                    </ul>
+                </div>
 
-                {step === 3 && (
-                    <>
-                        <h2 className="text-2xl font-bold">{t('Step 3. Update Reports')}</h2>
-                        <Image
-                            src="/step3.png"
-                            alt="Update Reports"
-                            width={800}
-                            height={300}
-                            className="w-full h-48 object-contain rounded-lg"
-                        />
-                            <ul>
-                                <li>{t('1. You can edit information or report found/not found.')}</li>
-                                <li>{t('2. Use original reporter name* you saved to make changes.')} </li>
-                            </ul>
-                        <button 
-                            onClick={nextStep} 
-                            className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
-                        >
-                            {t('Next')}
-                        </button>
-                    </>
-                )}
-
-                {step === 4 && (
-                    <>
-                        <h2 className="text-2xl font-bold">{t('Step 4. Stay Safe')}</h2>
-                        <div className="border border-gray-300 rounded-lg overflow-hidden mb-4">
-                        <Image
-                            src="/step4.jpg"
-                            alt="Safety Notice"
-                            width={800}
-                            height={300}
-                            className="w-full h-48 object-contain rounded-lg"
-                        />
-                        </div>
-                        {/* <p> */}
-                            <ul>
-                                <li>{t('1. Click here to review this tutorial again.')}</li>
-                                <li>{t('2. Click here to donate through Better Burma.')}</li>
-                                <li>{t('Our thoughts are with all friends and families. Stay strong.🇲🇲')}</li>
-                            </ul>
-                        {/* </p> */}
-                        <button 
-                            onClick={finish} 
-                            className="bg-green-500 text-white px-6 py-3 rounded w-full hover:bg-green-600 transition"
-                        >
-                            {t('Got it!')}
-                        </button>
-                    </>
-                )}
+                <button
+                    onClick={isFinalStep ? finish : nextStep}
+                    className={`mt-4 w-full py-2 rounded-md text-white font-semibold transition ${
+                        isFinalStep ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'
+                    }`}
+                >
+                    {isFinalStep ? t('Got it!') : t('Next')}
+                </button>
             </div>
         </div>
     );
