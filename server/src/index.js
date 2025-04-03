@@ -9,9 +9,9 @@ app.use(express.json());
 // In your server/index.js or server/app.js file
 // Enable CORS for all routes
 app.use(cors({
-  origin: 'http://localhost:3001', // Your Next.js client URL
+  origin: ['http://localhost:3001','https://www.kelselyay.com'], // Your Next.js client URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
+  credentials: false
 }));
 
 mongoose.connect(process.env.MONGO_URI)
@@ -19,6 +19,7 @@ mongoose.connect(process.env.MONGO_URI)
     .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 app.use('/api/reports', router);
+
 
 
 //host the server

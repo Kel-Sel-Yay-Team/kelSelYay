@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "./context/LanguageContext";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,8 +34,8 @@ export const metadata = {
     images: [
       {
         url: '/preview.png',
-        width: 1200,
-        height: 630,
+        width: 650,
+        height: 488,
         alt: 'Kel Sel Yay Preview Image',
       },
     ],
@@ -52,6 +53,7 @@ export const metadata = {
   alternates: {
     canonical: 'https://kelselyay.com/',
   },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({ children }) {
@@ -63,6 +65,7 @@ export default function RootLayout({ children }) {
         <LanguageProvider>
             {children}
         </LanguageProvider>
+        <GoogleAnalytics gaId="G-4QEMBKQBTJ"/>
       </body>
     </html>
   );

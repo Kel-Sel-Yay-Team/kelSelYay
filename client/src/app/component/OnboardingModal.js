@@ -28,16 +28,14 @@ export default function OnboardingModal({ onFinish }) {
                             alt="Map Overview"
                             width={800}
                             height={300}
-                            className="w-full h-48 object-cover rounded-lg"
+                            className="w-full h-48 object-contain rounded-lg"
                         />
-                        <p>
                             <ul>
                                 <li>{t('No Login Required.')}</li>
                                 <li>{t('1. Click here to view Missing People.')}</li>
                                 <li>{t('2. Click here to Report Missing Person.')}</li>
                                 <li>{t('3. Click here to change language.')}</li>
                             </ul>
-                        </p>
                         <button 
                             onClick={nextStep} 
                             className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
@@ -55,13 +53,11 @@ export default function OnboardingModal({ onFinish }) {
                             alt="Report Form"
                             width={800}
                             height={300}
-                            className="w-full h-48 object-cover rounded-lg"
+                            className="w-full h-48 object-contain rounded-lg"
                         />
-                        <p>
                             <ul>
                                 <li>{t('1. Make sure to save Reporter Name*.')}</li>
                             </ul>
-                        </p>
                         <button 
                             onClick={nextStep} 
                             className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
@@ -79,16 +75,12 @@ export default function OnboardingModal({ onFinish }) {
                             alt="Update Reports"
                             width={800}
                             height={300}
-                            className="w-full h-48 object-cover rounded-lg"
+                            className="w-full h-48 object-contain rounded-lg"
                         />
-                        <p>
                             <ul>
                                 <li>{t('1. You can edit information or report found/not found.')}</li>
                                 <li>{t('2. Use original reporter name* you saved to make changes.')} </li>
                             </ul>
-                        
-                        </p>
-
                         <button 
                             onClick={nextStep} 
                             className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
@@ -107,16 +99,16 @@ export default function OnboardingModal({ onFinish }) {
                             alt="Safety Notice"
                             width={800}
                             height={300}
-                            className="w-full h-48 object-cover rounded-lg"
+                            className="w-full h-48 object-contain rounded-lg"
                         />
                         </div>
-                        <p>
+                        {/* <p> */}
                             <ul>
                                 <li>{t('1. Click here to review this tutorial again.')}</li>
                                 <li>{t('We are accepting donations through Better Burma.')}</li>
                                 <li>{t('Stay Strong Friends & Families.')}</li>
                             </ul>
-                        </p>
+                        {/* </p> */}
                         <button 
                             onClick={finish} 
                             className="bg-green-500 text-white px-6 py-3 rounded w-full hover:bg-green-600 transition"
