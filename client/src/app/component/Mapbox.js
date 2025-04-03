@@ -125,7 +125,7 @@ function Mapbox() {
 
     const fetchMissingPeople = async() => {
         try {
-            const response = await fetch("http://localhost:3002/api/reports/notfound", {
+            const response = await fetch("https://kelselyay.onrender.com/api/reports/notfound", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

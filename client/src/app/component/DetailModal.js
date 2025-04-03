@@ -8,7 +8,7 @@ import ImageSection from "./ImageSection";
 import { useLanguage } from "../context/LanguageContext";
 
 const getCoordinates = async (query) => {
-    const res = await fetch(`https://kelselyay.onrender.com/geocode?address=${encodeURIComponent(query)}`);
+    const res = await fetch(`https://kelselyay.onrender.com/api/reports/geocode?address=${encodeURIComponent(query)}`);
     const data = await res.json();
     if (!data.results || !data.results.length) return null;
     const { lat, lng } = data.results[0].geometry.location;
@@ -107,7 +107,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
         try {
             setIsSaving(true);
 
-            const response = await fetch(`https://kelselyay.onrender.com/${detail._id || detail.id}`, {
+            const response = await fetch(`https://kelselyay.onrender.com/api/reports/${detail._id || detail.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ reporterName, found: true })
@@ -145,7 +145,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 setIsSaving(false);
                 return;
             }
-            const response = await fetch(`https://kelselyay.onrender.com/${detail._id || detail.id}`, {
+            const response = await fetch(`https://kelselyay.onrender.com/api/reports/${detail._id || detail.id}`, {
                 method: "DELETE",
                 headers: {
                     'Content-Type': 'application/json'
@@ -223,7 +223,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             };
             
             // Send update to server
-            const response = await fetch(`https://kelselyay.onrender.com/${detail._id || detail.id}`, {
+            const response = await fetch(`https://kelselyay.onrender.com/api/reports/${detail._id || detail.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -291,7 +291,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                         name={name}
                     />
                     
-                    <div className="details-section">
+                    <div className={`details-section ${isEditing ? 'editing' : ''}`}>
                         {detailSection.map((section, index) => (
                             <DetailRow
                                 key={index}
@@ -309,12 +309,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 <div className="modal-footer">
                     {isEditing ? (
                         <>  
-                            <button 
-                                className="action-button remove-button" 
-                                onClick={handleRemove}
-                            >
-                                {t('Remove Report')}
-                            </button>
                             <button 
                                 className="action-button cancel-button" 
                                 onClick={handleCancel}
@@ -690,6 +684,24 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     .modal-title-text {
                         font-size: 1.0rem;
                     }
+                }
+                :global(.editing .detail-row input),
+                :global(.editing .detail-row textarea) {
+                    border: 1px solid #ccc;
+                    border-radius: 6px;
+                    padding: 8px;
+                    background-color: #fff;
+                    color: #333;
+                    width: 100%;
+                    resize: vertical;
+                }
+
+                /* Optional focus */
+                :global(.editing .detail-row input:focus),
+                :global(.editing .detail-row textarea:focus) {
+                    border: 1px solid #d93025;
+                    outline: none;
+                    box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.2);
                 }
             `}</style>
         </div>
