@@ -9,7 +9,7 @@ app.use(express.json());
 // In your server/index.js or server/app.js file
 // Enable CORS for all routes
 app.use(cors({
-  origin: ['http://localhost:3001','https://www.kelselyay.com/'], // Your Next.js client URL
+  origin: ['http://localhost:3001','https://www.kelselyay.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
