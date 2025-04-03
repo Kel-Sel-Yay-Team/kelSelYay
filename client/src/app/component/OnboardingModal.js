@@ -88,7 +88,6 @@ export default function OnboardingModal({ onFinish }) {
                             </ul>
                         
                         </p>
-
                         <button 
                             onClick={nextStep} 
                             className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
