@@ -23,7 +23,6 @@ export const metadata = {
   icons: [
     { rel: 'icon', url: '/favicon.ico', type: 'image/x-icon' },
     { rel: 'icon', url: '/favicon.png', sizes: '32x32', type: 'image/png' },
-    { rel: 'apple-touch-icon', href: '/favicon.ico'},
   ],
   openGraph: {
     title: 'Kel Sel Yay - Missing People Map',
