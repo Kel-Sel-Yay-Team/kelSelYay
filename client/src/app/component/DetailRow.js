@@ -11,7 +11,7 @@ function DetailRow({
 }) {
   return (
     <div className={`detail-row ${isEditing ? 'editing' : ''}`}>
-      <h3>{label}</h3>
+      <h3 className="model-label">{label}</h3>
       {isEditing ? (
         isTextarea ? (
           <textarea 
@@ -33,6 +33,15 @@ function DetailRow({
       ) : (
         <p>{value || (label === "Description" ? "No description provided" : "Unknown")}</p>
       )}
+
+      <style jsx>
+        {`
+          .model-label{
+            font-weight: 700; /* Bold text */
+            margin-bottom: 6px;
+          }
+        `}
+      </style>
     </div>
   );
 }
