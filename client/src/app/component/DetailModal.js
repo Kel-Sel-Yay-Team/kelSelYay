@@ -7,16 +7,13 @@ import DetailRow from "./DetailRow";
 import ImageSection from "./ImageSection";
 import { useLanguage } from "../context/LanguageContext";
 
-//using Nominatim for geocoding
 const getCoordinates = async (query) => {
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
-    const res = await fetch(url);
+    const res = await fetch(`http://localhost:3002/api/reports/geocode?address=${encodeURIComponent(query)}`);
     const data = await res.json();
-    if (data.length > 0) {
-      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-    }
-    return null;
-  };
+    if (!data.results || !data.results.length) return null;
+    const { lat, lng } = data.results[0].geometry.location;
+    return { lat, lng };
+}
 
 function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
     const { t } = useLanguage();
@@ -223,20 +220,9 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 updatedImageUrl = newImageUrl;
             }
 
-            // Nominatim - Geocode the updated location
-            const coords = await getCoordinates(location);
-            if (!coords) {
-                alert("Invalid location. Please enter a valid place.");
-                setIsSaving(false);
-                return;
-            }
-
-            // Nominatim - Include lat, lng into payload
             const updateData = {
                 reporterName: reporterName,
                 locationOfMissingPerson: location,
-                lat: coords.lat,
-                lng: coords.lng,
                 missingPersonName: name,
                 phoneNumber: phoneNumber,
                 missingPersonDescription: description,
@@ -244,7 +230,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 timeSinceMissing: time,
                 imageUrl: updatedImageUrl,
             };
-        
             
             // Send update to server
             const response = await fetch(`http://localhost:3002/api/reports/${detail._id || detail.id}`, {
@@ -254,12 +239,11 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 },
                 body: JSON.stringify(updateData)
             });
-            const result = await response.json();
+                        
+            const updatedPerson = await response.json();
+            if (!response.ok) throw new Error(updatedPerson.error || "Something went wrong");
 
-            if (!response.ok) {
-                throw new Error('Failed to update record');
-            }
-            console.log("Update successful:", result);
+            if (onUpdateSuccess) onUpdateSuccess(updatedPerson.data);
 
             // Update the local state with the new values
             setImageUrl(updatedImageUrl);
@@ -267,27 +251,9 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             setNewImageFile(null);
             setNewImageUrl(null);
             setImageError(false);
-            
-            // Create updated person object to pass back to parent
-            const updatedPerson = {
-                ...detail,
-                reporterName: reporterName,
-                missingPersonName: name,
-                phoneNumber: phoneNumber,
-                missingPersonDescription: description,
-                relationshipToReporter: relationship,
-                locationOfMissingPerson: location,
-                timeSinceMissing: time,
-                imageUrl: updatedImageUrl
-            };
-            
-            // Call the onUpdateSuccess callback with the updated person
-            if (onUpdateSuccess) {
-                onUpdateSuccess(updatedPerson);
-            }
-
             // Exit edit mode
             setIsEditing(false);
+            
         } catch (error) {
             console.error('Error updating record:', error);
             alert('Failed to update information. Please try again.');

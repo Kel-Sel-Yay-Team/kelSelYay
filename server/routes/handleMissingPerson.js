@@ -112,19 +112,25 @@ router.put("/:id", async (req, res) => {
   
       // step 3: If location changed, re-geocode it
       if (locationOfMissingPerson && locationOfMissingPerson !== report.locationOfMissingPerson) {
-        const query = encodeURIComponent(locationOfMissingPerson);
-        const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`;
-  
-        const geoRes = await fetch(url, { headers: { "User-Agent": "kelyay-app" } });
-        const geoData = await geoRes.json();
-  
-        if (!geoData.length) {
-          return res.status(404).json({ success: false, error: "Location could not be geocoded." });
+        const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+
+        if (!apiKey) {
+          return res.status(500).json({ success: false, error: "Missing Google Maps API key" });
         }
-  
-        const { lat, lon } = geoData[0];
+
+        const query = encodeURIComponent(locationOfMissingPerson);
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&region=MM&key=${apiKey}`;
+
+        const geoRes = await fetch(url);
+        const geoData = await geoRes.json();
+
+        if (!geoData.results || !geoData.results.length) {
+            return res.status(404).json({ success: false, error: "Location could not be geocoded." });
+        }
+
+        const { lat, lng } = geoData.results[0].geometry.location;
         updateData.lat = parseFloat(lat);
-        updateData.lng = parseFloat(lon);
+        updateData.lng = parseFloat(lng);
         updateData.locationOfMissingPerson = locationOfMissingPerson;
       }
   
