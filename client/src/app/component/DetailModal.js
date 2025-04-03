@@ -42,7 +42,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
         { label: 'Description', key: 'missingPersonDescription', stateSetter: setDescription, stateValue: description, isTextarea: true },
         { label: 'Last Known Location', key: 'locationOfMissingPerson', stateSetter: setLocation, stateValue: location, isTextarea: false },
         { label: 'Missing Since', key: 'timeSinceMissing', stateSetter: setTime, stateValue: time, isTextarea: false },
-        { label: 'Reported By', key: 'relationshipToReporter', stateSetter: setRelationship, stateValue: relationship, isTextarea: false },
         { label: 'Contact Number', key: 'phoneNumber', stateSetter: setPhoneNumber, stateValue: phoneNumber, isTextarea: false },
     ]);
 
@@ -60,7 +59,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             { label: 'Description', key: 'missingPersonDescription', stateSetter: setDescription, stateValue: description, isTextarea: true },
             { label: 'Last Known Location', key: 'locationOfMissingPerson', stateSetter: setLocation, stateValue: location, isTextarea: false },
             { label: 'Missing Since', key: 'timeSinceMissing', stateSetter: setTime, stateValue: time, isTextarea: false },
-            { label: 'Reported By', key: 'relationshipToReporter', stateSetter: setRelationship, stateValue: relationship, isTextarea: false },
             { label: 'Contact Number', key: 'phoneNumber', stateSetter: setPhoneNumber, stateValue: phoneNumber, isTextarea: false },
         ]);
     }, [name, description, location, time, relationship, phoneNumber]);
