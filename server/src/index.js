@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(cors({
   origin: ['http://localhost:3001','https://www.kelselyay.com'], // Your Next.js client URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
+  credentials: false
 }));
 
 mongoose.connect(process.env.MONGO_URI)
