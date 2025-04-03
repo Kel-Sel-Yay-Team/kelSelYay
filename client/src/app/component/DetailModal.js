@@ -121,6 +121,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             onClose();
 
         } catch (error) {
+            console.error('Error marking as found:', error);
             alert('Failed to mark as found.');
         } finally {
             setIsSaving(false);
@@ -158,6 +159,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             if (!response.ok) {
                 throw new Error('Failed to delete record');
             }
+            console.log("Remove successful:", result);
             // Notify parent component about successful deletion
             if (onDeleteSuccess) {
                 onDeleteSuccess(detail._id || detail.id);
@@ -166,6 +168,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             // Close the modal
             onClose();
         } catch (error) {
+            console.error('Error deleting record:', error);
             alert('Failed to delete report. Please try again.');
         } finally {
             setIsSaving(false);
@@ -187,6 +190,8 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
                 const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
                 
+                console.log("Upload preset:", uploadPreset);
+                console.log("Cloud name:", cloudName);
                 
                 if (!uploadPreset || !cloudName) {
                     throw new Error('Missing Cloudinary configuration');
@@ -202,11 +207,13 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
           
                 if (!res.ok) {
                     const errorData = await res.json().catch(() => ({}));
+                    console.error("Cloudinary error response:", errorData);
                     throw new Error(`Failed to upload image: ${res.status} ${res.statusText}`);
                 }
           
                 const data = await res.json();
                 updatedImageUrl = data.secure_url;
+                console.log("Image uploaded successfully:", updatedImageUrl);
             } else if (newImageUrl) {
                 updatedImageUrl = newImageUrl;
             }
@@ -246,6 +253,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             setIsEditing(false);
             
         } catch (error) {
+            console.error('Error updating record:', error);
             alert('Failed to update information. Please try again.');
         } finally {
             setIsSaving(false);
@@ -266,12 +274,10 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     buttonText={t("Verify")}
                 />
             )}
-    
+
             <div className="modal-content">
                 <button className="close-button" onClick={onClose}>
-                    <span className="x-icon-wrapper">
-                        <X size={20} />
-                    </span>
+                    <X size={20} />
                 </button>
                 
                 <h1 className="modal-title">
@@ -341,316 +347,17 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                         </>
                     )}
                 </div>
-    
-                {isSaving && (
-                    <div className="loading-overlay">
-                        <div className="loading-content">
-                            <div className="spinner"></div>
-                            <p>{t("Editing report...")}</p>
-                        </div>
-                    </div>
-                )}
             </div>
-            <style jsx>{`
-                .modal-overlay {
-                    position: fixed;
-                    inset: 0;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    backdrop-filter: blur(4px);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 9999;
-                }
 
-                .modal-content {
-                    background-color: white;
-                    width: 90%;
-                    max-width: 800px;
-                    max-height: 90vh;
-                    border-radius: 12px;
-                    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-                    overflow-y: auto;
-                    position: relative;
-                    padding: 24px;
-                    color: #333;
-                    z-index: 10000;
-                    border-top: 4px solid #d93025; /* Red accent at top of modal */
-                }
-
-                .close-button {
-                    position: absolute;
-                    top: 13px;
-                    right: 13px;
-                    background: transparent;
-                    border: none;
-                    color: #666;
-                    cursor: pointer;
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.2s ease;
-                }
-
-                .close-button:hover {
-                    background-color: rgba(217, 48, 37, 0.1); /* Light red background on hover */
-                    color: #d93025; /* Red icon on hover */
-                }
-
-                .modal-title {
-                    font-size: 1.6rem;
-                    font-weight: 600;
-                    margin-bottom: 20px;
-                    color: #222;
-                    text-align: center;
-                    padding-bottom: 12px;
-                    border-bottom: 1px solid #eaeaea;
-                    position: relative;
-                }
-
-                .modal-title::after {
-                    content: "";
-                    position: absolute;
-                    bottom: -1px;
-                    left: 30%;
-                    right: 30%;
-                    height: 2px;
-                    background-color: #d93025; /* Red underline accent for title */
-                }
-
-                .modal-body {
-                    display: grid;
-                    grid-template-columns: 1fr 2fr;
-                    gap: 24px;
-                }
-
-                .details-section {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 16px;
-                }
-
-                /* Styling for labels to add a subtle red accent */
-                :global(.detail-row-label) {
-                    color: #333;
-                    border-left: 3px solid #d93025;
-                    padding-left: 8px;
-                    font-weight: 500;
-                }
-
-                .modal-footer {
-                    display: flex;
-                    justify-content: flex-end;
-                    gap: 12px;
-                    margin-top: 24px;
-                    padding-top: 16px;
-                    border-top: 1px solid #eaeaea;
-                }
-
-                .action-button {
-                    padding: 10px 16px;
-                    border-radius: 6px;
-                    font-size: 0.9rem;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    border: 1px solid transparent;
-                }
-
-                .action-button:focus {
-                    outline: none;
-                    box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.3); /* Red focus ring */
-                }
-
-                .cancel-button {
-                    background-color: #f5f5f5;
-                    color: #444;
-                    border-color: #ddd;
-                }
-
-                .cancel-button:hover {
-                    background-color: #eaeaea;
-                }
-
-                .save-button {
-                    background-color: #d93025; /* Red for primary action button */
-                    color: white;
-                }
-
-                .save-button:hover {
-                    background-color: #c62828; /* Darker red on hover */
-                }
-
-                .edit-button {
-                    background-color: #f5f5f5;
-                    color: #d93025; /* Red text for edit button */
-                    border-color: #d93025; /* Red border for edit button */
-                }
-
-                .edit-button:hover {
-                    background-color: rgba(217, 48, 37, 0.1); /* Light red background on hover */
-                }
-
-                .remove-button {
-                    background-color: white;
-                    color: #d93025;
-                    border-color: #d93025;
-                    margin-right: auto;
-                }
-
-                .remove-button:hover {
-                    background-color: #fce8e6;
-                }
-
-                .action-button:disabled {
-                    opacity: 0.6;
-                    cursor: not-allowed;
-                }
-
-                .loading-overlay {
-                    position: absolute;
-                    inset: 0;
-                    background-color: rgba(255, 255, 255, 0.85);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    border-radius: 12px;
-                    z-index: 10001;
-                }
-
-                .loading-content {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 16px;
-                }
-
-                .spinner {
-                    width: 40px;
-                    height: 40px;
-                    border: 3px solid rgba(217, 48, 37, 0.2); /* Light red spinner track */
-                    border-top-color: #d93025; /* Red spinner color */
-                    border-radius: 50%;
-                    animation: spin 1s linear infinite;
-                }
-
-                @keyframes spin {
-                    to {
-                        transform: rotate(360deg);
-                    }
-                }
-
-                /* Mobile optimizations that maintain desktop layout */
-                @media (max-width: 768px) {
-                    .modal-overlay {
-                        padding: 0.5rem;
-                        align-items: flex-start;
-                    }
-
-                    .modal-content {
-                        width: 95%;
-                        padding: 16px;
-                        margin-top: 10vh; /* Position higher on the screen */
-                    }
-
-                    .modal-title {
-                        font-size: 1.4rem;
-                        padding-top: 8px;
-                        margin-bottom: 16px;
-                    }
-                    
-                    .modal-title::after {
-                        left: 25%;
-                        right: 25%;
-                    }
-                    
-                    /* Keep two-column layout but adjust proportions for small screens */
-                    .modal-body {
-                        grid-template-columns: 0.8fr 1.2fr; /* Slightly adjust ratio */
-                        gap: 12px;
-                    }
-                    
-                    /* Optimize image size */
-                    :global(.image-section) {
-                        max-height: 180px;
-                    }
-                    
-                    :global(.image-section img) {
-                        max-height: 180px;
-                        object-fit: contain;
-                    }
-                    
-                    /* Make form elements more touchable */
-                    :global(.detail-row-label) {
-                        font-size: 0.85rem;
-                        margin-bottom: 3px;
-                        border-left: 2px solid #d93025;
-                        padding-left: 6px;
-                    }
-                    
-                    :global(.detail-row input),
-                    :global(.detail-row textarea) {
-                        font-size: 16px; /* Prevent iOS zoom */
-                        padding: 8px;
-                        min-height: 36px;
-                    }
-                    
-                    :global(.detail-row textarea) {
-                        min-height: 60px;
-                    }
-                    
-                    .action-button {
-                        padding: 8px 12px;
-                        font-size: 0.85rem;
-                        min-height: 36px;
-                    }
-                    
-                    .loading-overlay {
-                        background-color: rgba(255, 255, 255, 0.9);
-                    }
-                }
-                
-                /* Very small screens - maintain layout but further optimize */
-                @media (max-width: 480px) {
-                    .modal-content {
-                        padding: 12px;
-                        border-top: 3px solid #d93025;
-                    }
-                    
-                    .modal-title {
-                        font-size: 1.2rem;
-                    }
-                    
-                    .modal-title::after {
-                        left: 20%;
-                        right: 20%;
-                    }
-                    
-                    .modal-body {
-                        gap: 8px;
-                    }
-                    
-                    .modal-footer {
-                        gap: 6px;
-                    }
-                    
-                    .action-button {
-                        padding: 8px;
-                        font-size: 0.75rem;
-                    }
-                    
-                    .remove-button {
-                        font-size: 0.7rem;
-                    }
-                    
-                    :global(.detail-row) {
-                        margin-bottom: 6px;
-                    }
-                }
-            `}</style>
+            {/* Add this right after opening <div className="modal-content"> */}
+            {isSaving && (
+            <div className="loading-overlay">
+                <div className="loading-content">
+                <div className="spinner"></div>
+                <p>{t("Editing report...")}</p>
+                </div>
+            </div>
+            )}
         </div>
     );
 }
