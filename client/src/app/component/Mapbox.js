@@ -6,7 +6,6 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import DetailModal from "./DetailModal";
 import AddReportButton from "./AddReportButton";
 import OnboardingModal from './OnboardingModal';
-import { useRouter } from "next/router";
 import LanguageToggle from "./LanguageToggleButton";
 import DonateButton from "./DonateButton";
 import HelpButton from "./HelpButton";
@@ -19,7 +18,8 @@ function Mapbox() {
     const mapRef = useRef(null); // Store map reference
     const [missingPeople, setMissingPeople] = useState([]);
     const markersRef = useRef(new Map()); // Store markers by ID
-
+    const [recievedNewPost, setRecievedNewPost] = useState(false);
+    const [newReportCoords, setNewReportCoords] = useState(null);
     //for tutorial Box
     const [showOnboarding, setShowOnboarding] = useState(false);
 
@@ -113,22 +113,18 @@ function Mapbox() {
 
     const handleNewReport = (newReport) => {
         setMissingPeople(prev => [...prev, newReport]);
-    }
-
-    // Format time to match test data format
-    const formatTimeSinceMissing = (hours) => {
-        if (!hours && hours !== 0) return "Unknown";
+        setNewReportCoords({
+            lng: newReport.lng || 95.9560,
+            lat: newReport.lat || 21.9162
+        });
         
-        if (hours < 24) {
-            return `${hours} hours ago`;
-        } else {
-            const days = Math.floor(hours / 24);
-            const date = new Date();
-            date.setDate(date.getDate() - days);
-            const month = date.toLocaleString('default', { month: 'long' });
-            return `${month} ${date.getDate()}, 2025 (${days} days ago)`;
-        }
-    };
+        setNewReportCoords({
+            lng: newReport.lng || 95.9560,
+            lat: newReport.lat || 21.9162
+        });
+        
+        setRecievedNewPost(true);
+    }
 
     const fetchMissingPeople = async() => {
         try {
@@ -317,7 +313,6 @@ function Mapbox() {
         if (!localStorage.getItem("hasSeenOnboarding")) {
             setShowOnboarding(true);
         }
-
         return () => map.remove();
     }, []);
 
@@ -327,6 +322,21 @@ function Mapbox() {
         }
     }, [missingPeople]);
 
+    useEffect(() => {
+        if (recievedNewPost && newReportCoords && mapRef.current) {
+            mapRef.current.flyTo({
+                center: [newReportCoords.lng, newReportCoords.lat],
+                zoom: 15,
+                speed: 1.2,
+                curve: 1.3,
+                essential: true
+            });
+            
+            setTimeout(() => {
+                setRecievedNewPost(false);
+            }, 100);
+        }
+    }, [recievedNewPost, newReportCoords]);
 
 
     return (

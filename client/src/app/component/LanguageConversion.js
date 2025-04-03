@@ -69,8 +69,16 @@ const burmese = {
   //onBoarding
   'Step 1 — Map Overview': 'အဆင့် 1 — မြေပုံအကျဉ်းချုပ်',
   
-  
+  // NEWLY ADDED ERROR MESSAGES
+  'Please fill in all required fields': 'ကျေးဇူးပြု၍ လိုအပ်သော အချက်အလက်အားလုံး ဖြည့်စွက်ပါ',
+  'Name is required': 'အမည် ဖြည့်ရန် လိုအပ်သည်',
+  'Phone number is required': 'ဖုန်းနံပါတ် ဖြည့်ရန် လိုအပ်သည်',
+  'Reporter name is required': 'သတင်းပို့သူအမည် ဖြည့်ရန် လိုအပ်သည်',
+  'Location of missing people is required': 'နောက်ဆုံးသိရှိခဲ့သော တည်နေရာ ဖြည့်ရန် လိုအပ်သည်',
+  'Submitting report...': 'အစီရင်ခံစာ တင်သွင်းနေသည်...',
+  'Please upload a photo': 'ကျေးဇူးပြု၍ ဓာတ်ပုံ တင်ပေးပါ',
 };
+  
   
   const english = {
     // Just use the key directly for English

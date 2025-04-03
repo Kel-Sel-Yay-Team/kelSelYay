@@ -197,11 +197,11 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
 
         {/* Title */}
         <h2 className="modal-title">{t("Report Missing Person")}</h2>
-        {missingInput && (
+        {/* {missingInput && (
           <div className="error-message">
             {t("Please fill in all required fields")}
           </div>
-        )}
+        )} */}
         {/* Form */}
         <div className="modal-body">
           <div className="form-section">
@@ -323,7 +323,9 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
               placeholder={t("Last Known Location")}
               className={`form-input ${fieldErrors.locationOfMissingPerson ? 'input-error' : ''}`}
               />
-
+            {fieldErrors.locationOfMissingPerson && (
+              <div className="field-error-message">{t("Location of missing people is required")}</div>
+            )}
             <textarea
               name="missingPersonDescription"
               value={formData.missingPersonDescription}
