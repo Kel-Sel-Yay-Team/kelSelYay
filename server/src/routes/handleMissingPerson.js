@@ -159,4 +159,13 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+router.delete('/clear-missing', async (req, res) => {
+  try {
+    await db.collection('missingpeople').deleteMany({});
+    res.send('All documents deleted.');
+  } catch (error) {
+    res.status(500).send('Error deleting documents.');
+  }
+});
+
 export default router;
