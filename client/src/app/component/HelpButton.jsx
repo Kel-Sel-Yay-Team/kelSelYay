@@ -15,7 +15,7 @@ export default function HelpButton() {
   const handleFinishOnboarding = () => {
     setShowOnboarding(false);
   };
-
+  
   return (
     <>
       <div className="help-button" onClick={handleClick} role="button" tabIndex={0}>
