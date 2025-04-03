@@ -161,7 +161,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       
       const payload = { ...formData, imageUrl: finalImageUrl };
 
-      const response = await fetch("https://kelselyay.onrender.com/api/reports/api/reports", {
+      const response = await fetch("https://kelselyay.onrender.com/api/reports", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
