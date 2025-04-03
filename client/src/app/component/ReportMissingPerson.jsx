@@ -15,18 +15,57 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
     timeSinceMissing: "",
     imageUrl: "", // optional, use imagePreview if needed
   });
+
+  const [fieldErrors, setFieldErrors] = useState({
+    reporterName: false,
+    missingPersonName: false,
+    phoneNumber: false,
+    locationOfMissingPerson: false,
+    missingImage: false,
+    timeSinceMissing: false
+  });
   
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [missingInput, setMissingInput] = useState(false);
   const {t} = useLanguage();
+
+
+  const clearError = (updatedErrors) => {
+    setFieldErrors(updatedErrors);
+      
+    // Check if any fields still have errors
+    let hasErrors = false;
+    for (const key in updatedErrors) {
+      if (updatedErrors[key] === true) { // Look for TRUE (meaning errors)
+        hasErrors = true;
+        break;
+      }
+    }
+    setMissingInput(hasErrors);
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Update form data
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+  
+    // Clear error for this field if it has a value
+    if (value.trim() !== '') {
+      // Update field errors with the new value for this field
+      const updatedErrors = {
+        ...fieldErrors,
+        [name]: false
+      };
+      
+      clearError(updatedErrors);
+      
+    }
   };
 
   const handleImageChange = (e) => {
@@ -36,12 +75,58 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       setImageFile(file);
       const objectUrl = URL.createObjectURL(file);
       setImagePreview(objectUrl);
+
+      // const updatedErrors = {
+      //   ...fieldErrors,
+      //   missingImage: false
+      // };
+      
+      // clearError(updatedErrors);
     }
   };
+
+  const checkEmpty = () => {
+    const requiredFields = [
+      'reporterName', 
+      'missingPersonName', 
+      'phoneNumber', 
+      'locationOfMissingPerson',
+      `timeSinceMissing`
+    ];
+
+    let hasErrors = false;
+    const newFieldErrors = {}
+
+    requiredFields.forEach(field => {
+      if(!formData[field] || formData[field].trim() === ''){
+        newFieldErrors[field] = true;
+        hasErrors = true
+      } else {
+        newFieldErrors[field] = false;
+      }
+    })
+
+    // if (!imageFile) {
+    //   newFieldErrors.missingImage = true;
+    //   hasErrors = true;
+    // } else {
+    //   newFieldErrors.missingImage = false;
+    // }
+    setFieldErrors(newFieldErrors);
+    setMissingInput(hasErrors);
+
+    return !hasErrors
+  }
 
   const handleSubmit = async () => {
     try {
       setIsSaving(true);
+      
+      if(!checkEmpty()){
+        setIsSaving(false)
+        return
+      }
+
       let finalImageUrl = "";
 
       if (imageFile) {
@@ -112,7 +197,11 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
 
         {/* Title */}
         <h2 className="modal-title">{t("Report Missing Person")}</h2>
-
+        {missingInput && (
+          <div className="error-message">
+            {t("Please fill in all required fields")}
+          </div>
+        )}
         {/* Form */}
         <div className="modal-body">
           <div className="form-section">
@@ -125,15 +214,21 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                     <span className="upload-placeholder">{t("Click to upload photo")}</span>
                   )}
                 </label>
+                {/* {fieldErrors.missingImage && (
+                  <div className="field-error-message">{t("Please upload a photo")}</div>
+                )} */}
                 <input
                   type="file"
                   id="imageUpload"
                   accept="image/*"
                   onChange={handleImageChange}
                   style={{ display: "none" }}
+                  className={`form-input`}
                 />
+
+
                 {/* Only visible on mobile */}
-                <div className="time-mobile-wrapper">
+                {/* <div className="time-mobile-wrapper">
                   <input
                     name="timeSinceMissing"
                     value={formData.timeSinceMissing}
@@ -142,31 +237,55 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                     className="form-input time-mobile"
                     type="number"
                   />
+                </div> */}
+                <div className="time-mobile-wrapper">
+                  <div className="form-input input-with-unit time-mobile-wrapper-box">
+                    <input
+                      name="timeSinceMissing"
+                      value={formData.timeSinceMissing}
+                      onChange={handleChange}
+                      placeholder={t("Time Since Missing")}
+                      className="inner-time-input"
+                      type="number"
+                    />
+                    <span className="unit-label">{t("Days")}</span>
+                  </div>
                 </div>
+                
               </div>
-
+              
               <div className="input-column">
-                <input
+              <input
                   name="missingPersonName"
                   value={formData.missingPersonName}
                   onChange={handleChange}
                   placeholder={t("Missing Person's Name")}
-                  className="form-input"
+                  className={`form-input ${fieldErrors.missingPersonName ? 'input-error' : ''}`}
                 />
+                {fieldErrors.missingPersonName && (
+                  <div className="field-error-message">{t("Name is required")}</div>
+                )}
+
                 <input
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
                   placeholder={t("Contact Number")}
-                  className="form-input"
+                  className={`form-input ${fieldErrors.phoneNumber ? 'input-error' : ''}`}
                 />
+                {fieldErrors.phoneNumber && (
+                  <div className="field-error-message">{t("Phone number is required")}</div>
+                )}
                 <input
                   name="reporterName"
                   value={formData.reporterName}
                   onChange={handleChange}
                   placeholder={t("Reported By")}
-                  className="form-input"
+                  className={`form-input ${fieldErrors.reporterName ? 'input-error' : ''}`}
                 />
+                {fieldErrors.reporterName && (
+                  <div className="field-error-message">{t("Reporter name is required")}</div>
+                )}
                 <input
                   name="relationshipToReporter"
                   value={formData.relationshipToReporter}
@@ -175,14 +294,25 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                   className="form-input"
                 />
                 {/* Only visible on desktop */}
-                <input
+                {/* <input
                   name="timeSinceMissing"
                   value={formData.timeSinceMissing}
                   onChange={handleChange}
                   placeholder={t("Time Since Missing (e.g. 24)")}
                   className="form-input time-desktop"
                   type="number"
-                />
+                /> */}
+                <div className="form-input input-with-unit time-desktop-wrapper">
+                  <input
+                    name="timeSinceMissing"
+                    value={formData.timeSinceMissing}
+                    onChange={handleChange}
+                    placeholder={t("Time Since Missing (e.g. 24)")}
+                    className="inner-time-input"
+                    type="number"
+                  />
+                  <span className="unit-label">{t("Days")}</span>
+                </div>
               </div>
             </div>
 
@@ -191,8 +321,8 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
               value={formData.locationOfMissingPerson}
               onChange={handleChange}
               placeholder={t("Last Known Location")}
-              className="form-input"
-            />
+              className={`form-input ${fieldErrors.locationOfMissingPerson ? 'input-error' : ''}`}
+              />
 
             <textarea
               name="missingPersonDescription"
@@ -215,6 +345,16 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
           </div>
         </div>
       </div>
+
+      {/* Add this right after opening <div className="modal-content"> */}
+      {isSaving && (
+        <div className="loading-overlay">
+          <div className="loading-content">
+            <div className="spinner"></div>
+            <p>{t("Submitting report...")}</p>
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
       .modal-overlay {
@@ -327,7 +467,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
-        padding: 0.75rem;
+        padding: 0.5rem;
         color: white;
         font-size: 0.95rem;
         width: 100%;
@@ -375,8 +515,64 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       .time-desktop {
         display: block;
       }
+      
+      .time-desktop-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-right: 1rem;
+        position: relative;
+      }
 
-      @media (max-width: 767px) {
+      .time-desktop-wrapper .inner-time-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 0.95rem;
+        padding: 0;
+        margin: 0;
+        outline: none;
+      }
+
+      .time-desktop-wrapper .unit-label {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.95rem;
+        white-space: nowrap;
+        margin-left: 0.5rem;
+      }
+
+      .time-mobile-wrapper-box {
+        width: 100%;
+        max-width: 160px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+      }
+            
+      .time-mobile-wrapper-box .inner-time-input {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 0.75rem;
+        width: 100%;
+        outline: none;
+      }
+            
+      .time-mobile-wrapper-box .unit-label {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+        // padding-top: 1px; /* adjust this to match baseline */
+        white-space: nowrap;
+      }
+
+    @media (max-width: 767px) {
       .modal-content {
         max-height: 95vh;
         padding: 1rem;
@@ -457,7 +653,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       }
 
       .time-mobile-wrapper input::placeholder {
-        font-size: 0.65rem; /* or whatever size you want */
+        font-size: 0.52rem; /* or whatever size you want */
       }
           
       .time-mobile {
@@ -466,6 +662,15 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
         height: 40px;
         font-size: 0.75rem;
         padding: 0.2rem 0.2rem;
+      }
+      
+      .time-mobile-wrapper .unit-label {
+        padding-top: 2.2px;
+        font-size: 0.52rem;
+      }
+      
+      .time-desktop-wrapper {
+        display: none;
       }
     }
     @media (max-width: 424px) {
@@ -502,7 +707,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       }
       
       .time-mobile-wrapper input::placeholder {
-        font-size: 0.58rem; /* or whatever size you want */
+        font-size: 0.52rem; /* or whatever size you want */
       }
       
       .time-mobile-wrapper {
@@ -513,17 +718,56 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       
     @media (max-width: 320px) {
       .modal-title {
-        font-size: 1.2rem; /* or try 1.1rem if needed */
+        font-size: 1.1rem; /* or try 1.1rem if needed */
         line-height: 1.4;
       }
       .time-mobile-wrapper input::placeholder {
-        font-size: 0.58rem; /* or whatever size you want */
+        font-size: 0.52rem; /* or whatever size you want */
       }
       
       .time-mobile-wrapper {
         margin-top: 1.05rem;
       }
     }
+
+      .input-error {
+        border: 2px solid #ff4d4d;
+        background: rgba(255, 77, 77, 0.1);
+      }
+      
+      .error-message {
+        color: #ff4d4d;
+        text-align: center;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        background: rgba(255, 77, 77, 0.15);
+        border-radius: 8px;
+        font-size: 0.9rem;
+      }
+      
+      /* Shake animation for error fields */
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+      }
+      
+      .input-error {
+        animation: shake 0.6s;
+      }
+      .field-error-message {
+        color: #ff4d4d;
+        font-size: 0.75rem;
+        margin-top: -0.3rem;
+        margin-bottom: 0.3rem;
+        padding-left: 0.5rem;
+      }
+
+      /* For the image upload error */
+      .image-upload-container .field-error-message {
+        text-align: center;
+        margin-top: 0.3rem;
+      }
     `}</style>
 
     </div>

@@ -8,6 +8,7 @@ import AddReportButton from "./AddReportButton";
 import OnboardingModal from './OnboardingModal';
 import { useRouter } from "next/router";
 import LanguageToggle from "./LanguageToggleButton";
+import DonateButton from "./DonateButton";
 
 const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -343,10 +344,9 @@ function Mapbox() {
 
                 />
             )}
-
+            <DonateButton />
             {/* Floating button */}
             <AddReportButton onReportSubmitted={handleNewReport}/>
-            
             {/* Add some basic styling for the markers */}
             <style jsx global>{`
                 .missing-person-marker {

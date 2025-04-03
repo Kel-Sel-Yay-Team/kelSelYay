@@ -28,7 +28,7 @@ const burmese = {
     'Report Sighting': 'တွေ့မြင်မှုကို သတင်းပို့ရန်',
     'Remove Report': 'သတင်းပို့ချက်ကို ဖယ်ရှားရန်',
     
-    // Form placeholders & labels
+    // Form placeholders & labels & units
     'Enter Name': 'အမည်ထည့်သွင်းပါ',
     'Enter Description': 'ဖော်ပြချက် ထည့်သွင်းပါ',
     'Enter Last Known Location': 'နောက်ဆုံးသိရှိရသော တည်နေရာကို ထည့်သွင်းပါ',
@@ -55,11 +55,15 @@ const burmese = {
     'Click to upload photo' : 'ဓာတ်ပုံတင်ရန် နှိပ်ပါ',
     'Reported By' :'သတင်းပေးပို့သူ',
     'Relation to Reporter' : 'သတင်းထောက်နှင့်စပ်လျဉ်း',
-    'Time Since Missing (e.g. 24)' : 'ပျောက်ဆုံးနေသည့်အချိန်',
+    'Time Since Missing (e.g. 24)' : 'ပျောက်ဆုံးနေချိန်မှ',
+    'Time Since Missing' : 'ပျောက်ဆုံးနေချိန်မှ',
     'Last Known Location' : 'နောက်ဆုံးသိထားသောတည်နေရာ',
     'Description' : 'ဖော်ပြချက်',
     'Submit':'တင်မည်',
-    'Close':'ပိတ်မည်'
+    'Close':'ပိတ်မည်',
+
+    //units
+    'Days' : 'ရက်',
   };
   
   const english = {

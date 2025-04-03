@@ -350,6 +350,16 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     )}
                 </div>
             </div>
+
+            {/* Add this right after opening <div className="modal-content"> */}
+            {isSaving && (
+            <div className="loading-overlay">
+                <div className="loading-content">
+                <div className="spinner"></div>
+                <p>{t("Editing report...")}</p>
+                </div>
+            </div>
+            )}
         </div>
     );
 }
