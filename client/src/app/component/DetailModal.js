@@ -270,7 +270,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             <div className="modal-content">
                 <button className="close-button" onClick={onClose}>
                     <span className="x-icon-wrapper">
-                        <X size={20} />
+                        <X size={24} />
                     </span>
                 </button>
                 
@@ -387,13 +387,14 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     border: none;
                     color: #666;
                     cursor: pointer;
-                    width: 36px;
-                    height: 36px;
+                    // width: 36px;
+                    // height: 36px;
                     border-radius: 50%;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     transition: all 0.2s ease;
+                    z-index:1001;
                 }
 
                 .close-button:hover {
