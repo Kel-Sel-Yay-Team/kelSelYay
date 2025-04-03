@@ -24,13 +24,20 @@ export default function OnboardingModal({ onFinish }) {
                     <>
                         <h2 className="text-2xl font-bold">{t('Step 1. How to Use Our App?')}</h2>
                         <Image
-                            src="/map2.jpeg"
+                            src="/step1.png"
                             alt="Map Overview"
                             width={800}
                             height={300}
                             className="w-full h-48 object-cover rounded-lg"
                         />
-                        <p>The pointers on the map show reports of missing people and supply needs. Each dot represents someone who needs help.</p>
+                        <p>
+                            <ul>
+                                <li>{t('No Login Required.')}</li>
+                                <li>{t('1. Click here to view Missing People.')}</li>
+                                <li>{t('2. Click here to Report Missing Person.')}</li>
+                                <li>{t('3. Click here to change language.')}</li>
+                            </ul>
+                        </p>
                         <button 
                             onClick={nextStep} 
                             className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
@@ -42,15 +49,19 @@ export default function OnboardingModal({ onFinish }) {
 
                 {step === 2 && (
                     <>
-                        <h2 className="text-2xl font-bold">Step 2 — Reporting</h2>
+                        <h2 className="text-2xl font-bold">{t('Step 2. Reporting')}</h2>
                         <Image
-                            src="/map2.jpeg"
+                            src="/step2.png"
                             alt="Report Form"
                             width={800}
                             height={300}
                             className="w-full h-48 object-cover rounded-lg"
                         />
-                        <p>Click the Report button to submit a new report. You can share information about missing people or what supplies are urgently needed in your area.</p>
+                        <p>
+                            <ul>
+                                <li>{t('1. Make sure to save Reporter Name*.')}</li>
+                            </ul>
+                        </p>
                         <button 
                             onClick={nextStep} 
                             className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
@@ -62,40 +73,55 @@ export default function OnboardingModal({ onFinish }) {
 
                 {step === 3 && (
                     <>
-                        <h2 className="text-2xl font-bold">Step 3 — Update Reports</h2>
+                        <h2 className="text-2xl font-bold">{t('Step 3. Update Reports')}</h2>
                         <Image
-                            src="/postsubmit.jpeg"
+                            src="/step3.png"
                             alt="Update Reports"
                             width={800}
                             height={300}
                             className="w-full h-48 object-cover rounded-lg"
                         />
-                        <p>You or other aid workers can edit reports to mark people as found or update supply statuses when situations change.</p>
+                        <p>
+                            <ul>
+                                <li>{t('1. You can edit information or report found/not found.')}</li>
+                                <li>{t('2. Use original reporter name* you saved to make changes.')} </li>
+                            </ul>
+                        
+                        </p>
+
                         <button 
                             onClick={nextStep} 
                             className="bg-blue-500 text-white px-6 py-3 rounded w-full hover:bg-blue-600 transition"
                         >
-                            Next
+                            {t('Next')}
                         </button>
                     </>
                 )}
 
                 {step === 4 && (
                     <>
-                        <h2 className="text-2xl font-bold">Step 4 — Stay Safe</h2>
+                        <h2 className="text-2xl font-bold">{t('Step 4. Stay Safe')}</h2>
+                        <div className="border border-gray-300 rounded-lg overflow-hidden mb-4">
                         <Image
-                            src="/verifybox.jpeg"
+                            src="/step4.jpg"
                             alt="Safety Notice"
                             width={800}
                             height={300}
                             className="w-full h-48 object-cover rounded-lg"
                         />
-                        <p>No login is required. Your reports are anonymous and only viewable by trusted aid workers. Please only report information you believe is accurate and safe to share.</p>
+                        </div>
+                        <p>
+                            <ul>
+                                <li>{t('1. Click here to review this tutorial again.')}</li>
+                                <li>{t('We are accepting donations through Better Burma.')}</li>
+                                <li>{t('Stay Strong Friends & Families.')}</li>
+                            </ul>
+                        </p>
                         <button 
                             onClick={finish} 
                             className="bg-green-500 text-white px-6 py-3 rounded w-full hover:bg-green-600 transition"
                         >
-                            Got it!
+                            {t('Got it!')}
                         </button>
                     </>
                 )}
