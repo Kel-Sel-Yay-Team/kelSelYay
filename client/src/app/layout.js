@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "./context/LanguageContext";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -64,6 +65,7 @@ export default function RootLayout({ children }) {
         <LanguageProvider>
             {children}
         </LanguageProvider>
+        <GoogleAnalytics gaId="G-4QEMBKQBTJ"/>
       </body>
     </html>
   );
