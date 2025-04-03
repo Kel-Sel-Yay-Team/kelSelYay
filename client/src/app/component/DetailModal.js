@@ -8,7 +8,7 @@ import ImageSection from "./ImageSection";
 import { useLanguage } from "../context/LanguageContext";
 
 const getCoordinates = async (query) => {
-    const res = await fetch(`http://localhost:3002/api/reports/geocode?address=${encodeURIComponent(query)}`);
+    const res = await fetch(`https://kelselyay.onrender.com/geocode?address=${encodeURIComponent(query)}`);
     const data = await res.json();
     if (!data.results || !data.results.length) return null;
     const { lat, lng } = data.results[0].geometry.location;
@@ -107,7 +107,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
         try {
             setIsSaving(true);
 
-            const response = await fetch(`http://localhost:3002/api/reports/${detail._id || detail.id}`, {
+            const response = await fetch(`https://kelselyay.onrender.com/${detail._id || detail.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ reporterName, found: true })
@@ -145,7 +145,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 setIsSaving(false);
                 return;
             }
-            const response = await fetch(`http://localhost:3002/api/reports/${detail._id || detail.id}`, {
+            const response = await fetch(`https://kelselyay.onrender.com/${detail._id || detail.id}`, {
                 method: "DELETE",
                 headers: {
                     'Content-Type': 'application/json'
@@ -223,7 +223,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             };
             
             // Send update to server
-            const response = await fetch(`http://localhost:3002/api/reports/${detail._id || detail.id}`, {
+            const response = await fetch(`https://kelselyay.onrender.com/${detail._id || detail.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
