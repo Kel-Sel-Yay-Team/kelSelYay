@@ -23,6 +23,7 @@ export const metadata = {
   icons: [
     { rel: 'icon', url: '/favicon.ico', type: 'image/x-icon' },
     { rel: 'icon', url: '/favicon.png', sizes: '32x32', type: 'image/png' },
+    { rel: 'apple-touch-icon', href: '/favicon.ico'}
   ],
   openGraph: {
     title: 'Kel Sel Yay - Missing People Map',
@@ -33,8 +34,8 @@ export const metadata = {
     images: [
       {
         url: '/preview.png',
-        width: 1200,
-        height: 630,
+        width: 650,
+        height: 488,
         alt: 'Kel Sel Yay Preview Image',
       },
     ],
@@ -52,6 +53,7 @@ export const metadata = {
   alternates: {
     canonical: 'https://kelselyay.com/',
   },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({ children }) {
