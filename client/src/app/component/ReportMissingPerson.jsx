@@ -319,7 +319,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
               name="locationOfMissingPerson"
               value={formData.locationOfMissingPerson}
               onChange={handleChange}
-              placeholder={t("Last Known Location")}
+              placeholder={t("Last Known Location (eg. 26th street, Mandalay Jefferson Center, Mandalay, Myanmar)")}
               className={`form-input ${fieldErrors.locationOfMissingPerson ? 'input-error' : ''}`}
               />
             {fieldErrors.locationOfMissingPerson && (
