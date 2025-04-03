@@ -25,7 +25,7 @@ const burmese = {
   'Close': 'ပိတ်ရန်',
   'Verify': 'အတည်ပြုရန်',
   'Saving...': 'သိမ်းဆည်းနေသည်...',
-  'Report Sighting': 'တွေ့မြင်မှုကို သတင်းပို့ရန်',
+  'Report Sighting': 'ရှာတွေ့ပြီး',
   'Remove Report': 'ဖျက်ရန်',
   'Donate' : 'လှူရန်',
   
@@ -58,7 +58,7 @@ const burmese = {
   'Relation to Reporter' : 'သတင်းပို့သူနှင့်တော်စပ်ပုံ',
   'Time Since Missing (e.g. 24)' : 'ပျောက်ဆုံးသည်မှကြာချိန်(နေ့)',
   'Time Since Missing' : 'ပျောက်ဆုံးနေချိန်မှ',
-  'Last Known Location' : 'နောက်ဆုံးသိထားသောနေရာ',
+  'Last Known Location (eg. 26th street, Mandalay Jefferson Center, Mandalay, Myanmar)' : 'နောက်ဆုံး တွေ့ရှိခဲ့သည့် လိပ်စာ (ဥပမာ ၂၆လမ်း မန္တလေးဂျက်ဖာဆင်စင်တာ မန္တလေး မြန်မာ)',
   'Description' : 'ဖော်ပြချက်',
   'Submit':'တင်မည်',
   'Close':'ပိတ်မည်',
