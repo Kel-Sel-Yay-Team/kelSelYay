@@ -173,7 +173,6 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
         throw new Error(data.error || "Something went wrong");
       }
 
-      console.log("✅ Report submitted successfully:", data);
 
       if(onSubmitSuccess){
         onSubmitSuccess(data)
@@ -181,7 +180,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       
       onClose();
     } catch (error) {
-      console.error("🚨 Error submitting report:", error.message);
+      throw new Error("Something went wrong");
     } finally {
       setIsSaving(false);
     }

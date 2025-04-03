@@ -25,7 +25,6 @@ function Mapbox() {
 
     // Function to handle marker click
     const handleMarkerClick = (person) => {
-        console.log("Marker clicked:", person);
         setSelectedPerson(person);
     };
 
@@ -40,7 +39,6 @@ function Mapbox() {
 
     // Handle successful update from modal
     const handleDetailUpdate = (updatedPerson) => {
-        console.log("Person updated:", updatedPerson);
 
         //special case if found / reportSighting was updated
         if (updatedPerson.found) {
@@ -94,7 +92,6 @@ function Mapbox() {
     
     // Handle successful deletion from modal
     const handleDetailDelete = (deletedId) => {
-        console.log("Person deleted:", deletedId);
         
         // Remove the person from local state
         setMissingPeople(prevPeople => 
@@ -142,19 +139,16 @@ function Mapbox() {
             }
             
             const data = await response.json();
-            console.log("API data:", data);
             setMissingPeople(data); // Store fetched people in state
             
             return data;
         } catch (error) {
-            console.error("Error fetching missing people:", error);
             return [];
         }
     };
 
     // Function to add markers to the map
     const addMarkersToMap = (map, people) => {
-        console.log(`Adding ${people.length} markers to map`);
         
         // Clear existing markers
         markersRef.current.forEach(marker => marker.remove());
@@ -165,7 +159,6 @@ function Mapbox() {
         
         // Add markers for missing persons
         people.forEach((person, index) => {
-            console.log(`Processing marker ${index + 1}:`, person);
             
             // Create custom marker element
             let imgUrl = person.imageUrl;
@@ -235,7 +228,6 @@ function Mapbox() {
                 usedCoordinates.set(coordKey, 1);
             }
             
-            console.log(`Marker ${index + 1} coordinates:`, [lng, lat]);
             
             try {
                 // Create marker
@@ -255,9 +247,8 @@ function Mapbox() {
                     handleMarkerClick(personData);
                 });
                 
-                console.log(`Successfully added marker ${index + 1}`);
             } catch (error) {
-                console.error(`Error adding marker ${index + 1}:`, error);
+                throw new Error("Something went wrong");
             }
         });
     };
@@ -285,7 +276,6 @@ function Mapbox() {
                 addMarkersToMap(map, peopleData);
                 
             } catch (error) {
-                console.error("Error loading data:", error);
                 // Fall back to empty data if there's an error
                 addMarkersToMap(map, []);
             }

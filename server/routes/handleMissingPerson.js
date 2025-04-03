@@ -40,7 +40,6 @@ router.get('/geocode', async (req, res) => {
       const data = await response.json();
       res.json(data);
   } catch (error) {
-      console.error("Geocoding Error:", error);
       res.status(500).json({ error: "Failed to geocode" });
   }
 });
@@ -69,7 +68,6 @@ router.post('/', async (req, res) => {
         }
 
         const { lat, lng } = geoData.results[0].geometry.location;
-        console.log("lat and lng are", lat, lng);
 
         // Step 2: Store full report with lat/lng
         const report = new MissingPerson({

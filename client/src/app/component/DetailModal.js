@@ -121,7 +121,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             onClose();
 
         } catch (error) {
-            console.error('Error marking as found:', error);
             alert('Failed to mark as found.');
         } finally {
             setIsSaving(false);
@@ -159,7 +158,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             if (!response.ok) {
                 throw new Error('Failed to delete record');
             }
-            console.log("Remove successful:", result);
             // Notify parent component about successful deletion
             if (onDeleteSuccess) {
                 onDeleteSuccess(detail._id || detail.id);
@@ -168,7 +166,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             // Close the modal
             onClose();
         } catch (error) {
-            console.error('Error deleting record:', error);
             alert('Failed to delete report. Please try again.');
         } finally {
             setIsSaving(false);
@@ -190,8 +187,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
                 const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
                 
-                console.log("Upload preset:", uploadPreset);
-                console.log("Cloud name:", cloudName);
                 
                 if (!uploadPreset || !cloudName) {
                     throw new Error('Missing Cloudinary configuration');
@@ -207,13 +202,11 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
           
                 if (!res.ok) {
                     const errorData = await res.json().catch(() => ({}));
-                    console.error("Cloudinary error response:", errorData);
                     throw new Error(`Failed to upload image: ${res.status} ${res.statusText}`);
                 }
           
                 const data = await res.json();
                 updatedImageUrl = data.secure_url;
-                console.log("Image uploaded successfully:", updatedImageUrl);
             } else if (newImageUrl) {
                 updatedImageUrl = newImageUrl;
             }
@@ -253,7 +246,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             setIsEditing(false);
             
         } catch (error) {
-            console.error('Error updating record:', error);
             alert('Failed to update information. Please try again.');
         } finally {
             setIsSaving(false);
