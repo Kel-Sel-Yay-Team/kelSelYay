@@ -31,7 +31,7 @@ export default function OnboardingModal({ onFinish }) {
                             className="w-full h-48 object-contain rounded-lg"
                         />
                             <ul>
-                                <li>{t('No Login Required.')}</li>
+                                <li>{t('No Login Required*')}</li>
                                 <li>{t('1. Click here to view Missing People.')}</li>
                                 <li>{t('2. Click here to Report Missing Person.')}</li>
                                 <li>{t('3. Click here to change language.')}</li>
@@ -105,8 +105,8 @@ export default function OnboardingModal({ onFinish }) {
                         {/* <p> */}
                             <ul>
                                 <li>{t('1. Click here to review this tutorial again.')}</li>
-                                <li>{t('We are accepting donations through Better Burma.')}</li>
-                                <li>{t('Stay Strong Friends & Families.')}</li>
+                                <li>{t('2. Click here to donate through Better Burma.')}</li>
+                                <li>{t('Our thoughts are with all friends and families. Stay strong.🇲🇲')}</li>
                             </ul>
                         {/* </p> */}
                         <button 
