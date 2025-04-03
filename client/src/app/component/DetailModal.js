@@ -275,9 +275,9 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 </button>
                 
                 <h1 className="modal-title">
-                    <div className="modal-title-container">
+                    {/* <div className="modal-title-container"> */}
                         <p className="modal-title-text">{isEditing ? t("Edit Missing Person Details") : t("Missing Person Details")}</p>
-                    </div>
+                    {/* </div> */}
                 </h1>
                 
                 <div className="modal-body">
@@ -380,21 +380,21 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 }
 
                 .close-button {
-                    position: absolute;
-                    top: 13px;
-                    right: 13px;
-                    background: transparent;
-                    border: none;
-                    color: #666;
-                    cursor: pointer;
-                    // width: 36px;
-                    // height: 36px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.2s ease;
-                    z-index:1001;
+                  position: absolute;
+                  top: 13px;
+                  right: 13px;
+                  background: transparent;
+                  color: #666;
+                  cursor: pointer;
+                  width: 36px;
+                  height: 36px;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  padding: 0; /* ✅ ensures full area is clickable */
+                  border: none; /* ✅ optional but cleaner */
+                  z-index: 1001;
                 }
 
                 .close-button:hover {
@@ -423,11 +423,10 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 .modal-title-text {
                     font-size: 1.6rem;
                     font-weight: 600;
-                    color: white;
+                    color: red;
                     padding: 10px 24px;
                     margin: 0;
                 }
-                    
 
                 .modal-title::after {
                     display: none;
@@ -685,6 +684,11 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     
                     :global(.detail-row) {
                         margin-bottom: 6px;
+                    }
+                }
+                @media (max-width: 320px) {
+                    .modal-title-text {
+                        font-size: 1.0rem;
                     }
                 }
             `}</style>
