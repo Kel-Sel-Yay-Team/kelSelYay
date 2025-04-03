@@ -66,7 +66,7 @@ function ValidationModal({
           display: flex;
           justify-content: center;
           align-items: center;
-          z-index: 1100;
+          z-index: 10001;
           backdrop-filter: blur(10px);
         }
         

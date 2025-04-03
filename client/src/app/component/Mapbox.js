@@ -6,7 +6,6 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import DetailModal from "./DetailModal";
 import AddReportButton from "./AddReportButton";
 import OnboardingModal from './OnboardingModal';
-import { useRouter } from "next/router";
 import LanguageToggle from "./LanguageToggleButton";
 import DonateButton from "./DonateButton";
 import HelpButton from "./HelpButton";
@@ -19,13 +18,13 @@ function Mapbox() {
     const mapRef = useRef(null); // Store map reference
     const [missingPeople, setMissingPeople] = useState([]);
     const markersRef = useRef(new Map()); // Store markers by ID
-
+    const [recievedNewPost, setRecievedNewPost] = useState(false);
+    const [newReportCoords, setNewReportCoords] = useState(null);
     //for tutorial Box
     const [showOnboarding, setShowOnboarding] = useState(false);
 
     // Function to handle marker click
     const handleMarkerClick = (person) => {
-        console.log("Marker clicked:", person);
         setSelectedPerson(person);
     };
 
@@ -40,7 +39,6 @@ function Mapbox() {
 
     // Handle successful update from modal
     const handleDetailUpdate = (updatedPerson) => {
-        console.log("Person updated:", updatedPerson);
 
         //special case if found / reportSighting was updated
         if (updatedPerson.found) {
@@ -94,7 +92,6 @@ function Mapbox() {
     
     // Handle successful deletion from modal
     const handleDetailDelete = (deletedId) => {
-        console.log("Person deleted:", deletedId);
         
         // Remove the person from local state
         setMissingPeople(prevPeople => 
@@ -113,22 +110,18 @@ function Mapbox() {
 
     const handleNewReport = (newReport) => {
         setMissingPeople(prev => [...prev, newReport]);
-    }
-
-    // Format time to match test data format
-    const formatTimeSinceMissing = (hours) => {
-        if (!hours && hours !== 0) return "Unknown";
+        setNewReportCoords({
+            lng: newReport.lng || 95.9560,
+            lat: newReport.lat || 21.9162
+        });
         
-        if (hours < 24) {
-            return `${hours} hours ago`;
-        } else {
-            const days = Math.floor(hours / 24);
-            const date = new Date();
-            date.setDate(date.getDate() - days);
-            const month = date.toLocaleString('default', { month: 'long' });
-            return `${month} ${date.getDate()}, 2025 (${days} days ago)`;
-        }
-    };
+        setNewReportCoords({
+            lng: newReport.lng || 95.9560,
+            lat: newReport.lat || 21.9162
+        });
+        
+        setRecievedNewPost(true);
+    }
 
     const fetchMissingPeople = async() => {
         try {
@@ -146,19 +139,16 @@ function Mapbox() {
             }
             
             const data = await response.json();
-            console.log("API data:", data);
             setMissingPeople(data); // Store fetched people in state
             
             return data;
         } catch (error) {
-            console.error("Error fetching missing people:", error);
             return [];
         }
     };
 
     // Function to add markers to the map
     const addMarkersToMap = (map, people) => {
-        console.log(`Adding ${people.length} markers to map`);
         
         // Clear existing markers
         markersRef.current.forEach(marker => marker.remove());
@@ -169,7 +159,6 @@ function Mapbox() {
         
         // Add markers for missing persons
         people.forEach((person, index) => {
-            console.log(`Processing marker ${index + 1}:`, person);
             
             // Create custom marker element
             let imgUrl = person.imageUrl;
@@ -239,7 +228,6 @@ function Mapbox() {
                 usedCoordinates.set(coordKey, 1);
             }
             
-            console.log(`Marker ${index + 1} coordinates:`, [lng, lat]);
             
             try {
                 // Create marker
@@ -259,9 +247,8 @@ function Mapbox() {
                     handleMarkerClick(personData);
                 });
                 
-                console.log(`Successfully added marker ${index + 1}`);
             } catch (error) {
-                console.error(`Error adding marker ${index + 1}:`, error);
+                throw new Error("Something went wrong");
             }
         });
     };
@@ -289,7 +276,6 @@ function Mapbox() {
                 addMarkersToMap(map, peopleData);
                 
             } catch (error) {
-                console.error("Error loading data:", error);
                 // Fall back to empty data if there's an error
                 addMarkersToMap(map, []);
             }
@@ -317,7 +303,6 @@ function Mapbox() {
         if (!localStorage.getItem("hasSeenOnboarding")) {
             setShowOnboarding(true);
         }
-
         return () => map.remove();
     }, []);
 
@@ -327,6 +312,21 @@ function Mapbox() {
         }
     }, [missingPeople]);
 
+    useEffect(() => {
+        if (recievedNewPost && newReportCoords && mapRef.current) {
+            mapRef.current.flyTo({
+                center: [newReportCoords.lng, newReportCoords.lat],
+                zoom: 15,
+                speed: 1.2,
+                curve: 1.3,
+                essential: true
+            });
+            
+            setTimeout(() => {
+                setRecievedNewPost(false);
+            }, 100);
+        }
+    }, [recievedNewPost, newReportCoords]);
 
 
     return (

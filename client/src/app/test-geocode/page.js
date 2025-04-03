@@ -12,7 +12,6 @@ export default function TestGeocodePage() {
             const data = await res.json();
             setResult(data);
         } catch (error) {
-            console.error("Error fetching geocode:", error);
             setResult({ error: "Request failed" });
         }
     };    
