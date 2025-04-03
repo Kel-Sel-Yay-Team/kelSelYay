@@ -81,25 +81,26 @@ const burmese = {
   //step1
   'Step 1. How to Use Our App?': '1. အသုံးပြုပုံ',
   'Step 1 — Map Overview': 'အဆင့် 1 — မြေပုံအကျဉ်းချုပ်',
-  'No Login Required.': 'အကောင့်ဖွင့်ရန် မလိုအပ်ပါ။',
-  '1. Click here to view Missing People.':'၁. ပျောက်ဆုံးနေသူများကြည့်ရှုရန်',
-  '2. Click here to Report Missing Person.' : '၂. ပျောက်ဆုံးနေသူအား သတင်းပို့ရန်',
-  '3. Click here to change language.':'၃. ဘာသာစကားပြောင်းရန်',
+  'No Login Required*': 'အကောင့်ဖွင့်ရန် မလိုအပ်ပါ။',
+  '1. Click here to view Missing People.':'၁။ ပျောက်ဆုံးနေသူများကြည့်ရှုရန်',
+  '2. Click here to Report Missing Person.' : '၂။ ပျောက်ဆုံးနေသူအား သတင်းပို့ရန်',
+  '3. Click here to change language.':'၃။ ဘာသာစကားပြောင်းရန်',
 
   //step2
   'Step 2. Reporting':'2. အချက်အလက်ပြင်ဆင်ခြင်း',
-  '1. Make sure to save Reporter Name*.':'၁. သတင်းပေးသူအမည်ကိုသေချာသိမ်းဆည်းပါ။',
+  '1. Make sure to save Reporter Name*.':'၁။ သတင်းပေးသူအမည်ကိုသေချာသိမ်းဆည်းပါ။',
 
   //step3
   'Step 3. Update Reports':'3. အချက်အလက်ပြင်ဆင်ခြင်း',
-  '1. You can edit information or report found/not found.':'၁. အချက်အလက်များကို ပြင်ဆင်ရန်(သို့)တွေ့ရှိကြောင်းပြင်ဆင်နိုင်သည်။',
-  '2. Use original reporter name* you saved to make changes.':'၂. ပြောင်းလဲမှုများပြုလုပ်ရန် သင်သိမ်းဆည်းထားသည့် မူရင်းသတင်းပေးသူအမည်* ကို အသုံးပြုပါ။',
+  '1. You can edit information or report found/not found.':'၁။ အချက်အလက်များကို ပြင်ဆင်ရန်(သို့)တွေ့ရှိကြောင်းပြင်ဆင်နိုင်သည်။',
+  '2. Use original reporter name* you saved to make changes.':'၂။ ပြောင်းလဲမှုများပြုလုပ်ရန် သင်သိမ်းဆည်းထားသည့် မူရင်းသတင်းပေးသူအမည်* ကို အသုံးပြုပါ။',
 
   //step4
   'Step 4. Stay Safe':'4. လုံခြုံစွာနေပါ',
-  '1. Click here to review this tutorial again.':'အသုံးပြုပုံကို ပြန်လည်လေ့လာရန်',
-  'Stay Strong Friends & Families':'',
+  '1. Click here to review this tutorial again.':'၁။ အသုံးပြုပုံကို ပြန်လည်လေ့လာရန်',
 
+  'Click here to donate through Better Burma.' :'၂။ Better Burma မှတဆင့် အလှူငွေထည့်ဝင်နိုင်ပါသည်။', 
+  'Our thoughts are with all friends and families. Stay strong.🇲🇲':'KelSelYayအဖွဲ့ကမိသားစုမိတ်ဆွေများအတွက်အတူရှိနေပါတယ် 🇲🇲',
 
   'Next':'နောက်',
   'Got it!':'ရပြီ',
