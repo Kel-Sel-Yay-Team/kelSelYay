@@ -310,12 +310,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     {isEditing ? (
                         <>  
                             <button 
-                                className="action-button remove-button" 
-                                onClick={handleRemove}
-                            >
-                                {t('Remove Report')}
-                            </button>
-                            <button 
                                 className="action-button cancel-button" 
                                 onClick={handleCancel}
                             >
