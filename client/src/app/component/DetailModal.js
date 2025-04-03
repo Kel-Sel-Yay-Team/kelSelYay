@@ -275,7 +275,9 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 </button>
                 
                 <h1 className="modal-title">
-                    {isEditing ? t("Edit Missing Person Details") : t("Missing Person Details")}
+                    <div className="modal-title-container">
+                        <p className="modal-title-text">{isEditing ? t("Edit Missing Person Details") : t("Missing Person Details")}</p>
+                    </div>
                 </h1>
                 
                 <div className="modal-body">
@@ -329,14 +331,14 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                         </>
                     ) : (
                         <>
-                            <button className="action-button cancel-button" onClick={onClose}>
-                                {t("Close")}
+                            <button className="action-button edit-button" onClick={toggleEditMode}>
+                                {t("Edit")}
                             </button>
                             <button className="action-button save-button" onClick={toggleReportSighting}>
                                 {t("Report Sighting")}
                             </button>
-                            <button className="action-button edit-button" onClick={toggleEditMode}>
-                                {t("Edit")}
+                            <button className="action-button cancel-button" onClick={onClose}>
+                                {t("Close")}
                             </button>
                         </>
                     )}
@@ -375,7 +377,6 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     padding: 24px;
                     color: #333;
                     z-index: 10000;
-                    border-top: 4px solid #d93025; /* Red accent at top of modal */
                 }
 
                 .close-button {
@@ -401,31 +402,66 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 }
 
                 .modal-title {
+                    margin-bottom: 20px;
+                    text-align: center;
+                    position: relative;
+                    display: flex;
+                    justify-content: center;
+                }
+
+                .modal-title-container {
+                    display: inline-block;
+                    background-color: #d93025;
+                    border-radius: 8px;
+                    padding: 0;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    min-width: 50%;
+                    max-width: 60%;
+                }
+
+                .modal-title-text {
                     font-size: 1.6rem;
                     font-weight: 600;
-                    margin-bottom: 20px;
-                    color: #222;
-                    text-align: center;
-                    padding-bottom: 12px;
-                    border-bottom: 1px solid #eaeaea;
-                    position: relative;
+                    color: white;
+                    padding: 10px 24px;
+                    margin: 0;
                 }
+                    
 
                 .modal-title::after {
-                    content: "";
-                    position: absolute;
-                    bottom: -1px;
-                    left: 30%;
-                    right: 30%;
-                    height: 2px;
-                    background-color: #d93025; /* Red underline accent for title */
+                    display: none;
                 }
 
+                /* Adjust for mobile */
+                @media (max-width: 768px) {
+                    .modal-title-text {
+                        font-size: 1.4rem;
+                        padding: 8px 20px;
+                    }
+                    
+                    .modal-title-container {
+                        min-width: 70%;
+                    }
+                }
+
+                /* Very small screens */
+                @media (max-width: 480px) {
+                    .modal-title-text {
+                        font-size: 1.2rem;
+                        padding: 8px 16px;
+                    }
+                    
+                    .modal-title-container {
+                        min-width: 80%;
+                    }
+                }
+                
                 .modal-body {
                     display: grid;
                     grid-template-columns: 1fr 2fr;
                     gap: 24px;
                 }
+
 
                 .details-section {
                     display: flex;
