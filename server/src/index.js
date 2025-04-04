@@ -20,7 +20,15 @@ mongoose.connect(process.env.MONGO_URI)
 
 app.use('/api/reports', router);
 
-
+//DELETE ALL reports — for deployment reset only
+router.delete('/delete/all', async (req, res) => {
+  try {
+    await MissingPerson.deleteMany({});
+    res.status(200).json({ success: true, message: 'All reports deleted.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 //host the server
 app.listen(process.env.PORT || 3002);
