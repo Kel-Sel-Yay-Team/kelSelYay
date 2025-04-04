@@ -368,7 +368,7 @@ function Mapbox() {
                   });
                   setTimeout(() => {
                     setRecievedNewPost(false);
-                  }, 200);
+                  }, 500);
                 // Now set map center safely
                 // mapRef.current.setCenter([newReportCoords.lng, newReportCoords.lat]);
                 // setRecievedNewPost(false);
@@ -391,7 +391,7 @@ function Mapbox() {
             });
             setTimeout(() => {
               setRecievedNewPost(false);
-            }, 200);
+            }, 500);
           }
         }
       }, [recievedNewPost, newReportCoords]);
