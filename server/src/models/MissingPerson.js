@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const MissingPersonSchema = new mongoose.Schema({
     reporterName : { type: String, required: true},
@@ -14,5 +14,4 @@ const MissingPersonSchema = new mongoose.Schema({
     found: { type: Boolean, default: false },
   });
 
-export default mongoose.models.MissingPerson ||
-mongoose.model('MissingPerson', MissingPersonSchema);
+module.exports = mongoose.models.MissingPerson || mongoose.model('MissingPerson', MissingPersonSchema);
