@@ -156,7 +156,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
         const cloudinaryData = await res.json();
         finalImageUrl = cloudinaryData.secure_url;
       } else {
-        finalImageUrl = "https://picsum.photos/200/300";
+        finalImageUrl = "https://res.cloudinary.com/dpmhxppeg/image/upload/v1743667345/Missing%20People%20Pictures/iiz12qayrwjtkoczh2rq.png";
       }
       
       const payload = { ...formData, imageUrl: finalImageUrl };
