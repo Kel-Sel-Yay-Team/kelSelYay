@@ -314,7 +314,7 @@ function Mapbox() {
 
     useEffect(() => {
         // const isMobile = window.innerWidth < 769;
-        const isMobile = window.matchMedia( "(max-width: 768px)" )
+        const isMobile = window.matchMedia( "(max-width: 768px)" ).matches;
         if (recievedNewPost && newReportCoords && mapRef.current) {
             mapRef.current.flyTo({
                 center: [newReportCoords.lng, newReportCoords.lat],
