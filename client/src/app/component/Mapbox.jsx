@@ -369,18 +369,18 @@ function Mapbox() {
                   setTimeout(() => {
                     setRecievedNewPost(false);
                   }, 500);
-                // Now set map center safely
-                // mapRef.current.setCenter([newReportCoords.lng, newReportCoords.lat]);
-                // setRecievedNewPost(false);
               }, 300);
             } 
-            else {
+            else 
+            {
               // Fallback if no meta tag found
               mapRef.current.setCenter([newReportCoords.lng, newReportCoords.lat]);
               setRecievedNewPost(false);
             }
+
           } 
-          else {
+          else 
+          {
             // Desktop flyTo
             mapRef.current.flyTo({
               center: [newReportCoords.lng, newReportCoords.lat],

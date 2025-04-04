@@ -296,14 +296,6 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                   className="form-input"
                 />
                 {/* Only visible on desktop */}
-                {/* <input
-                  name="timeSinceMissing"
-                  value={formData.timeSinceMissing}
-                  onChange={handleChange}
-                  placeholder={t("Time Since Missing (e.g. 24)")}
-                  className="form-input time-desktop"
-                  type="number"
-                /> */}
                 <div className={`form-input input-with-unit time-desktop-wrapper ${fieldErrors.timeSinceMissing ? 'input-error' : ''}`}>
                   <input
                     name="timeSinceMissing"
