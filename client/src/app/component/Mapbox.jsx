@@ -320,7 +320,7 @@ function Mapbox() {
                 center: [newReportCoords.lng, newReportCoords.lat],
                 ...(isMobile? {} : {zoom: 15}),
                 speed: 1.2,
-                curve: 1.3,
+                ...(isMobile? {} : {curve: 1.3}),
                 essential: true
             });
             
