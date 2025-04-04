@@ -1,7 +1,9 @@
-import express from 'express';
-import MissingPerson from '../models/MissingPerson.js';
+const express = require('express');
+const MissingPerson = require('../models/MissingPerson.js');
+const GoogleMapService = require('../services/googleMapService.js');
 
 const router = express.Router();
+const googleMapService = new GoogleMapService();
 
 //CRUD
 //GET everyone from the database
@@ -9,7 +11,6 @@ router.get('/', async(req, res) => {
 
     try {
         const reports = await MissingPerson.find();
-
         res.status(200).json(reports);
         
     } catch(e) {
@@ -40,18 +41,7 @@ router.post('/', async (req, res) => {
 
         //Step 1: Geocode using Google Maps API
         const query = encodeURIComponent(locationOfMissingPerson);
-        const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&region=MM&key=${apiKey}`;
-        
-        const geoRes = await fetch(url);
-        const geoData = await geoRes.json();
-
-        if (!geoData.results || !geoData.results.length) {
-            return res.status(404).json({ error: "Location could not be geocoded." });
-        }
-
-        const { lat, lng } = geoData.results[0].geometry.location;
+        const { lat, lng } = await googleMapService.getLatLng(query);
 
         // Step 2: Store full report with lat/lng
         const report = new MissingPerson({
@@ -94,23 +84,8 @@ router.put("/:id", async (req, res) => {
   
       // step 3: If location changed, re-geocode it
       if (locationOfMissingPerson && locationOfMissingPerson !== report.locationOfMissingPerson) {
-        const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-
-        if (!apiKey) {
-          return res.status(500).json({ success: false, error: "Missing Google Maps API key" });
-        }
-
         const query = encodeURIComponent(locationOfMissingPerson);
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&region=MM&key=${apiKey}`;
-
-        const geoRes = await fetch(url);
-        const geoData = await geoRes.json();
-
-        if (!geoData.results || !geoData.results.length) {
-            return res.status(404).json({ success: false, error: "Location could not be geocoded." });
-        }
-
-        const { lat, lng } = geoData.results[0].geometry.location;
+        const { lat, lng } = await googleMapService.getLatLng(query);
         updateData.lat = parseFloat(lat);
         updateData.lng = parseFloat(lng);
         updateData.locationOfMissingPerson = locationOfMissingPerson;
@@ -159,5 +134,5 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+module.exports = router;
 
-export default router;
