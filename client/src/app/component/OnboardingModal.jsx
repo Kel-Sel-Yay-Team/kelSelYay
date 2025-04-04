@@ -27,14 +27,14 @@ export default function OnboardingModal({ onFinish }) {
         },
         {
             title: t('Step 2. Reporting'),
-            image: '/step2.png',
+            image: '/step2.jpg',
             list: [
                 t('1. Make sure to save Reporter Name*.')
             ]
         },
         {
             title: t('Step 3. Update Reports'),
-            image: '/step3.png',
+            image: '/step3.jpg',
             list: [
                 t('1. You can edit information or report found/not found.'),
                 t('2. Use original reporter name* you saved to make changes.')
