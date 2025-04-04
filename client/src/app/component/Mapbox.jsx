@@ -313,8 +313,8 @@ function Mapbox() {
     }, [missingPeople]);
 
     useEffect(() => {
-        const isMobile = window.innerWidth < 769;
-
+        // const isMobile = window.innerWidth < 769;
+        const isMobile = window.matchMedia( "(max-width: 768px)" )
         if (recievedNewPost && newReportCoords && mapRef.current) {
             mapRef.current.flyTo({
                 center: [newReportCoords.lng, newReportCoords.lat],
