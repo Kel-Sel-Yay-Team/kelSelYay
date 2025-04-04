@@ -440,6 +440,11 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
 
                 /* Very small screens */
                 @media (max-width: 480px) {
+
+                    .modal-content {
+                        max-height: ;
+                    }
+
                     .modal-title-text {
                         font-size: 1.2rem;
                         padding: 8px 16px;
@@ -447,6 +452,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     
                     .modal-title-container {
                         min-width: 80%;
+                        min-height: 
                     }
                 }
                 
@@ -649,7 +655,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                         padding: 12px;
                         border-top: 3px solid #d93025;
                     }
-                    
+
                     .modal-title {
                         font-size: 1.2rem;
                     }
@@ -679,10 +685,19 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     :global(.detail-row) {
                         margin-bottom: 6px;
                     }
+
+                    .details-section{
+                        font-size: 0.8rem;
+                        gap: 8px;
+                    }
                 }
                 @media (max-width: 320px) {
                     .modal-title-text {
                         font-size: 1.0rem;
+                    }
+                    .details-section{
+                        font-size: 0.8rem;
+                        gap: 4px;
                     }
                 }
                 :global(.editing .detail-row input),
@@ -703,6 +718,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     outline: none;
                     box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.2);
                 }
+
             `}</style>
         </div>
     );
