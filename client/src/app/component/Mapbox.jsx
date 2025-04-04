@@ -312,61 +312,21 @@ function Mapbox() {
         }
     }, [missingPeople]);
 
-    // useEffect(() => {
-    //     const isMobile = window.innerWidth < 769;
-
-    //     if (recievedNewPost && newReportCoords && mapRef.current) {
-    //         mapRef.current.flyTo({
-    //             center: [newReportCoords.lng, newReportCoords.lat],
-    //             ...(isMobile? {} : {zoom: 15}),
-    //             speed: 1.2,
-    //             curve: 1.3,
-    //             essential: true
-    //         });
-            
-    //         setTimeout(() => {
-    //             setRecievedNewPost(false);
-    //         }, 100);
-    //     }
-    // }, [recievedNewPost, newReportCoords]);
     useEffect(() => {
         const isMobile = window.innerWidth < 769;
-    
+
         if (recievedNewPost && newReportCoords && mapRef.current) {
-            if (isMobile) {
-                // Lock zoom during flyTo
-                const meta = document.querySelector('meta[name=viewport]');
-                if (meta) {
-                    meta.setAttribute(
-                        'content',
-                        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
-                    );
-                }
-            }
-        
-            // Run the flyTo (with or without zoom)
             mapRef.current.flyTo({
                 center: [newReportCoords.lng, newReportCoords.lat],
-                ...(isMobile ? {} : { zoom: 15 }),
+                ...(isMobile? {} : {zoom: 15}),
                 speed: 1.2,
                 curve: 1.3,
                 essential: true
             });
-        
+            
             setTimeout(() => {
                 setRecievedNewPost(false);
-            
-                // Unlock zoom after flyTo
-                if (isMobile) {
-                    const meta = document.querySelector('meta[name=viewport]');
-                    if (meta) {
-                        meta.setAttribute(
-                            'content',
-                            'width=device-width, initial-scale=1.0'
-                        );
-                    }
-                }
-            }, 1000); // Slightly longer than flyTo duration
+            }, 100);
         }
     }, [recievedNewPost, newReportCoords]);
 
