@@ -58,6 +58,7 @@ const burmese = {
   'Relation to Reporter' : 'သတင်းပို့သူနှင့်တော်စပ်ပုံ',
   'Time Since Missing (e.g. 24)' : 'ပျောက်ဆုံးသည်မှကြာချိန်(နေ့)',
   'Time Since Missing' : 'ပျောက်ဆုံးနေချိန်မှ',
+  'Time since missing is required': 'ပျောက်ဆုံးသွားသည့်အချိန်ကတည်းက လိုအပ်ပါသည်။',
   'Last Known Location (eg. 26th street, Mandalay Jefferson Center, Mandalay, Myanmar)' : 'နောက်ဆုံး တွေ့ရှိခဲ့သည့် လိပ်စာ (ဥပမာ ၂၆လမ်း မန္တလေးဂျက်ဖာဆင်စင်တာ မန္တလေး မြန်မာ)',
   'Description' : 'ဖော်ပြချက်',
   'Submit':'တင်မည်',
@@ -102,7 +103,7 @@ const burmese = {
   'Click here to donate through Better Burma.' :'၂။ Better Burma မှတဆင့် အလှူငွေထည့်ဝင်နိုင်ပါသည်။', 
   'Our thoughts are with all friends and families. Stay strong.🇲🇲':'KelSelYayအဖွဲ့ကမိသားစုမိတ်ဆွေများအတွက်အတူရှိနေပါတယ် 🇲🇲',
 
-  'Next':'နောက်',
+  'Next':'ရှေ့သို့',
   'Got it!':'ရပြီ',
 };
   

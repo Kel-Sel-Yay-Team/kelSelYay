@@ -313,10 +313,12 @@ function Mapbox() {
     }, [missingPeople]);
 
     useEffect(() => {
+        const isMobile = window.innerWidth < 769;
+
         if (recievedNewPost && newReportCoords && mapRef.current) {
             mapRef.current.flyTo({
                 center: [newReportCoords.lng, newReportCoords.lat],
-                zoom: 15,
+                ...(isMobile? {} : {zoom: 15}),
                 speed: 1.2,
                 curve: 1.3,
                 essential: true

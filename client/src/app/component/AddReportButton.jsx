@@ -22,20 +22,20 @@ export default function AddReportButton({ onReportSubmitted }) {
   return (
     <>
         <button
-    className="add-report-button"
-    onClick={() => setIsOpen(true)}
-    aria-label="Add Report"
-  >
-    <FontAwesomeIcon icon={faUser} className="icon" />
-    <span className="label">{t("Report Missing Person")}</span> 
-  </button>
+          className="add-report-button"
+          onClick={() => setIsOpen(true)}
+          aria-label="Add Report"
+        >
+          <FontAwesomeIcon icon={faUser} className="icon" />
+          <span className="label">{t("Report Missing Person")}</span> 
+        </button>
 
-  {isOpen && <ReportMissingPerson 
-                    onClose={() => setIsOpen(false)} 
-                    onSubmitSuccess={handleReportSuccess}
-                  />}
+    {isOpen && <ReportMissingPerson 
+                      onClose={() => setIsOpen(false)} 
+                      onSubmitSuccess={handleReportSuccess}
+                    />}
 
-  <style jsx>{`
+    <style jsx>{`
     .add-report-button {
       position: fixed;
       top: 1rem;
@@ -86,6 +86,21 @@ export default function AddReportButton({ onReportSubmitted }) {
 
     .label {
       line-height: 1;
+    }
+
+    @media (max-width: 320px) {
+      .add-report-button {
+        padding: 0.8rem 0.4rem;
+        font-size: 0.8rem;
+        max-width: 180px;
+      }
+      .icon {
+        font-size: 0.6rem;
+      }
+      
+      .label {
+        line-height: 0.8;
+      }
     }
   `}</style>
 
