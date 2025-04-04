@@ -316,13 +316,24 @@ function Mapbox() {
         // const isMobile = window.innerWidth < 769;
         const isMobile = window.matchMedia( "(max-width: 768px)" ).matches;
         if (recievedNewPost && newReportCoords && mapRef.current) {
-            mapRef.current.flyTo({
-                center: [newReportCoords.lng, newReportCoords.lat],
-                ...(isMobile? {} : {zoom: 15}),
-                speed: 1.2,
-                ...(isMobile? {} : {curve: 1.3}),
-                essential: true
-            });
+            if(isMobile)
+            {
+                mapRef.current.easeTo({
+                    center: [newReportCoords.lng, newReportCoords.lat],
+                    duration: 100, // in milliseconds, short and sweet
+                    essential: true
+                });
+            }
+            else
+            {
+                mapRef.current.flyTo({
+                    center: [newReportCoords.lng, newReportCoords.lat],
+                    ...(isMobile? {} : {zoom: 15}),
+                    speed: 1.2,
+                    ...(isMobile? {} : {curve: 1.3}),
+                    essential: true
+                });
+            }
             
             setTimeout(() => {
                 setRecievedNewPost(false);
