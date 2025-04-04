@@ -312,28 +312,58 @@ function Mapbox() {
         }
     }, [missingPeople]);
 
-    useEffect(() => {
-        // const isMobile = window.innerWidth < 769;
-        const isMobile = window.matchMedia( "(max-width: 768px)" ).matches;
-        if (recievedNewPost && newReportCoords && mapRef.current) {
-            if(isMobile)
-            {
-                mapRef.current.setCenter([newReportCoords.lng, newReportCoords.lat]);
-            }
-            else
-            {
-                mapRef.current.flyTo({
-                    center: [newReportCoords.lng, newReportCoords.lat],
-                    ...(isMobile? {} : {zoom: 15}),
-                    speed: 1.2,
-                    ...(isMobile? {} : {curve: 1.3}),
-                    essential: true
-                });
-            }
+    // useEffect(() => {
+    //     // const isMobile = window.innerWidth < 769;
+    //     const isMobile = window.matchMedia( "(max-width: 768px)" ).matches;
+    //     if (recievedNewPost && newReportCoords && mapRef.current) {
+    //         if(isMobile)
+    //         {
+    //             mapRef.current.setCenter([newReportCoords.lng, newReportCoords.lat]);
+    //         }
+    //         else
+    //         {
+    //             mapRef.current.flyTo({
+    //                 center: [newReportCoords.lng, newReportCoords.lat],
+    //                 ...(isMobile? {} : {zoom: 15}),
+    //                 speed: 1.2,
+    //                 ...(isMobile? {} : {curve: 1.3}),
+    //                 essential: true
+    //             });
+    //         }
             
+    //         setTimeout(() => {
+    //             setRecievedNewPost(false);
+    //         }, 100);
+    //     }
+    // }, [recievedNewPost, newReportCoords]);
+
+    useEffect(() => {
+        const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    
+        if (recievedNewPost && newReportCoords && mapRef.current) {
+            // ✅ Step 1: Blur any focused input (prevent browser zoom lock)
+            document.activeElement?.blur();
+            // ✅ Step 2: Scroll to top in case of mobile zoom shift
+            window.scrollTo(0, 0);
+    
+            // ✅ Step 3: Wait for zoom reset to complete before map transition
             setTimeout(() => {
+                if (isMobile) {
+                    // Mobile-safe: no animation
+                    mapRef.current.setCenter([newReportCoords.lng, newReportCoords.lat]);
+                } else {
+                    // Desktop: smooth animation
+                    mapRef.current.flyTo({
+                        center: [newReportCoords.lng, newReportCoords.lat],
+                        zoom: 15,
+                        speed: 1.2,
+                        curve: 1.3,
+                        essential: true
+                    });
+                }
+    
                 setRecievedNewPost(false);
-            }, 100);
+            }, 250); // 250ms gives mobile enough time to reset zoom
         }
     }, [recievedNewPost, newReportCoords]);
 
