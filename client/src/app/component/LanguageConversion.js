@@ -25,7 +25,7 @@ const burmese = {
   'Close': 'ပိတ်ရန်',
   'Verify': 'အတည်ပြုရန်',
   'Saving...': 'သိမ်းဆည်းနေသည်...',
-  'Report Sighting': 'ရှာတွေ့ပြီး',
+  'Mark As Found': 'ရှာတွေ့ပြီး',
   'Remove Report': 'ဖျက်ရန်',
   'Donate' : 'လှူရန်',
   
@@ -100,7 +100,7 @@ const burmese = {
   'Step 4. Stay Safe':'4. လုံခြုံစွာနေပါ',
   '1. Click here to review this tutorial again.':'၁။ အသုံးပြုပုံကို ပြန်လည်လေ့လာရန်',
 
-  'Click here to donate through Better Burma.' :'၂။ Better Burma မှတဆင့် အလှူငွေထည့်ဝင်နိုင်ပါသည်။', 
+  '2. Click here to donate through Better Burma.' :'၂။ Better Burma မှတဆင့် အလှူငွေထည့်ဝင်နိုင်ပါသည်။', 
   'Our thoughts are with all friends and families. Stay strong.🇲🇲':'KelSelYayအဖွဲ့ကမိသားစုမိတ်ဆွေများအတွက်အတူရှိနေပါတယ် 🇲🇲',
 
   'Next':'ရှေ့သို့',
