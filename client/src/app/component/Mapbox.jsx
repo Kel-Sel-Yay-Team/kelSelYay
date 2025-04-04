@@ -318,11 +318,7 @@ function Mapbox() {
         if (recievedNewPost && newReportCoords && mapRef.current) {
             if(isMobile)
             {
-                mapRef.current.easeTo({
-                    center: [newReportCoords.lng, newReportCoords.lat],
-                    duration: 100, // in milliseconds, short and sweet
-                    essential: true
-                });
+                mapRef.current.setCenter([newReportCoords.lng, newReportCoords.lat]);
             }
             else
             {
