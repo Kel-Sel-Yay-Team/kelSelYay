@@ -25,7 +25,7 @@ const burmese = {
   'Close': 'ပိတ်ရန်',
   'Verify': 'အတည်ပြုရန်',
   'Saving...': 'သိမ်းဆည်းနေသည်...',
-  'Report Sighting': 'ရှာတွေ့ပြီး',
+  'Mark As Found': 'ရှာတွေ့ပြီး',
   'Remove Report': 'ဖျက်ရန်',
   'Donate' : 'လှူရန်',
   
