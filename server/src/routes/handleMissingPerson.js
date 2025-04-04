@@ -159,4 +159,14 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+//DELETE ALL reports — for deployment reset only
+router.delete('/delete/all', async (req, res) => {
+  try {
+    await MissingPerson.deleteMany({});
+    res.status(200).json({ success: true, message: 'All reports deleted.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 export default router;
