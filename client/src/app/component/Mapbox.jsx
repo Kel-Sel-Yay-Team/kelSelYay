@@ -9,6 +9,7 @@ import OnboardingModal from './OnboardingModal';
 import LanguageToggle from "./LanguageToggleButton";
 import DonateButton from "./DonateButton";
 import HelpButton from "./HelpButton";
+import Menu from "./Menu";
 
 const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -400,7 +401,7 @@ function Mapbox() {
     return (
         <>
             <div id="map" ref={mapContainerRef} style={{ width: '100%', height: '100vh' }} />
-            <LanguageToggle/>
+            <LanguageToggle insideMenu={false}/>
             {showOnboarding && <OnboardingModal onFinish={handleOnboardingFinish} />}
             
             {/* Render modal when a person is selected */}
@@ -410,11 +411,13 @@ function Mapbox() {
                     onClose={handleCloseModal}
                     onUpdateSuccess={handleDetailUpdate}
                     onDeleteSuccess={handleDetailDelete}
-
                 />
             )}
             <DonateButton />
             <HelpButton/>
+            
+            {/* Add the mobile menu component */}
+            <Menu />
             
             {/* Floating button */}
             <AddReportButton onReportSubmitted={handleNewReport}/>
