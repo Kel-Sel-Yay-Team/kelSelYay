@@ -69,6 +69,10 @@ const burmese = {
 
   //onBoarding
   
+  //Missing people page
+  'Back to Map' : 'မြေပုံသို့ ပြန်သွားရန်',
+  'days ago': 'လွန်ခဲ့သောရက်များ',
+  'Last seen': 'နောက်ဆုံးတွေ့တာ။',
   // NEWLY ADDED ERROR MESSAGES
   'Please fill in all required fields': 'ကျေးဇူးပြု၍ လိုအပ်သော အချက်အလက်အားလုံး ဖြည့်စွက်ပါ',
   'Name is required': 'အမည် ဖြည့်ရန် လိုအပ်သည်',
