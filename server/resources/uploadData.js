@@ -80,9 +80,7 @@ async function uploadReports() {
 
       const result = await res.json();
 
-      if (res.ok) {
-        console.log(`✅ Uploaded: ${report.missingPersonName || 'Unknown Name'}`);
-      } else {
+      if (!res.ok) {
         console.error(`❌ Failed to upload: ${report.missingPersonName || 'Unknown Name'}`);
         console.error(result);
       }
@@ -91,7 +89,7 @@ async function uploadReports() {
       await new Promise(resolve => setTimeout(resolve, 200));
     }
 
-    console.log('🚀 All reports uploaded!');
+    // console.log('🚀 All reports uploaded!');
   } catch (err) {
     console.error('❌ Error uploading reports:', err.message);
   }

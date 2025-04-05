@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import LanguageToggle from '../component/LanguageToggleButton';
 import DetailModal from '../component/DetailModal';
 import AddReportButton from '../component/AddReportButton';
@@ -13,6 +14,14 @@ export default function MissingPeoplePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedPerson, setSelectedPerson] = useState(null);
+  
+  // Get search parameters from URL
+  const searchParams = useSearchParams();
+  const lat = searchParams.get('lat');
+  const lng = searchParams.get('lng');
+  const ids = searchParams.get('ids');
+  const locationFiltered = Boolean(lat && lng);
+  const [locationTitle, setLocationTitle] = useState('');
 
   useEffect(() => {
     async function fetchMissingPeople() {
@@ -31,7 +40,22 @@ export default function MissingPeoplePage() {
           throw new Error(`API issue when trying to fetch reports: ${response.status}`);
         }
         
-        const data = await response.json();
+        let data = await response.json();
+        
+        // If we have lat/lng parameters, filter the people to only show those at this location
+        if (locationFiltered && ids) {
+          const idArray = ids.split(',');
+          data = data.filter(person => 
+            idArray.includes(person._id) || idArray.includes(person.id)
+          );
+          
+          // Get location name for title if available
+          if (data.length > 0) {
+            const locationName = data[0].locationOfMissingPerson || `${lat}, ${lng}`;
+            setLocationTitle(locationName);
+          }
+        }
+        
         setMissingPeople(data);
       } catch (err) {
         setError(err.message);
@@ -41,8 +65,10 @@ export default function MissingPeoplePage() {
     }
     
     fetchMissingPeople();
-  }, []);
+  }, [lat, lng, ids, locationFiltered]);
 
+  // Rest of your existing functions: handlePersonClick, handleCloseModal, etc.
+  
   // Function to handle card click
   const handlePersonClick = (person) => {
     try {
@@ -63,7 +89,7 @@ export default function MissingPeoplePage() {
       personData.timeSinceMissing = personData.timeSinceMissing || '';
       personData.imageUrl = personData.imageUrl || '/testPic.png';
       
-      console.log("Setting selected person:", personData);
+      // console.log("Setting selected person:", personData);
       setSelectedPerson(personData);
     } catch (err) {
       console.error("Error in handlePersonClick:", err);
@@ -125,18 +151,23 @@ export default function MissingPeoplePage() {
     <div className="container mx-auto p-4 min-h-screen pb-24">
       {/* Sticky header with back button */}
       <div className="sticky-header">
-        {/* <h1 className="page-title">Missing People</h1> */}
-        <Link href="/" className="back-to-map-button pl-14">
+        <Link href="/" className="back-to-map-button">
           ← {t("Back to Map")}
         </Link>
+        
+        {/* Show location title only when filtered by location */}
+        {locationFiltered && locationTitle && (
+          <h1 className="location-title">{t("Missing at")}: {locationTitle}</h1>
+        )}
+        
         <div className="header-actions">
           <AddReportButton onReportSubmitted={handleNewReport} />
         </div>
       </div>
       
-      {loading && <p className="text-center py-10">Loading...</p>}
+      {loading && <p className="text-center py-10">{t("Loading...")}</p>}
       
-      {error && <p className="text-red-500 text-center py-10">Error: {error}</p>}
+      {error && <p className="text-red-500 text-center py-10">{t("Error")}: {error}</p>}
       
       {!loading && !error && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
@@ -145,7 +176,6 @@ export default function MissingPeoplePage() {
               key={person._id || person.id} 
               className="border rounded-lg overflow-hidden shadow-md cursor-pointer hover:shadow-lg transition-shadow bg-white"
               onClick={() => {
-                console.log("Card clicked", person);
                 handlePersonClick(person);
               }}
               style={{ transition: "transform 0.2s" }}
@@ -170,7 +200,6 @@ export default function MissingPeoplePage() {
         </div>
       )}
 
-
       {/* Language toggle */}
       <div className="fixed bottom-4 right-4 z-50">
         <LanguageToggle insideMenu={false} className="always-show" />
@@ -189,145 +218,152 @@ export default function MissingPeoplePage() {
       )}
       
       {!loading && !error && missingPeople.length === 0 && (
-        <p className="text-center py-10">No missing people reports found.</p>
+        <p className="text-center py-10">{t("No missing people reports found.")}</p>
       )}
 
-    <style jsx>{`
-      /* Modal debug styling */
-      .modal-debug {
-        position: relative;
-        z-index: 10000;
-      }
+      <style jsx>{`
+        /* Modal debug styling */
+        .modal-debug {
+          position: relative;
+          z-index: 10000;
+        }
 
-      /* Sticky header styles with mobile improvements */
-      .sticky-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: white;
-        padding: 1rem;
-        border-bottom: 1px solid #eaeaea;
-        margin-bottom: 1rem;
-        z-index: 100;
-        flex-wrap: wrap;
-        gap: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      }
-
-      /* Add padding to the top of the container to account for the fixed header */
-      :global(.container) {
-        padding-top: 70px !important;
-      }
-
-      .page-title {
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin-right: auto;
-      }
-
-      .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .back-to-map-button {
-        background-color: rgb(246, 59, 59);
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        font-weight: 500;
-        transition: background-color 0.3s ease;
-        white-space: nowrap;
-        margin-left: 1rem;
-      }
-
-      .back-to-map-button:hover {
-        background-color: #2563eb;
-      }
-
-      /* Mobile optimizations */
-      @media (max-width: 640px) {
+        /* Sticky header styles with mobile improvements */
         .sticky-header {
-          padding: 0.7rem;
-        }
-
-        
-        :global(.container) {
-          padding-top: 60px !important;
-        }
-        
-        .page-title {
-          font-size: 1.25rem;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
           width: 100%;
-          margin-bottom: 0.5rem;
-        }
-        
-        .header-actions {
-          width: auto;
-          margin-right: 1rem;
-        }
-        
-        .back-to-map-button {
-          padding: 0.4rem 0.8rem;
-          font-size: 0.9rem;
-        }
-      }
-
-      /* Very small screens */
-      @media (max-width: 380px) {
-        .header-actions {
-          flex-direction: row;
+          display: flex;
+          justify-content: space-between;
           align-items: center;
-          gap: 6px;
+          background-color: white;
+          padding: 1rem;
+          border-bottom: 1px solid #eaeaea;
+          margin-bottom: 1rem;
+          z-index: 100;
+          flex-wrap: wrap;
+          gap: 10px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
-        .back-to-map-button {
-          font-size: 0.8rem;
-          width: auto;
-          text-align: center;
-        }
-      }
 
-      /* AddReportButton style overrides */
-      :global(.add-report-button) {
-        position: relative !important;
-        top: unset !important;
-        left: unset !important;
-        transform: none !important;
-        background-color: red !important;
-      }
-      
-      /* Additional styling for mobile */
-      @media (max-width: 640px) {
+        /* Add padding to the top of the container to account for the fixed header */
+        :global(.container) {
+          padding-top: 70px !important;
+        }
+
+        .location-title {
+          font-size: 1.3rem;
+          font-weight: bold;
+          color: #ef4444;
+          margin: 0 auto;
+          text-align: center;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 50%;
+        }
+
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .back-to-map-button {
+          background-color: rgb(246, 59, 59);
+          color: white;
+          padding: 0.5rem 1rem;
+          border-radius: 0.375rem;
+          font-weight: 500;
+          transition: background-color 0.3s ease;
+          white-space: nowrap;
+        }
+
+        .back-to-map-button:hover {
+          background-color: #2563eb;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+          .sticky-header {
+            padding: 0.7rem;
+          }
+          
+          :global(.container) {
+            padding-top: 60px !important;
+          }
+          
+          .location-title {
+            font-size: 1.1rem;
+            width: 100%;
+            margin: 0.5rem 0;
+            max-width: 100%;
+            text-align: center;
+            order: -1;
+          }
+          
+          .header-actions {
+            width: auto;
+            margin-right: 1rem;
+          }
+          
+          .back-to-map-button {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+          }
+        }
+
+        /* Very small screens */
+        @media (max-width: 380px) {
+          .header-actions {
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+          }
+          
+          .back-to-map-button {
+            font-size: 0.8rem;
+            width: auto;
+            text-align: center;
+          }
+        }
+
+        /* AddReportButton style overrides */
         :global(.add-report-button) {
-          padding: 0.4rem 0.8rem !important;
-          font-size: 0.9rem !important;
-          max-width: 175px !important;
-          width: auto !important;
+          position: relative !important;
+          top: unset !important;
+          left: unset !important;
+          transform: none !important;
+          background-color: red !important;
         }
         
-        :global(.add-report-button .label) {
-          font-size: 0.9rem !important;
+        /* Additional styling for mobile */
+        @media (max-width: 640px) {
+          :global(.add-report-button) {
+            padding: 0.4rem 0.8rem !important;
+            font-size: 0.9rem !important;
+            max-width: 175px !important;
+            width: auto !important;
+          }
+          
+          :global(.add-report-button .label) {
+            font-size: 0.9rem !important;
+          }
+          
+          :global(.add-report-button .icon) {
+            font-size: 0.9rem !important;
+          }
         }
         
-        :global(.add-report-button .icon) {
-          font-size: 0.9rem !important;
+        @media (max-width: 380px) {
+          :global(.add-report-button) {
+            width: auto !important;
+            max-width: none !important;
+          }
         }
-      }
-      
-      @media (max-width: 380px) {
-        :global(.add-report-button) {
-          width: auto !important;
-          max-width: none !important;
-        }
-      }
-    `}</style>
+      `}</style>
     </div>
   );
 }
