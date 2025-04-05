@@ -28,7 +28,7 @@ router.get('/notfound', async (req, res) => {
   }
 });
 
-//GET route with geocoding functionality (Google Maps version)
+//POST route with geocoding functionality (Google Maps version)
 router.post('/', async (req, res) => {
     try {
         const { locationOfMissingPerson, ...rest } = req.body;
@@ -70,6 +70,17 @@ router.post('/', async (req, res) => {
 });
 
 
+// POST a single missing person report (no geocoding)
+router.post('/batch', async (req, res) => {
+  try {
+    const report = new MissingPerson(req.body);
+    const saved = await report.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    console.error('❌ Error saving missing person report:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 //EDIT (with reporterName validation)
 router.put("/:id", async (req, res) => {
