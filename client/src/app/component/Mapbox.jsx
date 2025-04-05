@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import DetailModal from "./DetailModal";
@@ -10,6 +11,8 @@ import LanguageToggle from "./LanguageToggleButton";
 import DonateButton from "./DonateButton";
 import HelpButton from "./HelpButton";
 import Menu from "./Menu";
+import { getMissingPeople } from "@/utils/mongoHelper";
+import { filter, getMarkers } from "@/utils/filterHelper";
 
 const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -21,14 +24,25 @@ function Mapbox() {
     const markersRef = useRef(new Map()); // Store markers by ID
     const [recievedNewPost, setRecievedNewPost] = useState(false);
     const [newReportCoords, setNewReportCoords] = useState(null);
+    const [markerList, setMarkerList] = useState([]);
+    const [clusteredData, setClusteredData] = useState(null)
     //for tutorial Box
     const [showOnboarding, setShowOnboarding] = useState(false);
 
-    // Function to handle marker click
-    const handleMarkerClick = (person) => {
-        setSelectedPerson(person);
-    };
 
+    const handleMarkerClick = (coordKey, peopleAtLocation) => {
+        // console.log("Marker clicked!", coordKey, peopleAtLocation?.length || 0);
+        if (!peopleAtLocation || peopleAtLocation.length === 0) {
+            return;
+        }
+        
+        // Get the IDs of all people at this location to pass as query params
+        const ids = peopleAtLocation.map(person => person._id || person.id).join(',');
+        
+        // Navigate to missing people page with these coordinate-specific people
+        const [lat, lng] = coordKey.split(',');
+        window.location.href = `/missing-people?lat=${lat}&lng=${lng}&ids=${ids}`;
+    };
     // Function to close modal
     const handleCloseModal = () => {
         setSelectedPerson(null);
@@ -109,154 +123,100 @@ function Mapbox() {
         }
     };
 
-    const handleNewReport = (newReport) => {
+    const handleNewReport = (newReport, existedCoor) => {
         setMissingPeople(prev => [...prev, newReport]);
-        setNewReportCoords({
-            lng: newReport.lng || 95.9560,
-            lat: newReport.lat || 21.9162
-        });
-        
-        setNewReportCoords({
-            lng: newReport.lng || 95.9560,
-            lat: newReport.lat || 21.9162
-        });
-        
+        if(!existedCoor) {
+            setNewReportCoords({
+                lng: newReport.lng || 95.9560,
+                lat: newReport.lat || 21.9162
+            }
+        )}
+
         setRecievedNewPost(true);
     }
 
     const fetchMissingPeople = async() => {
-        try {
-            const response = await fetch("https://kelselyay.onrender.com/api/reports/notfound", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                mode: 'cors'
-            });
-
-            if(!response.ok) {
-                throw new Error(`API issue when trying to fetch reports: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            setMissingPeople(data); // Store fetched people in state
-            
-            return data;
-        } catch (error) {
-            return [];
-        }
+        const data = await getMissingPeople();
+        const filteredMap = await filter(data);   
+        setClusteredData(filteredMap);
+        const markersCoor = getMarkers(filteredMap);                                        
+        setMissingPeople(data); // Store fetched people in state
+        setMarkerList(markersCoor);
+        return data;
     };
 
-    // Function to add markers to the map
-    const addMarkersToMap = (map, people) => {
-        
+
+    const addMarkersToMap = async (map, people) => {
         // Clear existing markers
         markersRef.current.forEach(marker => marker.remove());
         markersRef.current.clear();
         
-        // Keep track of coordinates to avoid exact overlaps
-        const usedCoordinates = new Map();
+        if (!people || !Array.isArray(people)) {
+            console.error('Invalid people data provided to addMarkersToMap:', people);
+            return;  // Exit early if data is invalid
+        }
+
+        const localClusteredData = await filter(people);
         
-        // Add markers for missing persons
-        people.forEach((person, index) => {
-            
-            // Create custom marker element
-            let imgUrl = person.imageUrl;
-            if(!imgUrl || imgUrl === 'https://example.com/image.jpg' || imgUrl === 'https://example.com/updated-image.jpg'){
-                imgUrl = '/testPic.png';
-            }
+        Object.entries(localClusteredData).forEach(([coordKey, peopleAtLocation]) => {
+            const [lat, lng] = coordKey.split(',').map(Number);
+            const count = peopleAtLocation.length;
 
-
-            /* Marker CSS DO NOT TOUCH */
+            // Create marker element
             const el = document.createElement('div');
-            el.className = 'relative';
-
-            // Create the circular part with the image
+            el.className = 'marker-wrapper'; // New wrapper class
+            
+            const markerContent = document.createElement('div');
+            markerContent.className = 'marker-cluster';
+            
             const circle = document.createElement('div');
-            circle.className = 'w-10 h-10 rounded-full overflow-hidden border-2 border-red-500';
-            circle.style.backgroundImage = `url(${imgUrl})`;
-            circle.style.backgroundSize = 'cover';
-            circle.style.backgroundPosition = 'center';
-
-            // Create the teardrop point
-            const point = document.createElement('div');
-            point.className = 'absolute left-1/2 w-0 h-0';
-            point.style.transform = 'translateX(-50%)';
-            point.style.bottom = '-8px';
-            point.style.borderLeft = '6px solid transparent';
-            point.style.borderRight = '6px solid transparent';
-            point.style.borderTop = '10px solid #ef4444'; // red-500 color
-            point.style.zIndex = '-1'; // Place behind the circle
-
-            // Add a small connecting piece between the circle and point to avoid a gap
-            const connector = document.createElement('div');
-            connector.className = 'absolute left-1/2 w-4 h-2 bg-red-500';
-            connector.style.transform = 'translateX(-50%)';
-            connector.style.bottom = '-1px';
-            connector.style.zIndex = '-1'; // Place behind the circle
-
-            // Assemble the components
-            el.appendChild(circle);
-            el.appendChild(connector);
-            el.appendChild(point);
-
-            // Add any additional styling like drop shadow
-            el.style.filter = 'drop-shadow(0 3px 3px rgba(0, 0, 0, 0.3))';
-
-            // Append to the desired parent element
-            document.body.appendChild(el);
+            circle.className = 'cluster-circle';
+            circle.textContent = count;
             
-            /* Marker CSS ENDS HERE DO NOT TOUCH */
-
-            // Add data attribute for identification
-            el.dataset.personId = person._id || person.id;
-            
-            // Get coordinates with offset to prevent exact overlaps
-            let lat = person.lat ? person.lat : 21.9162;
-            let lng = person.lng ? person.lng : 95.9560;
-            
-            // Create a unique key for these coordinates
-            const coordKey = `${lat},${lng}`;
-            
-            // If these exact coordinates are already used, offset slightly
-            if (usedCoordinates.has(coordKey)) {
-                const offset = usedCoordinates.get(coordKey) * 0.001; // Small offset
-                lat += offset;
-                lng += offset;
-                usedCoordinates.set(coordKey, usedCoordinates.get(coordKey) + 1);
+            // Add color based on count
+            if (count < 2) {
+                circle.classList.add('count-1');
+            } else if (count < 5) {
+                circle.classList.add('count-small');
+            } else if (count < 10) {
+                circle.classList.add('count-medium');
             } else {
-                usedCoordinates.set(coordKey, 1);
+                circle.classList.add('count-large');
             }
             
+            const point = document.createElement('div');
+            point.className = 'cluster-point';
+            
+            // Update the DOM structure
+            markerContent.appendChild(circle);
+            markerContent.appendChild(point);
+            el.appendChild(markerContent);
+            el.dataset.coordKey = coordKey;
             
             try {
-                // Create marker
-                const marker = new mapboxgl.Marker(el)
-                    .setLngLat([lng, lat])
-                    .addTo(map);
+                const marker = new mapboxgl.Marker({
+                    element: el,
+                    anchor: 'bottom', 
+                    offset: [0, 0]   
+                })
+                .setLngLat([lng, lat])
+                .addTo(map);
                 
-                // Store marker reference by person ID for later updates
-                markersRef.current.set(person._id || person.id, marker);
+                // Store marker reference
+                markersRef.current.set(coordKey, marker);
                 
-                // Add click event
+                // Add click event to the wrapper element
                 el.addEventListener('click', () => {
-                    // Make a deep copy to avoid reference issues
-                    const personData = {...person};
-                    // Ensure the Modal has all needed fields
-                    personData.id = personData._id || personData.id;
-                    handleMarkerClick(personData);
+                    handleMarkerClick(coordKey, peopleAtLocation);
                 });
                 
             } catch (error) {
-                throw new Error("Something went wrong");
+                console.error("Failed to create marker:", error);
             }
         });
     };
 
     useEffect(() => {
-
-        // Initialize map
         mapboxgl.accessToken = mapbox_accesstoken;
         const map = new mapboxgl.Map({
             container: mapContainerRef.current,
@@ -270,14 +230,9 @@ function Mapbox() {
 
         map.on('load', async () => {
             try {
-                // Fetch missing people data from API
-                const peopleData = await fetchMissingPeople();
-                
-                // Add markers to map
-                addMarkersToMap(map, peopleData);
-                
+                const peopleData = await fetchMissingPeople();           
+                addMarkersToMap(map, peopleData);           
             } catch (error) {
-                // Fall back to empty data if there's an error
                 addMarkersToMap(map, []);
             }
         });
@@ -397,6 +352,17 @@ function Mapbox() {
         }
       }, [recievedNewPost, newReportCoords]);
 
+    useEffect(() => {
+        // Disable scrolling on body
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        
+        // Re-enable scrolling when component unmounts
+        return () => {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+        };
+    }, []);
 
     return (
         <>
@@ -405,14 +371,15 @@ function Mapbox() {
             {showOnboarding && <OnboardingModal onFinish={handleOnboardingFinish} />}
             
             {/* Render modal when a person is selected */}
-            {selectedPerson && (
-                <DetailModal 
-                    detail={selectedPerson}
-                    onClose={handleCloseModal}
-                    onUpdateSuccess={handleDetailUpdate}
-                    onDeleteSuccess={handleDetailDelete}
-                />
-            )}
+            {/* {selectedPerson && (
+                <Link href="/missing-people"></Link>
+                // <DetailModal 
+                //     detail={selectedPerson}
+                //     onClose={handleCloseModal}
+                //     onUpdateSuccess={handleDetailUpdate}
+                //     onDeleteSuccess={handleDetailDelete}
+                // />
+            // )} */}
             <DonateButton />
             <HelpButton/>
             
@@ -423,6 +390,21 @@ function Mapbox() {
             <AddReportButton onReportSubmitted={handleNewReport}/>
             {/* Add some basic styling for the markers */}
             <style jsx global>{`
+                html, body {
+                    margin: 0;
+                    padding: 0;
+                    overflow: hidden;
+                    height: 100%;
+                    width: 100%;
+                }
+                
+                #map {
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    width: 100%;
+                    height: 100vh; 
+                }
                 .missing-person-marker {
                     cursor: pointer;
                     z-index: 2;
@@ -431,6 +413,138 @@ function Mapbox() {
                 .custom-marker {
                     z-index: 1;
                 }
+                
+                .marker-cluster {
+                    position: relative;
+                    width: 36px;
+                    height: 46px;
+                    cursor: pointer;
+                    // pointer-events: none;
+                }
+                
+                .cluster-circle {
+                    position: absolute;
+                    top: 0;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 50%;
+                    background-color: #ef4444;
+                    color: white;
+                    font-weight: bold;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                    border: 2px solid white;
+                }
+                
+                .cluster-point {
+                    position: absolute;
+                    bottom: 0;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 0;
+                    height: 0;
+                    border-left: 8px solid transparent;
+                    border-right: 8px solid transparent;
+                    border-top: 10px solid #ef4444;
+                }
+                
+                .count-1 {
+                    background-color: #ef4444;
+                }
+                
+                .count-small {
+                    background-color: #f97316;
+                }
+                
+                .count-medium {
+                    background-color: #eab308;
+                }
+                
+                .count-large {
+                    background-color: #84cc16;
+                }
+                .marker-wrapper {
+                        cursor: pointer;
+                        will-change: transform; /* Optimizes for animation */
+                    }
+                
+                .marker-cluster {
+                    position: relative;
+                    width: 36px;
+                    height: 46px;
+                    pointer-events: none; /* Makes click pass through to wrapper */
+                }
+                
+                .cluster-circle {
+                    position: absolute;
+                    top: 0;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 50%;
+                    background-color: #ef4444;
+                    color: white;
+                    font-weight: bold;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                    border: 2px solid white;
+                }
+                
+                .cluster-point {
+                    position: absolute;
+                    bottom: 0;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 0;
+                    height: 0;
+                    border-left: 8px solid transparent;
+                    border-right: 8px solid transparent;
+                    border-top: 10px solid #ef4444;
+                }
+    
+                /* Color classes remain the same */
+                .count-1 {
+                    background-color: #84cc16; /* least impacted */
+                }
+
+                .count-small {
+                    background-color: #eab308;
+                }
+
+                .count-medium {
+                    background-color: #f97316;
+                }
+
+                .count-large {
+                    background-color: #ef4444; /* most impacted */
+                }
+
+                /* Marker point colors should match circle colors */
+                .count-1 + .cluster-point {
+                    border-top-color: #84cc16;
+                }
+
+                .count-small + .cluster-point {
+                    border-top-color: #eab308;
+                }
+
+                .count-medium + .cluster-point {
+                    border-top-color: #f97316;
+                }
+
+                .count-large + .cluster-point {
+                    border-top-color: #ef4444;
+                }
+
             `}</style>
         </>
     );

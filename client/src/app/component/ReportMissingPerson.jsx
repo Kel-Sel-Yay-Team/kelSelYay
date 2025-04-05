@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
+import { cloudinaryImageUpload } from "@/utils/cloudinaryHelper";
+import { postNewReports, existCoor } from "@/utils/mongoHelper";
 
 export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
   const [formData, setFormData] = useState({
@@ -79,13 +81,6 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       setImageFile(file);
       const objectUrl = URL.createObjectURL(file);
       setImagePreview(objectUrl);
-
-      // const updatedErrors = {
-      //   ...fieldErrors,
-      //   missingImage: false
-      // };
-      
-      // clearError(updatedErrors);
     }
   };
 
@@ -110,13 +105,6 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
         newFieldErrors[field] = false;
       }
     })
-
-    // if (!imageFile) {
-    //   newFieldErrors.missingImage = true;
-    //   hasErrors = true;
-    // } else {
-    //   newFieldErrors.missingImage = false;
-    // }
     setFieldErrors(newFieldErrors);
     setMissingInput(hasErrors);
 
@@ -135,31 +123,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       let finalImageUrl = "";
 
       if (imageFile) {
-        const formDataUpload = new FormData();
-        formDataUpload.append("file", imageFile);
-
-        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-
-        if (!uploadPreset || !cloudName) {
-          throw new Error("Missing Cloudinary config");
-        }
-
-        formDataUpload.append("upload_preset", uploadPreset);
-        formDataUpload.append("folder", "Missing People Pictures");
-
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-          method: "POST",
-          body: formDataUpload,
-        });
-
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => ({}));
-          throw new Error(errorData.error?.message || "Failed to upload image");
-        }
-
-        const cloudinaryData = await res.json();
-        finalImageUrl = cloudinaryData.secure_url;
+        finalImageUrl = await cloudinaryImageUpload(imageFile);
       } else {
         finalImageUrl = "https://res.cloudinary.com/dpmhxppeg/image/upload/v1743667345/Missing%20People%20Pictures/iiz12qayrwjtkoczh2rq.png";
       }
@@ -171,22 +135,17 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
         ...rest, 
         locationOfMissingPerson: `${locationStreet}, ${locationCity}`.trim(),
         imageUrl: finalImageUrl };
+      
+      // Submitting the post to DB and double check for marker
+      const data = await postNewReports(payload);
+      const lat = data.lat;
+      const lng = data.lng;
+      const existedCoor = await existCoor(lat, lng);
+      
+      // if not existed, add maker with counter 1;
 
-      const response = await fetch("https://kelselyay.onrender.com/api/reports", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Something went wrong");
-      }
-
-
-      if(onSubmitSuccess){
-        onSubmitSuccess(data)
+      if(onSubmitSuccess){  
+        onSubmitSuccess(data, existedCoor)
       }
       
       onClose();
