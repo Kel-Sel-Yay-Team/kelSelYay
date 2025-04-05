@@ -329,7 +329,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                                 {t("Edit")}
                             </button>
                             <button className="action-button save-button" onClick={toggleReportSighting}>
-                                {t("Report Sighting")}
+                                {t("Mark As Found")}
                             </button>
                             <button className="action-button cancel-button" onClick={onClose}>
                                 {t("Close")}
