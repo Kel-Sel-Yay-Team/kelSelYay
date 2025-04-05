@@ -65,7 +65,7 @@ export default function OnboardingModal({ onFinish }) {
                             alt={`Step ${step}`}
                             width={300}
                             height={300}
-                            className="w-full h-auto object-contain rounded-md"
+                            className="w-auto max-h-100 max-[426px]:w-auto max-[426px]:max-h-80 object contain rounded-md"
                         />
                     </div>
 
