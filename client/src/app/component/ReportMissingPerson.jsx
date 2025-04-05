@@ -12,6 +12,8 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
     missingPersonDescription: "",
     relationshipToReporter: "",
     locationOfMissingPerson: "",
+    locationStreet: "",
+    locationCity:"",
     timeSinceMissing: "",
     imageUrl: "", // optional, use imagePreview if needed
   });
@@ -21,6 +23,8 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
     missingPersonName: false,
     phoneNumber: false,
     locationOfMissingPerson: false,
+    locationStreet: false,
+    locationCity: false,
     missingImage: false,
     timeSinceMissing: false
   });
@@ -90,7 +94,8 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       'reporterName', 
       'missingPersonName', 
       'phoneNumber', 
-      'locationOfMissingPerson',
+      'locationStreet',
+      'locationCity',
       `timeSinceMissing`
     ];
 
@@ -158,8 +163,14 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       } else {
         finalImageUrl = "https://res.cloudinary.com/dpmhxppeg/image/upload/v1743667345/Missing%20People%20Pictures/iiz12qayrwjtkoczh2rq.png";
       }
+
+      // destructring to rest to remove locationStreet and locationCity
+      const { locationStreet,locationCity, ...rest } = formData;
       
-      const payload = { ...formData, imageUrl: finalImageUrl };
+      const payload = { 
+        ...rest, 
+        locationOfMissingPerson: `${locationStreet}, ${locationCity}`.trim(),
+        imageUrl: finalImageUrl };
 
       const response = await fetch("https://kelselyay.onrender.com/api/reports", {
         method: "POST",
@@ -312,15 +323,24 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                 )}  
               </div>
             </div>
-
-            <input
-              name="locationOfMissingPerson"
-              value={formData.locationOfMissingPerson}
-              onChange={handleChange}
-              placeholder={t("Last Known Location (eg. 26th street, Mandalay Jefferson Center, Mandalay, Myanmar)")}
-              className={`form-input ${fieldErrors.locationOfMissingPerson ? 'input-error' : ''}`}
-              />
-            {fieldErrors.locationOfMissingPerson && (
+            
+            <div className="flex flex-row gap-4">
+              <input
+                name="locationStreet"
+                value={formData.locationStreet}
+                onChange={handleChange}
+                placeholder={t("Street")}
+                className={`form-input ${fieldErrors.locationStreet || fieldErrors.locationCity ? 'input-error' : ''}`}
+                />
+                <input
+                name="locationCity"
+                value={formData.locationCity}
+                onChange={handleChange}
+                placeholder={t("City")}
+                className={`form-input ${fieldErrors.locationStreet || fieldErrors.locationCity ? 'input-error' : ''}`}
+                />
+              </div>
+            {(fieldErrors.locationStreet || fieldErrors.locationCity) && (
               <div className="field-error-message">{t("Location of missing people is required")}</div>
             )}
             <textarea
