@@ -605,7 +605,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     
                     /* Keep two-column layout but adjust proportions for small screens */
                     .modal-body {
-                        grid-template-columns: 0.8fr 1.2fr; /* Slightly adjust ratio */
+                        grid-template-columns: 0.3fr 1.2fr; /* Slightly adjust ratio */
                         gap: 12px;
                     }
                     
@@ -666,6 +666,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     }
                     
                     .modal-body {
+                        grid-template-columns: 0.8fr 1.2fr; /* Slightly adjust ratio */
                         gap: 8px;
                     }
                     
@@ -698,6 +699,9 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     .details-section{
                         font-size: 0.8rem;
                         gap: 4px;
+                    }
+                    .modal-body{
+                        grid-template-columns: 0.8fr 1.2fr; /* Slightly adjust ratio */
                     }
                 }
                 :global(.editing .detail-row input),
