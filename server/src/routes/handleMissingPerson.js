@@ -17,7 +17,6 @@ router.get('/', async(req, res) => {
     }
 });
 
-
 //GET, not-found people (for rendering on mapbox)
 router.get('/notfound', async (req, res) => {
   try {
@@ -25,6 +24,25 @@ router.get('/notfound', async (req, res) => {
       res.status(200).json(reports);
   } catch (e) {
       res.status(500).json({ error: e.message });
+  }
+});
+// GET, check if a report already exists with given lat & lng
+router.get('/coordexists', async (req, res) => {
+  try {
+    const { lat, lng } = req.query;
+
+    if (!lat || !lng) {
+      return res.status(400).json({ error: 'lat and lng are required as query parameters.' });
+    }
+
+    const exists = await MissingPerson.exists({
+      lat: parseFloat(lat),
+      lng: parseFloat(lng)
+    });
+
+    res.status(200).json({ exists: !!exists });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
