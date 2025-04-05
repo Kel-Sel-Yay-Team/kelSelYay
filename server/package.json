@@ -15,9 +15,10 @@
   "dependencies": {
     "cloudinary": "^2.6.0",
     "cors": "^2.8.5",
-    "cloudinary": "^2.6.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "mongoose": "^8.13.1"
+    "fs-extra": "^11.3.0",
+    "mongoose": "^8.13.1",
+    "node-fetch": "^3.3.2"
   }
 }
