@@ -64,7 +64,10 @@ export default function SearchButton({ data, isOpen, setIsOpen }) {
         {isOpen && (
             <div>
                 <SearchBar onInputChange={handleSearchInput} />
-                <MissingListModal data={filteredData} showTitle={!query} onSelectPerson={(person) => setSelectedPerson(person)}/>
+                <MissingListModal data={filteredData} 
+                showTitle={!query} 
+                titleMessage={t("All Missing People")}
+                onSelectPerson={(person) => setSelectedPerson(person)}/>
             </div>
         )}
         {selectedPerson && (

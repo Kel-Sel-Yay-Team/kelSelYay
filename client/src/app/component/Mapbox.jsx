@@ -12,6 +12,9 @@ import HelpButton from "./HelpButton";
 import SearchButton from "./SearchButton";
 import { getMissingPeople } from "@/utils/mongoHelper";
 import { filter, getMarkers } from "@/utils/filterHelper";
+import MissingListModal from "./MissingListModal";
+import CloseButton from "./CloseButton";
+import { useLanguage } from "../context/LanguageContext";
 
 const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -28,20 +31,14 @@ function Mapbox() {
     //for tutorial Box
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [searchMode, setSearchMode] = useState(false);
+    const [clusterModalPeople, setClusterModalPeople] = useState([]);
+    const { t } = useLanguage()
 
     // Function to handle when cluster marker is clicked
     const handleClusterMarkerClick = (coordKey, peopleAtLocation) => {
         // console.log("Marker clicked!", coordKey, peopleAtLocation?.length || 0);
-        if (!peopleAtLocation || peopleAtLocation.length === 0) {
-            return;
-        }
-        
-        // Get the IDs of all people at this location to pass as query params
-        const ids = peopleAtLocation.map(person => person._id || person.id).join(',');
-        
-        // Navigate to missing people page with these coordinate-specific people
-        const [lat, lng] = coordKey.split(',');
-        window.location.href = `/missing-people?lat=${lat}&lng=${lng}&ids=${ids}`;
+        if (!peopleAtLocation || peopleAtLocation.length === 0) return;
+        setClusterModalPeople(peopleAtLocation);
     };
 
     // Function to handle when individual marker is clicked
@@ -486,9 +483,29 @@ function Mapbox() {
                     onUpdateSuccess={handleDetailUpdate}
                     onDeleteSuccess={handleDetailDelete}
                 />
-            )}
+            )} 
             {/* <DonateButton /> */}
-            <SearchButton data={missingPeople} isOpen={searchMode} setIsOpen={setSearchMode}/>
+            {clusterModalPeople.length > 0 ? (
+              <CloseButton onClose={() => setClusterModalPeople([])} />
+            ) : (
+              <SearchButton 
+                data={missingPeople} 
+                isOpen={searchMode} 
+                setIsOpen={setSearchMode} 
+              />
+            )}
+            {/* <SearchButton data={missingPeople} isOpen={searchMode} setIsOpen={setSearchMode}/> */}
+            {clusterModalPeople.length > 0 && (
+              <MissingListModal 
+                data={clusterModalPeople} 
+                showTitle={true}
+                titleMessage={`${clusterModalPeople[0].locationOfMissingPerson} ${t("Missing People")}` || `${lat}, ${lng}`}
+                onSelectPerson={(person) => {
+                  setSelectedPerson(person);
+                  setClusterModalPeople([]); // close modal
+                }}
+              />
+            )}
             <HelpButton/>
             
             {/* Add the mobile menu component */}

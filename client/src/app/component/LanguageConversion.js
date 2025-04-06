@@ -112,8 +112,9 @@ const burmese = {
   'Next':'ရှေ့သို့',
   'Got it!':'ရပြီ',
 
-  //list
-  'All Missing People' : 'ပျောက်ဆုံးသူစာရင်း'
+  //list titles
+  'All Missing People' : 'ပျောက်ဆုံးသူအားလုံး',
+  'Missing People' : 'ပျောက်ဆုံးသူများ'
 };
   
   

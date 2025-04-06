@@ -2,7 +2,7 @@
 
 import { useLanguage } from "../context/LanguageContext";
 
-export default function MissingListModal({ data = [], showTitle = true , onSelectPerson}) {
+export default function MissingListModal({ data = [], showTitle = true , titleMessage, onSelectPerson}) {
   const { t } = useLanguage();
 
   return (
@@ -10,7 +10,7 @@ export default function MissingListModal({ data = [], showTitle = true , onSelec
     <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 backdrop-blur-sm pt-20">
 
       <div className="modal-container">
-        {showTitle && <span className="top-label">{t("All Missing People")}</span>}
+        {showTitle && <span className="top-label">{titleMessage || t("Default Missing People")}</span>}
 
         <div className="modal-content">
           <div className="scroll-area">
@@ -123,18 +123,35 @@ export default function MissingListModal({ data = [], showTitle = true , onSelec
             font-size: 1rem;
             color: #666;
           }
-        
-            @media (max-width: 321px) {
-                .modal-content {
+
+          @media (max-width: 425px) {
+            .modal-content {
                   max-height: 60vh;
-                }
+            }
 
             .top-label{
               top: -1.1rem;
-              left: 0.65rem;
+              left: 0.5rem;
               font-size: 0.65rem;
               font-weight: 600;
               color: white;
+            }
+          }
+        
+          @media (max-width: 375px) {
+
+            .top-label{
+              top: -1.0rem;
+              font-size: 0.6rem;
+            }
+          }
+        
+          @media (max-width: 321px) {
+
+            .top-label{
+              top: -1.0rem;
+              left: 0.5rem;
+              font-size: 0.5rem;
             }
           }
         `}</style>
