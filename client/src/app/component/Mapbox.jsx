@@ -291,10 +291,10 @@ function Mapbox() {
                 const clustercircle = document.createElement('div');
                 clustercircle.className = 'w-10 h-10 rounded-full overflow-hidden border-2 border-white flex items-center justify-center font-bold text-sm';
                 clustercircle.style.backgroundColor = 
-                    count < 10 ? '#eab308' : '#ef4444'; // dynamic color
+                    count <= 5 ? '#eab308' : '#ffffff'; // dynamic color
                 clustercircle.textContent = count;
-                clustercircle.style.color= 'white';
-                clustercircle.style.borderColor = 'black';
+                clustercircle.style.color= 'red';
+                clustercircle.style.borderColor = 'red';
 
                 // Create the teardrop point
                 const clusterpoint = document.createElement('div');
