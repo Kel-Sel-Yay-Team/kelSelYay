@@ -11,11 +11,11 @@ export default function AddReportButton({ onReportSubmitted }) {
   const { t } = useLanguage();
 
 
-  const handleReportSuccess=(newReport) => {
+  const handleReportSuccess=(newReport, existedCoor) => {
     setIsOpen(false);
 
     if(onReportSubmitted){
-      onReportSubmitted(newReport)
+      onReportSubmitted(newReport, existedCoor)
     }
   }
 

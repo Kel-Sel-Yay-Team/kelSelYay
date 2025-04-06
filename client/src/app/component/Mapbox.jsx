@@ -1,16 +1,17 @@
 'use client';
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import DetailModal from "./DetailModal";
 import AddReportButton from "./AddReportButton";
 import OnboardingModal from './OnboardingModal';
 import LanguageToggle from "./LanguageToggleButton";
-import DonateButton from "./DonateButton";
 import HelpButton from "./HelpButton";
-import Menu from "./Menu";
 import SearchButton from "./SearchButton";
+import { getMissingPeople } from "@/utils/mongoHelper";
+import { filter, getMarkers } from "@/utils/filterHelper";
 
 const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -22,12 +23,29 @@ function Mapbox() {
     const markersRef = useRef(new Map()); // Store markers by ID
     const [recievedNewPost, setRecievedNewPost] = useState(false);
     const [newReportCoords, setNewReportCoords] = useState(null);
+    const [markerList, setMarkerList] = useState([]);
+    const [clusteredData, setClusteredData] = useState(null)
     //for tutorial Box
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [searchMode, setSearchMode] = useState(false);
 
-    // Function to handle marker click
-    const handleMarkerClick = (person) => {
+    // Function to handle when cluster marker is clicked
+    const handleClusterMarkerClick = (coordKey, peopleAtLocation) => {
+        // console.log("Marker clicked!", coordKey, peopleAtLocation?.length || 0);
+        if (!peopleAtLocation || peopleAtLocation.length === 0) {
+            return;
+        }
+        
+        // Get the IDs of all people at this location to pass as query params
+        const ids = peopleAtLocation.map(person => person._id || person.id).join(',');
+        
+        // Navigate to missing people page with these coordinate-specific people
+        const [lat, lng] = coordKey.split(',');
+        window.location.href = `/missing-people?lat=${lat}&lng=${lng}&ids=${ids}`;
+    };
+
+    // Function to handle when individual marker is clicked
+    const handleIndividualMarkerClick = (person) => {
         setSelectedPerson(person);
     };
 
@@ -111,154 +129,227 @@ function Mapbox() {
         }
     };
 
-    const handleNewReport = (newReport) => {
+    const handleNewReport = (newReport, existedCoor) => {
         setMissingPeople(prev => [...prev, newReport]);
-        setNewReportCoords({
-            lng: newReport.lng || 95.9560,
-            lat: newReport.lat || 21.9162
-        });
-        
-        setNewReportCoords({
-            lng: newReport.lng || 95.9560,
-            lat: newReport.lat || 21.9162
-        });
-        
+        if(!existedCoor) {
+            setNewReportCoords({
+                lng: newReport.lng || 95.9560,
+                lat: newReport.lat || 21.9162
+            }
+        )}
+
         setRecievedNewPost(true);
     }
 
     const fetchMissingPeople = async() => {
-        try {
-            const response = await fetch("https://kelselyay.onrender.com/api/reports/notfound", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                mode: 'cors'
-            });
-
-            if(!response.ok) {
-                throw new Error(`API issue when trying to fetch reports: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            setMissingPeople(data); // Store fetched people in state
-            
-            return data;
-        } catch (error) {
-            return [];
-        }
+        const data = await getMissingPeople();
+        const filteredMap = await filter(data);   
+        setClusteredData(filteredMap);
+        const markersCoor = getMarkers(filteredMap);                                        
+        setMissingPeople(data); // Store fetched people in state
+        setMarkerList(markersCoor);
+        return data;
     };
 
-    // Function to add markers to the map
-    const addMarkersToMap = (map, people) => {
-        
+
+    const addMarkersToMap = async (map, people) => {
         // Clear existing markers
         markersRef.current.forEach(marker => marker.remove());
         markersRef.current.clear();
         
-        // Keep track of coordinates to avoid exact overlaps
         const usedCoordinates = new Map();
+
+
+        if (!people || !Array.isArray(people)) {
+            console.error('Invalid people data provided to addMarkersToMap:', people);
+            return;  // Exit early if data is invalid
+        }
+
+        const localClusteredData = await filter(people);
+
+        Object.entries(localClusteredData).forEach(([coordKey, peopleAtLocation]) => {
+            const [lat, lng] = coordKey.split(',').map(Number);
+            const count = peopleAtLocation.length;
+
         
-        // Add markers for missing persons
-        people.forEach((person, index) => {
-            
-            // Create custom marker element
-            let imgUrl = person.imageUrl;
-            if(!imgUrl || imgUrl === 'https://example.com/image.jpg' || imgUrl === 'https://example.com/updated-image.jpg'){
-                imgUrl = '/testPic.png';
-            }
+            if(count <= 5) {
+                // Add markers for missing persons
+                peopleAtLocation.forEach((person, index) => {
+                    
+                    const personData = {...person};
+
+                                        // Create custom marker element
+                    let imgUrl = person.imageUrl;
+                    if(!imgUrl || imgUrl === 'https://example.com/image.jpg' || imgUrl === 'https://example.com/updated-image.jpg'){
+                        imgUrl = '/testPic.png';
+                    }
 
 
-            /* Marker CSS DO NOT TOUCH */
-            const el = document.createElement('div');
-            el.className = 'relative';
+                    /* Marker CSS DO NOT TOUCH */
+                    const el = document.createElement('div');
+                    el.className = 'relative';
 
-            // Create the circular part with the image
-            const circle = document.createElement('div');
-            circle.className = 'w-10 h-10 rounded-full overflow-hidden border-2 border-red-500';
-            circle.style.backgroundImage = `url(${imgUrl})`;
-            circle.style.backgroundSize = 'cover';
-            circle.style.backgroundPosition = 'center';
+                    el.style.cursor = 'pointer';
+                    el.style.pointerEvents = 'auto';
 
-            // Create the teardrop point
-            const point = document.createElement('div');
-            point.className = 'absolute left-1/2 w-0 h-0';
-            point.style.transform = 'translateX(-50%)';
-            point.style.bottom = '-8px';
-            point.style.borderLeft = '6px solid transparent';
-            point.style.borderRight = '6px solid transparent';
-            point.style.borderTop = '10px solid #ef4444'; // red-500 color
-            point.style.zIndex = '-1'; // Place behind the circle
+                    // --- Circle (Image) ---
+                    const circle = document.createElement('div');
+                    circle.style.width = '40px';
+                    circle.style.height = '40px';
+                    circle.style.borderRadius = '9999px'; // fully rounded
+                    circle.style.overflow = 'hidden';
+                    circle.style.border = '2px solid #ef4444';
+                    circle.style.backgroundImage = `url(${imgUrl})`;
+                    circle.style.backgroundSize = 'cover';
+                    circle.style.backgroundPosition = 'center';
 
-            // Add a small connecting piece between the circle and point to avoid a gap
-            const connector = document.createElement('div');
-            connector.className = 'absolute left-1/2 w-4 h-2 bg-red-500';
-            connector.style.transform = 'translateX(-50%)';
-            connector.style.bottom = '-1px';
-            connector.style.zIndex = '-1'; // Place behind the circle
+                    // --- Connector (small rectangle) ---
+                    const connector = document.createElement('div');
+                    connector.style.position = 'absolute';
+                    connector.style.left = '50%';
+                    connector.style.width = '16px';
+                    connector.style.height = '8px';
+                    connector.style.backgroundColor = '#ef4444';
+                    connector.style.transform = 'translateX(-50%)';
+                    connector.style.bottom = '-1px';
+                    connector.style.zIndex = '-1';
 
-            // Assemble the components
-            el.appendChild(circle);
-            el.appendChild(connector);
-            el.appendChild(point);
+                    // --- Teardrop Point ---
+                    const point = document.createElement('div');
+                    point.style.position = 'absolute';
+                    point.style.left = '50%';
+                    point.style.width = '0';
+                    point.style.height = '0';
+                    point.style.transform = 'translateX(-50%)';
+                    point.style.bottom = '-8px';
+                    point.style.borderLeft = '6px solid transparent';
+                    point.style.borderRight = '6px solid transparent';
+                    point.style.borderTop = '10px solid #ef4444';
+                    point.style.zIndex = '-1';
 
-            // Add any additional styling like drop shadow
-            el.style.filter = 'drop-shadow(0 3px 3px rgba(0, 0, 0, 0.3))';
+                    // Assemble the components
+                    el.appendChild(circle);
+                    el.appendChild(connector);
+                    el.appendChild(point);
 
-            // Append to the desired parent element
-            document.body.appendChild(el);
-            
-            /* Marker CSS ENDS HERE DO NOT TOUCH */
+                    // Add any additional styling like drop shadow
+                    el.style.filter = 'drop-shadow(0 3px 3px rgba(0, 0, 0, 0.3))';
 
-            // Add data attribute for identification
-            el.dataset.personId = person._id || person.id;
-            
-            // Get coordinates with offset to prevent exact overlaps
-            let lat = person.lat ? person.lat : 21.9162;
-            let lng = person.lng ? person.lng : 95.9560;
-            
-            // Create a unique key for these coordinates
-            const coordKey = `${lat},${lng}`;
-            
-            // If these exact coordinates are already used, offset slightly
-            if (usedCoordinates.has(coordKey)) {
-                const offset = usedCoordinates.get(coordKey) * 0.001; // Small offset
-                lat += offset;
-                lng += offset;
-                usedCoordinates.set(coordKey, usedCoordinates.get(coordKey) + 1);
-            } else {
-                usedCoordinates.set(coordKey, 1);
-            }
-            
-            
-            try {
-                // Create marker
-                const marker = new mapboxgl.Marker(el)
+                    /* Marker CSS ENDS HERE DO NOT TOUCH */
+
+                    el.dataset.personId = person._id || person.id;
+
+                    
+                    // Get coordinates with offset to prevent exact overlaps
+                    let lat = person.lat ? person.lat : 21.9162;
+                    let lng = person.lng ? person.lng : 95.9560;
+                    
+                    // Create a unique key for these coordinates
+                    const coordKey = `${lat},${lng}`;
+                    
+                    // If these exact coordinates are already used, offset slightly
+                    if (usedCoordinates.has(coordKey)) {
+                        const offset = usedCoordinates.get(coordKey) * 0.001; // Small offset
+                        lat += offset;
+                        lng += offset;
+                        usedCoordinates.set(coordKey, usedCoordinates.get(coordKey) + 1);
+                    } else {
+                        usedCoordinates.set(coordKey, 1);
+                    }
+                    
+                    
+                    try {
+
+                        // Add click event
+                        el.addEventListener('click', () => {
+
+                            handleIndividualMarkerClick(personData);
+                        });
+
+                         // Create marker
+                        const marker = new mapboxgl.Marker(el)
+                            .setLngLat([lng, lat])
+                            .addTo(map);
+
+                        markersRef.current.set(personData._id || personData.id, marker);
+
+                        
+                    } catch (error) {
+                        throw new Error("Something went wrong");
+                    }
+                });
+            } 
+            else {
+
+                /* Marker CSS DO NOT TOUCH */
+
+                // Create marker element
+                const cluster_el = document.createElement('div');
+                cluster_el.className = 'relative'; // New wrapper class
+
+                // Create the circular part for the cluster count
+                const clustercircle = document.createElement('div');
+                clustercircle.className = 'w-10 h-10 rounded-full overflow-hidden border-2 border-white flex items-center justify-center font-bold text-sm';
+                clustercircle.style.backgroundColor = 
+                    count <= 5 ? '#eab308' : '#ffffff'; // dynamic color
+                clustercircle.textContent = count;
+                clustercircle.style.color= 'red';
+                clustercircle.style.borderColor = 'red';
+
+                // Create the teardrop point
+                const clusterpoint = document.createElement('div');
+                clusterpoint.className = 'absolute left-1/2 w-0 h-0';
+                clusterpoint.style.transform = 'translateX(-50%)';
+                clusterpoint.style.bottom = '-8px';
+                clusterpoint.style.borderLeft = '6px solid transparent';
+                clusterpoint.style.borderRight = '6px solid transparent';
+                clusterpoint.style.borderTop = count < 10 ? '10px solid #eab308' : '10px solid #ef4444';
+                clusterpoint.style.zIndex = '-1';
+
+                // Create connector to avoid gap
+                const clusterconnector = document.createElement('div');
+                clusterconnector.className = 'absolute left-1/2 w-4 h-2';
+                clusterconnector.style.backgroundColor = count < 10 ? '#eab308' : '#ef4444';
+                clusterconnector.style.transform = 'translateX(-50%)';
+                clusterconnector.style.bottom = '-1px';
+                clusterconnector.style.zIndex = '-1';
+
+                // Assemble cluster marker
+                cluster_el.appendChild(clustercircle);
+                cluster_el.appendChild(clusterconnector);
+                cluster_el.appendChild(clusterpoint);
+                cluster_el.style.filter = 'drop-shadow(0 3px 3px rgba(0, 0, 0, 0.3))';
+                
+                /* Marker CSS ENDS */
+
+              
+                cluster_el.dataset.coordKey = coordKey;
+                
+                try {
+                    const marker = new mapboxgl.Marker({
+                        element: cluster_el,
+                        anchor: 'bottom', 
+                        offset: [0, 0]   
+                    })
                     .setLngLat([lng, lat])
                     .addTo(map);
-                
-                // Store marker reference by person ID for later updates
-                markersRef.current.set(person._id || person.id, marker);
-                
-                // Add click event
-                el.addEventListener('click', () => {
-                    // Make a deep copy to avoid reference issues
-                    const personData = {...person};
-                    // Ensure the Modal has all needed fields
-                    personData.id = personData._id || personData.id;
-                    handleMarkerClick(personData);
-                });
-                
-            } catch (error) {
-                throw new Error("Something went wrong");
+                    
+                    // Store marker reference
+                    markersRef.current.set(coordKey, marker);
+                    
+                    // Add click event to the wrapper element
+                    cluster_el.addEventListener('click', () => {
+                        handleClusterMarkerClick(coordKey, peopleAtLocation);
+                    });
+                    
+                } catch (error) {
+                    console.error("Failed to create marker:", error);
+                }
             }
         });
     };
 
     useEffect(() => {
-
-        // Initialize map
         mapboxgl.accessToken = mapbox_accesstoken;
         const map = new mapboxgl.Map({
             container: mapContainerRef.current,
@@ -272,14 +363,9 @@ function Mapbox() {
 
         map.on('load', async () => {
             try {
-                // Fetch missing people data from API
-                const peopleData = await fetchMissingPeople();
-                
-                // Add markers to map
-                addMarkersToMap(map, peopleData);
-                
+                const peopleData = await fetchMissingPeople();           
+                addMarkersToMap(map, peopleData);           
             } catch (error) {
-                // Fall back to empty data if there's an error
                 addMarkersToMap(map, []);
             }
         });
@@ -374,6 +460,17 @@ function Mapbox() {
         }
       }, [recievedNewPost, newReportCoords]);
 
+    useEffect(() => {
+        // Disable scrolling on body
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        
+        // Re-enable scrolling when component unmounts
+        return () => {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+        };
+    }, []);
 
     return (
         <>
