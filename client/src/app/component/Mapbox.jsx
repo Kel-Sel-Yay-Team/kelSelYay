@@ -10,6 +10,7 @@ import LanguageToggle from "./LanguageToggleButton";
 import DonateButton from "./DonateButton";
 import HelpButton from "./HelpButton";
 import Menu from "./Menu";
+import SearchButton from "./SearchButton";
 
 const mapbox_accesstoken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -23,6 +24,7 @@ function Mapbox() {
     const [newReportCoords, setNewReportCoords] = useState(null);
     //for tutorial Box
     const [showOnboarding, setShowOnboarding] = useState(false);
+    const [searchMode, setSearchMode] = useState(false);
 
     // Function to handle marker click
     const handleMarkerClick = (person) => {
@@ -313,31 +315,6 @@ function Mapbox() {
         }
     }, [missingPeople]);
 
-    // useEffect(() => {
-    //     // const isMobile = window.innerWidth < 769;
-    //     const isMobile = window.matchMedia( "(max-width: 768px)" ).matches;
-    //     if (recievedNewPost && newReportCoords && mapRef.current) {
-    //         if(isMobile)
-    //         {
-    //             mapRef.current.setCenter([newReportCoords.lng, newReportCoords.lat]);
-    //         }
-    //         else
-    //         {
-    //             mapRef.current.flyTo({
-    //                 center: [newReportCoords.lng, newReportCoords.lat],
-    //                 ...(isMobile? {} : {zoom: 15}),
-    //                 speed: 1.2,
-    //                 ...(isMobile? {} : {curve: 1.3}),
-    //                 essential: true
-    //             });
-    //         }
-            
-    //         setTimeout(() => {
-    //             setRecievedNewPost(false);
-    //         }, 100);
-    //     }
-    // }, [recievedNewPost, newReportCoords]);
-
     useEffect(() => {
         const isMobile = window.matchMedia("(max-width: 768px)").matches;
       
@@ -413,14 +390,17 @@ function Mapbox() {
                     onDeleteSuccess={handleDetailDelete}
                 />
             )}
-            <DonateButton />
+            {/* <DonateButton /> */}
+            <SearchButton data={missingPeople} isOpen={searchMode} setIsOpen={setSearchMode}/>
             <HelpButton/>
             
             {/* Add the mobile menu component */}
-            <Menu />
+            {/* <Menu /> */}
             
             {/* Floating button */}
-            <AddReportButton onReportSubmitted={handleNewReport}/>
+            <div className={searchMode ? 'hidden' : 'block'}>
+              <AddReportButton onReportSubmitted={handleNewReport} />
+            </div>
             {/* Add some basic styling for the markers */}
             <style jsx global>{`
                 .missing-person-marker {

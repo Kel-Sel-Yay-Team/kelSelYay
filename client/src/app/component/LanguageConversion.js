@@ -28,6 +28,8 @@ const burmese = {
   'Mark As Found': 'ရှာတွေ့ပြီး',
   'Remove Report': 'ဖျက်ရန်',
   'Donate' : 'လှူရန်',
+  'Search' : 'ရှာရန်',
+  'Search...' : 'ရှာရန်...',
   
   // Form placeholders & labels & units
   'Enter Name': 'အမည်ရေးရန်',
@@ -109,6 +111,9 @@ const burmese = {
 
   'Next':'ရှေ့သို့',
   'Got it!':'ရပြီ',
+
+  //list
+  'All Missing People' : 'ပျောက်ဆုံးသူစာရင်း'
 };
   
   

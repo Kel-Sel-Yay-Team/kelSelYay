@@ -21,14 +21,14 @@ export default function AddReportButton({ onReportSubmitted }) {
 
   return (
     <>
-        <button
-          className="add-report-button"
-          onClick={() => setIsOpen(true)}
-          aria-label="Add Report"
-        >
-          <FontAwesomeIcon icon={faUser} className="icon" />
-          <span className="label">{t("Report Missing Person")}</span> 
-        </button>
+    <button
+      className="add-report-button"
+      onClick={() => setIsOpen(true)}
+      aria-label="Add Report"
+    >
+      <FontAwesomeIcon icon={faUser} className="icon" />
+      <span className="label">{t("Report Missing Person")}</span> 
+    </button>
 
     {isOpen && <ReportMissingPerson 
                       onClose={() => setIsOpen(false)} 
