@@ -46,7 +46,7 @@ export default function MissingListModal({ data = [], showTitle = true , onSelec
             position: relative;
             width: 90%;
             max-width: 640px;
-            max-height: calc(75vh + 2rem); /* extra height to accommodate label */
+            max-height: calc(63vh + 2rem); /* extra height to accommodate label */
             display: flex;
             flex-direction: column;
             align-items: stretch;
