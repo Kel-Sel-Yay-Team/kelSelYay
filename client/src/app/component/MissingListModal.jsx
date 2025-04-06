@@ -7,7 +7,7 @@ export default function MissingListModal({ data = [], showTitle = true , onSelec
 
   return (
     // <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-sm">
-    <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 backdrop-blur-sm pt-25">
+    <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 backdrop-blur-sm pt-22">
 
       <div className="modal-container">
         {showTitle && <span className="top-label">{t("All Missing People")}</span>}
