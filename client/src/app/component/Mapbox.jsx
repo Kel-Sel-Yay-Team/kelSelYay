@@ -151,67 +151,169 @@ function Mapbox() {
         markersRef.current.forEach(marker => marker.remove());
         markersRef.current.clear();
         
+        const usedCoordinates = new Map();
+
+        
         if (!people || !Array.isArray(people)) {
             console.error('Invalid people data provided to addMarkersToMap:', people);
             return;  // Exit early if data is invalid
         }
 
         const localClusteredData = await filter(people);
-        
+
         Object.entries(localClusteredData).forEach(([coordKey, peopleAtLocation]) => {
             const [lat, lng] = coordKey.split(',').map(Number);
             const count = peopleAtLocation.length;
 
-            // Create marker element
-            const el = document.createElement('div');
-            el.className = 'marker-wrapper'; // New wrapper class
-            
-            const markerContent = document.createElement('div');
-            markerContent.className = 'marker-cluster';
-            
-            const circle = document.createElement('div');
-            circle.className = 'cluster-circle';
-            circle.textContent = count;
-            
-            // Add color based on count
-            if (count < 2) {
-                circle.classList.add('count-1');
-            } else if (count < 5) {
-                circle.classList.add('count-small');
-            } else if (count < 10) {
-                circle.classList.add('count-medium');
-            } else {
-                circle.classList.add('count-large');
-            }
-            
-            const point = document.createElement('div');
-            point.className = 'cluster-point';
-            
-            // Update the DOM structure
-            markerContent.appendChild(circle);
-            markerContent.appendChild(point);
-            el.appendChild(markerContent);
-            el.dataset.coordKey = coordKey;
-            
-            try {
-                const marker = new mapboxgl.Marker({
-                    element: el,
-                    anchor: 'bottom', 
-                    offset: [0, 0]   
-                })
-                .setLngLat([lng, lat])
-                .addTo(map);
-                
-                // Store marker reference
-                markersRef.current.set(coordKey, marker);
-                
-                // Add click event to the wrapper element
-                el.addEventListener('click', () => {
-                    handleMarkerClick(coordKey, peopleAtLocation);
+        
+            if(count <= 5) {
+                // Add markers for missing persons
+                peopleAtLocation.forEach((person, index) => {
+                            
+                    // Create custom marker element
+                    let imgUrl = person.imageUrl;
+                    if(!imgUrl || imgUrl === 'https://example.com/image.jpg' || imgUrl === 'https://example.com/updated-image.jpg'){
+                        imgUrl = '/testPic.png';
+                    }
+
+
+                    /* Marker CSS DO NOT TOUCH */
+                    const el = document.createElement('div');
+                    el.className = 'relative';
+
+                    // Create the circular part with the image
+                    const circle = document.createElement('div');
+                    circle.className = 'w-10 h-10 rounded-full overflow-hidden border-2 border-red-500';
+                    circle.style.backgroundImage = `url(${imgUrl})`;
+                    circle.style.backgroundSize = 'cover';
+                    circle.style.backgroundPosition = 'center';
+
+                    // Create the teardrop point
+                    const point = document.createElement('div');
+                    point.className = 'absolute left-1/2 w-0 h-0';
+                    point.style.transform = 'translateX(-50%)';
+                    point.style.bottom = '-8px';
+                    point.style.borderLeft = '6px solid transparent';
+                    point.style.borderRight = '6px solid transparent';
+                    point.style.borderTop = '10px solid #ef4444'; // red-500 color
+                    point.style.zIndex = '-1'; // Place behind the circle
+
+                    // Add a small connecting piece between the circle and point to avoid a gap
+                    const connector = document.createElement('div');
+                    connector.className = 'absolute left-1/2 w-4 h-2 bg-red-500';
+                    connector.style.transform = 'translateX(-50%)';
+                    connector.style.bottom = '-1px';
+                    connector.style.zIndex = '-1'; // Place behind the circle
+
+                    // Assemble the components
+                    el.appendChild(circle);
+                    el.appendChild(connector);
+                    el.appendChild(point);
+
+                    // Add any additional styling like drop shadow
+                    el.style.filter = 'drop-shadow(0 3px 3px rgba(0, 0, 0, 0.3))';
+
+                    // Append to the desired parent element
+                    document.body.appendChild(el);
+                    
+                    /* Marker CSS ENDS HERE DO NOT TOUCH */
+
+                    // Add data attribute for identification
+                    el.dataset.personId = person._id || person.id;
+                    
+                    // Get coordinates with offset to prevent exact overlaps
+                    let lat = person.lat ? person.lat : 21.9162;
+                    let lng = person.lng ? person.lng : 95.9560;
+                    
+                    // Create a unique key for these coordinates
+                    const coordKey = `${lat},${lng}`;
+                    
+                    // If these exact coordinates are already used, offset slightly
+                    if (usedCoordinates.has(coordKey)) {
+                        const offset = usedCoordinates.get(coordKey) * 0.001; // Small offset
+                        lat += offset;
+                        lng += offset;
+                        usedCoordinates.set(coordKey, usedCoordinates.get(coordKey) + 1);
+                    } else {
+                        usedCoordinates.set(coordKey, 1);
+                    }
+                    
+                    
+                    try {
+                        // Create marker
+                        const marker = new mapboxgl.Marker(el)
+                            .setLngLat([lng, lat])
+                            .addTo(map);
+                        
+                        // Store marker reference by person ID for later updates
+                        markersRef.current.set(person._id || person.id, marker);
+                        
+                        // Add click event
+                        el.addEventListener('click', () => {
+                            // Make a deep copy to avoid reference issues
+                            const personData = {...person};
+                            // Ensure the Modal has all needed fields
+                            personData.id = personData._id || personData.id;
+                            handleMarkerClick(personData);
+                        });
+                        
+                    } catch (error) {
+                        throw new Error("Something went wrong");
+                    }
                 });
+            } 
+            else {
+                // Create marker element
+                const el = document.createElement('div');
+                el.className = 'marker-wrapper'; // New wrapper class
                 
-            } catch (error) {
-                console.error("Failed to create marker:", error);
+                const markerContent = document.createElement('div');
+                markerContent.className = 'marker-cluster';
+                
+                const circle = document.createElement('div');
+                circle.className = 'cluster-circle';
+                circle.textContent = count;
+                
+                // Add color based on count
+                if (count < 2) {
+                    circle.classList.add('count-1');
+                } else if (count < 5) {
+                    circle.classList.add('count-small');
+                } else if (count < 10) {
+                    circle.classList.add('count-medium');
+                } else {
+                    circle.classList.add('count-large');
+                }
+                
+                const point = document.createElement('div');
+                point.className = 'cluster-point';
+                
+                // Update the DOM structure
+                markerContent.appendChild(circle);
+                markerContent.appendChild(point);
+                el.appendChild(markerContent);
+                el.dataset.coordKey = coordKey;
+                
+                try {
+                    const marker = new mapboxgl.Marker({
+                        element: el,
+                        anchor: 'bottom', 
+                        offset: [0, 0]   
+                    })
+                    .setLngLat([lng, lat])
+                    .addTo(map);
+                    
+                    // Store marker reference
+                    markersRef.current.set(coordKey, marker);
+                    
+                    // Add click event to the wrapper element
+                    el.addEventListener('click', () => {
+                        handleMarkerClick(coordKey, peopleAtLocation);
+                    });
+                    
+                } catch (error) {
+                    console.error("Failed to create marker:", error);
+                }
             }
         });
     };
