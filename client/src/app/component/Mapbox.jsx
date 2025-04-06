@@ -29,8 +29,8 @@ function Mapbox() {
     //for tutorial Box
     const [showOnboarding, setShowOnboarding] = useState(false);
 
-
-    const handleMarkerClick = (coordKey, peopleAtLocation) => {
+    // Function to handle when cluster marker is clicked
+    const handleClusterMarkerClick = (coordKey, peopleAtLocation) => {
         // console.log("Marker clicked!", coordKey, peopleAtLocation?.length || 0);
         if (!peopleAtLocation || peopleAtLocation.length === 0) {
             return;
@@ -43,6 +43,12 @@ function Mapbox() {
         const [lat, lng] = coordKey.split(',');
         window.location.href = `/missing-people?lat=${lat}&lng=${lng}&ids=${ids}`;
     };
+
+    // Function to handle when individual marker is clicked
+    const handleIndividualMarkerClick = (person) => {
+        setSelectedPerson(person);
+    };
+
     // Function to close modal
     const handleCloseModal = () => {
         setSelectedPerson(null);
@@ -153,7 +159,7 @@ function Mapbox() {
         
         const usedCoordinates = new Map();
 
-        
+
         if (!people || !Array.isArray(people)) {
             console.error('Invalid people data provided to addMarkersToMap:', people);
             return;  // Exit early if data is invalid
@@ -169,8 +175,10 @@ function Mapbox() {
             if(count <= 5) {
                 // Add markers for missing persons
                 peopleAtLocation.forEach((person, index) => {
-                            
-                    // Create custom marker element
+                    
+                    const personData = {...person};
+
+                                        // Create custom marker element
                     let imgUrl = person.imageUrl;
                     if(!imgUrl || imgUrl === 'https://example.com/image.jpg' || imgUrl === 'https://example.com/updated-image.jpg'){
                         imgUrl = '/testPic.png';
@@ -181,29 +189,43 @@ function Mapbox() {
                     const el = document.createElement('div');
                     el.className = 'relative';
 
-                    // Create the circular part with the image
+                    el.style.cursor = 'pointer';
+                    el.style.pointerEvents = 'auto';
+
+                    // --- Circle (Image) ---
                     const circle = document.createElement('div');
-                    circle.className = 'w-10 h-10 rounded-full overflow-hidden border-2 border-red-500';
+                    circle.style.width = '40px';
+                    circle.style.height = '40px';
+                    circle.style.borderRadius = '9999px'; // fully rounded
+                    circle.style.overflow = 'hidden';
+                    circle.style.border = '2px solid #ef4444';
                     circle.style.backgroundImage = `url(${imgUrl})`;
                     circle.style.backgroundSize = 'cover';
                     circle.style.backgroundPosition = 'center';
 
-                    // Create the teardrop point
+                    // --- Connector (small rectangle) ---
+                    const connector = document.createElement('div');
+                    connector.style.position = 'absolute';
+                    connector.style.left = '50%';
+                    connector.style.width = '16px';
+                    connector.style.height = '8px';
+                    connector.style.backgroundColor = '#ef4444';
+                    connector.style.transform = 'translateX(-50%)';
+                    connector.style.bottom = '-1px';
+                    connector.style.zIndex = '-1';
+
+                    // --- Teardrop Point ---
                     const point = document.createElement('div');
-                    point.className = 'absolute left-1/2 w-0 h-0';
+                    point.style.position = 'absolute';
+                    point.style.left = '50%';
+                    point.style.width = '0';
+                    point.style.height = '0';
                     point.style.transform = 'translateX(-50%)';
                     point.style.bottom = '-8px';
                     point.style.borderLeft = '6px solid transparent';
                     point.style.borderRight = '6px solid transparent';
-                    point.style.borderTop = '10px solid #ef4444'; // red-500 color
-                    point.style.zIndex = '-1'; // Place behind the circle
-
-                    // Add a small connecting piece between the circle and point to avoid a gap
-                    const connector = document.createElement('div');
-                    connector.className = 'absolute left-1/2 w-4 h-2 bg-red-500';
-                    connector.style.transform = 'translateX(-50%)';
-                    connector.style.bottom = '-1px';
-                    connector.style.zIndex = '-1'; // Place behind the circle
+                    point.style.borderTop = '10px solid #ef4444';
+                    point.style.zIndex = '-1';
 
                     // Assemble the components
                     el.appendChild(circle);
@@ -213,13 +235,10 @@ function Mapbox() {
                     // Add any additional styling like drop shadow
                     el.style.filter = 'drop-shadow(0 3px 3px rgba(0, 0, 0, 0.3))';
 
-                    // Append to the desired parent element
-                    document.body.appendChild(el);
-                    
                     /* Marker CSS ENDS HERE DO NOT TOUCH */
 
-                    // Add data attribute for identification
                     el.dataset.personId = person._id || person.id;
+
                     
                     // Get coordinates with offset to prevent exact overlaps
                     let lat = person.lat ? person.lat : 21.9162;
@@ -240,22 +259,20 @@ function Mapbox() {
                     
                     
                     try {
-                        // Create marker
+
+                        // Add click event
+                        el.addEventListener('click', () => {
+
+                            handleIndividualMarkerClick(personData);
+                        });
+
+                         // Create marker
                         const marker = new mapboxgl.Marker(el)
                             .setLngLat([lng, lat])
                             .addTo(map);
-                        
-                        // Store marker reference by person ID for later updates
-                        markersRef.current.set(person._id || person.id, marker);
-                        
-                        // Add click event
-                        el.addEventListener('click', () => {
-                            // Make a deep copy to avoid reference issues
-                            const personData = {...person};
-                            // Ensure the Modal has all needed fields
-                            personData.id = personData._id || personData.id;
-                            handleMarkerClick(personData);
-                        });
+
+                        markersRef.current.set(personData._id || personData.id, marker);
+
                         
                     } catch (error) {
                         throw new Error("Something went wrong");
@@ -263,40 +280,54 @@ function Mapbox() {
                 });
             } 
             else {
+
+                /* Marker CSS DO NOT TOUCH */
+
                 // Create marker element
-                const el = document.createElement('div');
-                el.className = 'marker-wrapper'; // New wrapper class
+                const cluster_el = document.createElement('div');
+                cluster_el.className = 'relative'; // New wrapper class
+
+                // Create the circular part for the cluster count
+                const clustercircle = document.createElement('div');
+                clustercircle.className = 'w-10 h-10 rounded-full overflow-hidden border-2 border-white flex items-center justify-center font-bold text-sm';
+                clustercircle.style.backgroundColor = 
+                    count < 10 ? '#eab308' : '#ef4444'; // dynamic color
+                clustercircle.textContent = count;
+                clustercircle.style.color= 'white';
+                clustercircle.style.borderColor = 'black';
+
+                // Create the teardrop point
+                const clusterpoint = document.createElement('div');
+                clusterpoint.className = 'absolute left-1/2 w-0 h-0';
+                clusterpoint.style.transform = 'translateX(-50%)';
+                clusterpoint.style.bottom = '-8px';
+                clusterpoint.style.borderLeft = '6px solid transparent';
+                clusterpoint.style.borderRight = '6px solid transparent';
+                clusterpoint.style.borderTop = count < 10 ? '10px solid #eab308' : '10px solid #ef4444';
+                clusterpoint.style.zIndex = '-1';
+
+                // Create connector to avoid gap
+                const clusterconnector = document.createElement('div');
+                clusterconnector.className = 'absolute left-1/2 w-4 h-2';
+                clusterconnector.style.backgroundColor = count < 10 ? '#eab308' : '#ef4444';
+                clusterconnector.style.transform = 'translateX(-50%)';
+                clusterconnector.style.bottom = '-1px';
+                clusterconnector.style.zIndex = '-1';
+
+                // Assemble cluster marker
+                cluster_el.appendChild(clustercircle);
+                cluster_el.appendChild(clusterconnector);
+                cluster_el.appendChild(clusterpoint);
+                cluster_el.style.filter = 'drop-shadow(0 3px 3px rgba(0, 0, 0, 0.3))';
                 
-                const markerContent = document.createElement('div');
-                markerContent.className = 'marker-cluster';
-                
-                const circle = document.createElement('div');
-                circle.className = 'cluster-circle';
-                circle.textContent = count;
-                
-                // Add color based on count
-                if (count < 2) {
-                    circle.classList.add('count-1');
-                } else if (count < 5) {
-                    circle.classList.add('count-small');
-                } else if (count < 10) {
-                    circle.classList.add('count-medium');
-                } else {
-                    circle.classList.add('count-large');
-                }
-                
-                const point = document.createElement('div');
-                point.className = 'cluster-point';
-                
-                // Update the DOM structure
-                markerContent.appendChild(circle);
-                markerContent.appendChild(point);
-                el.appendChild(markerContent);
-                el.dataset.coordKey = coordKey;
+                /* Marker CSS ENDS */
+
+              
+                cluster_el.dataset.coordKey = coordKey;
                 
                 try {
                     const marker = new mapboxgl.Marker({
-                        element: el,
+                        element: cluster_el,
                         anchor: 'bottom', 
                         offset: [0, 0]   
                     })
@@ -307,8 +338,8 @@ function Mapbox() {
                     markersRef.current.set(coordKey, marker);
                     
                     // Add click event to the wrapper element
-                    el.addEventListener('click', () => {
-                        handleMarkerClick(coordKey, peopleAtLocation);
+                    cluster_el.addEventListener('click', () => {
+                        handleClusterMarkerClick(coordKey, peopleAtLocation);
                     });
                     
                 } catch (error) {
@@ -473,15 +504,14 @@ function Mapbox() {
             {showOnboarding && <OnboardingModal onFinish={handleOnboardingFinish} />}
             
             {/* Render modal when a person is selected */}
-            {/* {selectedPerson && (
-                <Link href="/missing-people"></Link>
-                // <DetailModal 
-                //     detail={selectedPerson}
-                //     onClose={handleCloseModal}
-                //     onUpdateSuccess={handleDetailUpdate}
-                //     onDeleteSuccess={handleDetailDelete}
-                // />
-            // )} */}
+            {selectedPerson && (
+                <DetailModal 
+                    detail={selectedPerson}
+                    onClose={handleCloseModal}
+                    onUpdateSuccess={handleDetailUpdate}
+                    onDeleteSuccess={handleDetailDelete}
+                />
+            )}
             <DonateButton />
             <HelpButton/>
             
@@ -490,164 +520,6 @@ function Mapbox() {
             
             {/* Floating button */}
             <AddReportButton onReportSubmitted={handleNewReport}/>
-            {/* Add some basic styling for the markers */}
-            <style jsx global>{`
-                html, body {
-                    margin: 0;
-                    padding: 0;
-                    overflow: hidden;
-                    height: 100%;
-                    width: 100%;
-                }
-                
-                #map {
-                    position: absolute;
-                    top: 0;
-                    bottom: 0;
-                    width: 100%;
-                    height: 100vh; 
-                }
-                .missing-person-marker {
-                    cursor: pointer;
-                    z-index: 2;
-                }
-                
-                .custom-marker {
-                    z-index: 1;
-                }
-                
-                .marker-cluster {
-                    position: relative;
-                    width: 36px;
-                    height: 46px;
-                    cursor: pointer;
-                    // pointer-events: none;
-                }
-                
-                .cluster-circle {
-                    position: absolute;
-                    top: 0;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 50%;
-                    background-color: #ef4444;
-                    color: white;
-                    font-weight: bold;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 14px;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-                    border: 2px solid white;
-                }
-                
-                .cluster-point {
-                    position: absolute;
-                    bottom: 0;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 0;
-                    height: 0;
-                    border-left: 8px solid transparent;
-                    border-right: 8px solid transparent;
-                    border-top: 10px solid #ef4444;
-                }
-                
-                .count-1 {
-                    background-color: #ef4444;
-                }
-                
-                .count-small {
-                    background-color: #f97316;
-                }
-                
-                .count-medium {
-                    background-color: #eab308;
-                }
-                
-                .count-large {
-                    background-color: #84cc16;
-                }
-                .marker-wrapper {
-                        cursor: pointer;
-                        will-change: transform; /* Optimizes for animation */
-                    }
-                
-                .marker-cluster {
-                    position: relative;
-                    width: 36px;
-                    height: 46px;
-                    pointer-events: none; /* Makes click pass through to wrapper */
-                }
-                
-                .cluster-circle {
-                    position: absolute;
-                    top: 0;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 50%;
-                    background-color: #ef4444;
-                    color: white;
-                    font-weight: bold;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 14px;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-                    border: 2px solid white;
-                }
-                
-                .cluster-point {
-                    position: absolute;
-                    bottom: 0;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 0;
-                    height: 0;
-                    border-left: 8px solid transparent;
-                    border-right: 8px solid transparent;
-                    border-top: 10px solid #ef4444;
-                }
-    
-                /* Color classes remain the same */
-                .count-1 {
-                    background-color: #84cc16; /* least impacted */
-                }
-
-                .count-small {
-                    background-color: #eab308;
-                }
-
-                .count-medium {
-                    background-color: #f97316;
-                }
-
-                .count-large {
-                    background-color: #ef4444; /* most impacted */
-                }
-
-                /* Marker point colors should match circle colors */
-                .count-1 + .cluster-point {
-                    border-top-color: #84cc16;
-                }
-
-                .count-small + .cluster-point {
-                    border-top-color: #eab308;
-                }
-
-                .count-medium + .cluster-point {
-                    border-top-color: #f97316;
-                }
-
-                .count-large + .cluster-point {
-                    border-top-color: #ef4444;
-                }
-
-            `}</style>
         </>
     );
 }
