@@ -280,45 +280,96 @@ function Mapbox() {
 
                 /* Marker CSS DO NOT TOUCH */
 
-                // Create marker element
-                const cluster_el = document.createElement('div');
-                cluster_el.className = 'relative'; // New wrapper class
+                // // Create marker element
+                // const cluster_el = document.createElement('div');
+                // cluster_el.className = 'relative'; // New wrapper class
 
-                // Create the circular part for the cluster count
-                const clustercircle = document.createElement('div');
-                clustercircle.className = 'w-10 h-10 rounded-full overflow-hidden border-2 border-white flex items-center justify-center font-bold text-sm';
-                clustercircle.style.backgroundColor = 
-                    count <= 5 ? '#eab308' : '#ffffff'; // dynamic color
-                clustercircle.textContent = count;
-                clustercircle.style.color= 'red';
-                clustercircle.style.borderColor = 'red';
+                // // Create the circular part for the cluster count
+                // const clustercircle = document.createElement('div');
+                // clustercircle.className = 'w-10 h-10 rounded-full overflow-hidden border-2 border-white flex items-center justify-center font-bold text-sm';
+                // clustercircle.style.backgroundColor = 
+                //     count <= 5 ? '#eab308' : '#ffffff'; // dynamic color
+                // clustercircle.textContent = count;
+                // clustercircle.style.color= 'red';
+                // clustercircle.style.borderColor = 'red';
 
-                // Create the teardrop point
-                const clusterpoint = document.createElement('div');
-                clusterpoint.className = 'absolute left-1/2 w-0 h-0';
-                clusterpoint.style.transform = 'translateX(-50%)';
-                clusterpoint.style.bottom = '-8px';
-                clusterpoint.style.borderLeft = '6px solid transparent';
-                clusterpoint.style.borderRight = '6px solid transparent';
-                clusterpoint.style.borderTop = count < 10 ? '10px solid #eab308' : '10px solid #ef4444';
-                clusterpoint.style.zIndex = '-1';
+                // // Create the teardrop point
+                // const clusterpoint = document.createElement('div');
+                // clusterpoint.className = 'absolute left-1/2 w-0 h-0';
+                // clusterpoint.style.transform = 'translateX(-50%)';
+                // clusterpoint.style.bottom = '-8px';
+                // clusterpoint.style.borderLeft = '6px solid transparent';
+                // clusterpoint.style.borderRight = '6px solid transparent';
+                // clusterpoint.style.borderTop = count < 10 ? '10px solid #eab308' : '10px solid #ef4444';
+                // clusterpoint.style.zIndex = '-1';
 
-                // Create connector to avoid gap
-                const clusterconnector = document.createElement('div');
-                clusterconnector.className = 'absolute left-1/2 w-4 h-2';
-                clusterconnector.style.backgroundColor = count < 10 ? '#eab308' : '#ef4444';
-                clusterconnector.style.transform = 'translateX(-50%)';
-                clusterconnector.style.bottom = '-1px';
-                clusterconnector.style.zIndex = '-1';
+                // // Create connector to avoid gap
+                // const clusterconnector = document.createElement('div');
+                // clusterconnector.className = 'absolute left-1/2 w-4 h-2';
+                // clusterconnector.style.backgroundColor = count < 10 ? '#eab308' : '#ef4444';
+                // clusterconnector.style.transform = 'translateX(-50%)';
+                // clusterconnector.style.bottom = '-1px';
+                // clusterconnector.style.zIndex = '-1';
 
-                // Assemble cluster marker
-                cluster_el.appendChild(clustercircle);
-                cluster_el.appendChild(clusterconnector);
-                cluster_el.appendChild(clusterpoint);
-                cluster_el.style.filter = 'drop-shadow(0 3px 3px rgba(0, 0, 0, 0.3))';
+                // // Assemble cluster marker
+                // cluster_el.appendChild(clustercircle);
+                // cluster_el.appendChild(clusterconnector);
+                // cluster_el.appendChild(clusterpoint);
+                // cluster_el.style.filter = 'drop-shadow(0 3px 3px rgba(0, 0, 0, 0.3))';
                 
                 /* Marker CSS ENDS */
 
+                /* Marker CSS DO NOT TOUCH */
+
+                // ===== DYNAMIC SIZE CALCULATION =====
+                const baseSize = 40;
+                const growthFactor = Math.ceil((count - 5) / 5);
+                const cap_count = count <= 60 ? count : 60;
+                const newSize = cap_count <= 5 ? baseSize : baseSize + (baseSize / 40) * growthFactor;
+                const newFontSize = cap_count <= 5 ? 14 : 14 + growthFactor * 1.2;
+
+                // Color logic 
+                const baseColor = count <= 5 ? '#eab308' : '#ffffff';
+                const pointColor = count < 10 ? '#eab308' : '#ef4444';
+
+                // ===== CLUSTER MARKER ELEMENT =====
+                const cluster_el = document.createElement('div');
+                cluster_el.className = 'relative';
+                
+
+                // ===== CLUSTER CIRCLE =====
+                const clustercircle = document.createElement('div');
+                clustercircle.className = 'rounded-full overflow-hidden border-2 border-white flex items-center justify-center font-bold';
+                clustercircle.style.width = `${newSize}px`;
+                clustercircle.style.height = `${newSize}px`;
+                clustercircle.style.backgroundColor = baseColor;
+                clustercircle.textContent = count;
+                clustercircle.style.color = 'red';
+                clustercircle.style.borderColor = 'red';
+                clustercircle.style.fontSize = `${newFontSize}px`;
+
+                // ===== POINT =====
+                const pointWidth = newSize * 0.25;
+                const pointHeight = newSize * 0.45;
+
+                const clusterpoint = document.createElement('div');
+                clusterpoint.className = 'absolute left-1/2';
+                clusterpoint.style.width = '0';
+                clusterpoint.style.height = '0';
+                clusterpoint.style.transform = 'translateX(-50%)';
+                clusterpoint.style.bottom = `-${pointHeight * 0.75}px`;
+                clusterpoint.style.borderLeft = `${pointWidth}px solid transparent`;
+                clusterpoint.style.borderRight = `${pointWidth}px solid transparent`;
+                clusterpoint.style.borderTop = `${pointHeight}px solid ${pointColor}`;
+                clusterpoint.style.zIndex = '-1';
+
+                // ===== ASSEMBLE CLUSTER MARKER =====
+                cluster_el.appendChild(clustercircle);
+                // cluster_el.appendChild(clusterconnector);
+                cluster_el.appendChild(clusterpoint);
+                cluster_el.style.filter = 'drop-shadow(0 3px 3px rgba(0, 0, 0, 0.3))';
+
+                // DYNAMIC MARKER ENDS HERE
               
                 cluster_el.dataset.coordKey = coordKey;
                 
@@ -342,6 +393,7 @@ function Mapbox() {
                 } catch (error) {
                     console.error("Failed to create marker:", error);
                 }
+                /* Marker CSS ENDS */
             }
         });
     };
