@@ -57,10 +57,16 @@ export default function FilterButton({ onApplyFilter }) {
 
       <style jsx>{`
         .filter-button {
-          padding: 0.25rem;
-          border-radius: 999px;
-          background-color: white;
-          border: 1px solid #ddd;
+          width: 1.0rem;
+          height: 1.0rem;
+          padding: 0.2rem;
+          background-color: transparent;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.85rem;
+          color: red;
+          cursor: pointer;
         }
 
         .filter-modal {
