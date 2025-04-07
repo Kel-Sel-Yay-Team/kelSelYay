@@ -1,5 +1,7 @@
 import express from 'express';
 import MissingPerson from '../models/MissingPerson.js';
+import { geocodeLocation } from '../utils/geocodeLocation.js';
+import { checkForCustomLocation } from '../utils/geoOverride.js';
 
 const router = express.Router();
 
@@ -56,6 +58,7 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ error: "Location is required." });
         }
 
+        /*
         //Step 1: Geocode using Google Maps API
         const query = encodeURIComponent(locationOfMissingPerson);
         const apiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -69,7 +72,11 @@ router.post('/', async (req, res) => {
             return res.status(404).json({ error: "Location could not be geocoded." });
         }
 
-        const { lat, lng } = geoData.results[0].geometry.location;
+        const { lat, lng } = geoData.results[0].geometry.location;*/
+
+        let lat, lng;
+        ({lat,lng} = await geocodeLocation(locationOfMissingPerson));
+        
 
         // Step 2: Store full report with lat/lng
         const report = new MissingPerson({
