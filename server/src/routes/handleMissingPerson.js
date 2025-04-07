@@ -5,6 +5,11 @@ import { checkForCustomLocation } from '../utils/geoOverride.js';
 
 const router = express.Router();
 
+//image handling middleware
+import multer from 'multer';
+const storage = multer.memoryStorage(); // We'll need buffer for S3 later
+const upload = multer({ storage });
+
 //CRUD
 //GET everyone from the database
 router.get('/', async(req, res) => {
@@ -84,8 +89,30 @@ router.post('/', async (req, res) => {
     }
 });
 
+//testing image upload with AWS
+router.post("/testImage", upload.single("image"), (req, res) => {
+  const file = req.file;
+  const caption = req.body.caption;
 
+  if (!file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+
+  // For now, just return what we got
+  console.log("Received file:", file.originalname);
+  console.log("Caption:", caption);
+
+  res.json({
+    message: "File received successfully",
+    filename: file.originalname,
+    caption: caption,
+  });
+});
+
+
+// admin purposes only
 // POST a single missing person report (no geocoding)
+/*
 router.post('/batch', async (req, res) => {
   try {
     const report = new MissingPerson(req.body);
@@ -95,8 +122,7 @@ router.post('/batch', async (req, res) => {
     console.error('❌ Error saving missing person report:', err.message);
     res.status(500).json({ error: err.message });
   }
-});
-
+});*/
 
 //EDIT (with reporterName validation)
 router.put("/:id", async (req, res) => {
@@ -149,6 +175,8 @@ router.put("/:id", async (req, res) => {
     }
   });
 
+
+  
 
 //input: reporterName, the id of the request
 router.delete('/:id', async (req, res) => {
