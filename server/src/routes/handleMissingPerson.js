@@ -103,7 +103,7 @@ router.post("/testImage", upload.single("image"), async (req, res) => {
   }
 
   const ext = path.extname(file.originalname);
-  const key = `missing-photos/${uuidv4()}${ext}`;
+  const key = `missing-people-photos/${uuidv4()}${ext}`;
 
   const s3 = new S3Client({
     region: process.env.AWS_REGION,
@@ -189,7 +189,6 @@ router.put("/:id", async (req, res) => {
   });
 
 
-  
 
 //input: reporterName, the id of the request
 router.delete('/:id', async (req, res) => {
