@@ -4,9 +4,9 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { useLanguage } from "../context/LanguageContext";
+import FilterButton from "./FilterButton";
 
-export default function SearchBar({ onInputChange }) {
-
+export default function SearchBar({ onInputChange, onApplyFilter }) {
   const { t } = useLanguage();
   const [input, setInput] = useState("");
 
@@ -27,6 +27,7 @@ export default function SearchBar({ onInputChange }) {
           className="label"
         />
         <FontAwesomeIcon icon={faSearch} className="icon" />
+        <FilterButton onApplyFilter={onApplyFilter}/>
       </div>
 
       <style jsx>{`

@@ -8,11 +8,14 @@ import SearchBar from "./SearchBar";
 import MissingListModal from "./MissingListModal";
 import DetailModal from "./DetailModal";
 
+
 export default function SearchButton({ data, isOpen, setIsOpen }) {
 
   const {t} = useLanguage();
   const [query, setQuery] = useState("");
   const [selectedPerson, setSelectedPerson] = useState(null);
+
+  const [filterType, setFilterType] = useState('all');
 
   const toggleButton = () => {
     setIsOpen(!isOpen);
@@ -24,6 +27,10 @@ export default function SearchButton({ data, isOpen, setIsOpen }) {
   const handleSearchInput = (text) => {
     setQuery(text.toLowerCase());
   };
+  const handleFilterApply = (type) => {
+    setFilterType(type);
+  }
+
 
 //   const filteredData = useMemo(() => {
 //     if (!query) return data;
@@ -35,15 +42,25 @@ export default function SearchButton({ data, isOpen, setIsOpen }) {
 //   }, [query, data]);
 
   const filteredData = useMemo(() => {
-    if (!query) return data;
-    
-    const normalizedQuery = query.toLowerCase().trim();
+    let result = data;
+
+    if (query) {
+      const normalizedQuery = query.toLowerCase().trim();
+      result = result.filter((person) => {
+        const name = person.missingPersonName?.toLowerCase().trim() || "";
+        return name.includes(normalizedQuery);
+      });
+    }
   
-    return data.filter((person) => {
-      const name = person.missingPersonName?.toLowerCase().trim() || "";
-      return name.includes(normalizedQuery);
-    });
-  }, [query, data]);
+    if (filterType === "found") {
+      result = result.filter((person) => person.found === true);
+    } else if (filterType === "notfound") {
+      result = result.filter((person) => person.found === false);
+    }
+  
+    return result;
+  }, [query, data, filterType]);
+
 
   return (
     <>
@@ -52,7 +69,7 @@ export default function SearchButton({ data, isOpen, setIsOpen }) {
             <span className="search-text">{isOpen? t("Close") : t("Search")}</span>
 
             {/* Debug or test the data prop */}
-            {/*
+            {/*\\\\\
             {isOpen && (
             <div className="search-data-preview">
                 <p>Total People: {data?.length || 0}</p>
@@ -63,13 +80,17 @@ export default function SearchButton({ data, isOpen, setIsOpen }) {
         </div>
         {isOpen && (
             <div>
-                <SearchBar onInputChange={handleSearchInput} />
+                <SearchBar onInputChange={handleSearchInput} onApplyFilter={handleFilterApply}/>
+
+                {console.log("check filter type", filterType)}
+
                 <MissingListModal data={filteredData} 
                 showTitle={!query} 
                 titleMessage={t("All Missing People")}
                 onSelectPerson={(person) => setSelectedPerson(person)}/>
             </div>
         )}
+        
         {selectedPerson && (
           <DetailModal
             detail={selectedPerson}

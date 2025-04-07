@@ -5,6 +5,9 @@ import { useLanguage } from "../context/LanguageContext";
 export default function MissingListModal({ data = [], showTitle = true , titleMessage, onSelectPerson}) {
   const { t } = useLanguage();
 
+  // console.log("Modal rendering!");
+  // console.log("Modal data:", data);
+
   return (
     // <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-sm">
     <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 backdrop-blur-sm pt-20">
@@ -52,6 +55,7 @@ export default function MissingListModal({ data = [], showTitle = true , titleMe
             display: flex;
             flex-direction: column;
             align-items: stretch;
+
           }
 
           .top-label {
