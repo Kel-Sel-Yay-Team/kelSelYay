@@ -124,7 +124,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       let finalImageUrl = "";
 
       if (imageFile) {
-        finalImageUrl = await uploadAwsImage(imageFile, "Missing person image");
+        finalImageUrl = await cloudinaryImageUpload(imageFile);
       } else {
         finalImageUrl = "https://res.cloudinary.com/dpmhxppeg/image/upload/v1743667345/Missing%20People%20Pictures/iiz12qayrwjtkoczh2rq.png";
       }
