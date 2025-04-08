@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function FilterButton({ onApplyFilter }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState("all");
+  const { t } = useLanguage();
 
   const applyFilter = () => {
     onApplyFilter(selected);
@@ -29,7 +31,7 @@ export default function FilterButton({ onApplyFilter }) {
               checked={selected === "all"}
               onChange={() => setSelected("all")}
             />{" "}
-            All
+            {t("All")}
           </label>
           <label>
             <input
@@ -39,7 +41,7 @@ export default function FilterButton({ onApplyFilter }) {
               checked={selected === "found"}
               onChange={() => setSelected("found")}
             />{" "}
-            Found
+            {t("Found")}
           </label>
           <label>
             <input
@@ -49,9 +51,9 @@ export default function FilterButton({ onApplyFilter }) {
               checked={selected === "notfound"}
               onChange={() => setSelected("notfound")}
             />{" "}
-            Not Found
+            {t("Missing")}
           </label>
-          <button className="apply-button" onClick={applyFilter}>Apply</button>
+          <button className="apply-button" onClick={applyFilter}>{t("Apply")}</button>
         </div>
       )}
 
