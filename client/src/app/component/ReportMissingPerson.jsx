@@ -5,7 +5,6 @@ import { X } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import { cloudinaryImageUpload } from "@/utils/cloudinaryHelper";
 import { postNewReports, existCoor } from "@/utils/mongoHelper";
-import { uploadAwsImage } from "@/utils/awsHelper";
 
 export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
   const [formData, setFormData] = useState({
