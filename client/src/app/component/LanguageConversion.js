@@ -39,6 +39,8 @@ const burmese = {
   'Enter Reported By': 'သတင်းပို့သူကို ထည့်သွင်းပါ', 
   'Enter Contact Number': 'ဆက်သွယ်ရန် ဖုန်းနံပါတ်ကို ထည့်သွင်းပါ',
   'Reporter name': 'သတင်းပို့သူအမည်',
+  'Street' : 'နေရပ်လိပ်စာ',
+  'City' : 'မြို့',
   
   // Messages
   'Please enter the name of the person who originally reported this case:': 'မူလသတင်းပေးပို့သူ၏ အမည်ကို ထည့်သွင်းရန်',
