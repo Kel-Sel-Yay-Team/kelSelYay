@@ -114,7 +114,13 @@ const burmese = {
 
   //list titles
   'All Missing People' : 'ပျောက်ဆုံးသူအားလုံး',
-  'Missing People' : 'ပျောက်ဆုံးသူများ'
+  'Missing People' : 'ပျောက်ဆုံးသူများ',
+
+  //filter
+  'Found' : 'တွေ့ပြီး',
+  'Missing' : 'ပျောက်ဆုံး',
+  'All': 'အားလုံး',
+  'Apply': 'ရှာမည်'
 };
   
   
