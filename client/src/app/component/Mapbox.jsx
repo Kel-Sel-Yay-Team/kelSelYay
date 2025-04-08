@@ -463,62 +463,48 @@ function Mapbox() {
 
         if (recievedNewPost && mapRef.current && coords) {
           if (isMobile) {
-            document.activeElement?.blur(); // blur input
-      
+            document.activeElement?.blur(); // Dismiss keyboard if any input is focused
+        
             const meta = document.querySelector('meta[name=viewport]');
             const originalContent = meta?.getAttribute('content');
-      
+        
             if (meta) {
+              // 1️⃣ Lock zoom to prevent iOS from keeping the zoomed-in state
               meta.setAttribute(
                 'content',
-                'width=device-width, initial-scale=1.0, maximum-scale=1.0'
+                'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
               );
-              
-              mapRef.current.flyTo({
-                center: [coords.lng, coords.lat],
-                zoom: 15,
-                speed: 1.2,
-                curve: 1.3,
-                essential: true
-              });
-              
+          
+              // 2️⃣ Give iOS time to process the zoom lock (use longer timeout for reliability)
               setTimeout(() => {
+                // 3️⃣ Restore original meta zoom behavior
                 meta.setAttribute(
                   'content',
                   originalContent || 'width=device-width, initial-scale=1.0'
                 );
-                setRecievedNewPost(false);
-              }, 800); // match the flyTo duration
-      
-            //   setTimeout(() => {
-            //     // Restore original zoom behavior
-            //     meta.setAttribute(
-            //       'content',
-            //       originalContent || 'width=device-width, initial-scale=1.0'
-            //     );
-            //     mapRef.current.flyTo({
-            //         center: [coords.lng, coords.lat],
-            //         zoom: 15,
-            //         speed: 1.2,
-            //         curve: 1.3,
-            //         essential: true
-            //       });
-            //       setTimeout(() => {
-            //         setRecievedNewPost(false);
-            //       }, 500);
-            //   }, 300);
-            } 
-            else 
-            {
+            
+                // 4️⃣ Optional: wait another tiny delay before flying, helps ensure smooth UX
+                setTimeout(() => {
+                  mapRef.current.flyTo({
+                    center: [coords.lng, coords.lat],
+                    zoom: 15,
+                    speed: 1.2,
+                    curve: 1.3,
+                    essential: true
+                  });
+              
+                  setTimeout(() => {
+                    setRecievedNewPost(false);
+                  }, 500);
+                }, 100); // extra delay to wait for layout to normalize
+              }, 350); // slightly longer for iOS to catch up
+            } else {
               // Fallback if no meta tag found
               mapRef.current.setCenter([coords.lng, coords.lat]);
               setRecievedNewPost(false);
             }
-
-          } 
-          else 
-          {
-            // Desktop flyTo
+          } else {
+            // Non-mobile platforms (desktop behavior)
             mapRef.current.flyTo({
               center: [coords.lng, coords.lat],
               zoom: 15,
@@ -526,6 +512,7 @@ function Mapbox() {
               curve: 1.3,
               essential: true
             });
+        
             setTimeout(() => {
               setRecievedNewPost(false);
             }, 500);
