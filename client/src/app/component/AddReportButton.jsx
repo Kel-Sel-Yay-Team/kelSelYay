@@ -5,11 +5,16 @@ import ReportMissingPerson from "./ReportMissingPerson";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { useLanguage } from "../context/LanguageContext";
+import { lockZoom, unlockZoom } from "@/utils/viewportHelper";
 
 export default function AddReportButton({ onReportSubmitted }) {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useLanguage();
 
+  const handleOpen = () => {
+    setIsOpen(true);
+    lockZoom(); // Prevent zoom on iOS Safari
+  };
 
   const handleReportSuccess=(newReport, existedCoor) => {
     setIsOpen(false);
@@ -19,11 +24,16 @@ export default function AddReportButton({ onReportSubmitted }) {
     }
   }
 
+  const handleClose = () => {
+    setIsOpen(false);
+    unlockZoom(); // Restore zoom behavior
+  };
+
   return (
     <>
     <button
       className="add-report-button"
-      onClick={() => setIsOpen(true)}
+      onClick={handleOpen}
       aria-label="Add Report"
     >
       <FontAwesomeIcon icon={faUser} className="icon" />
@@ -31,7 +41,7 @@ export default function AddReportButton({ onReportSubmitted }) {
     </button>
 
     {isOpen && <ReportMissingPerson 
-                      onClose={() => setIsOpen(false)} 
+                      onClose={handleClose} 
                       onSubmitSuccess={handleReportSuccess}
                     />}
 

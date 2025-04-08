@@ -92,6 +92,22 @@ export default function FilterButton({ onApplyFilter }) {
             border-radius: 10px;
             cursor: pointer;
             }
+        @media(max-width : 425px) {
+          .filter-modal label{
+            font-size: 0.75rem
+          }
+        }
+        @media(max-width : 320px) {
+          .apply-button {
+            padding: 0.5rem 1rem;
+            font-size: 0.5rem;
+            width: 4rem;
+          }
+
+          .filter-modal label{
+            font-size: 0.5rem;
+          }
+        }
       `}</style>
     </>
   );
