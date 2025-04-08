@@ -2,8 +2,16 @@ import express from 'express';
 import MissingPerson from '../models/MissingPerson.js';
 import { geocodeLocation } from '../utils/geocodeLocation.js';
 import { checkForCustomLocation } from '../utils/geoOverride.js';
+import path from "path";
 
 const router = express.Router();
+
+//image handling middleware
+import multer from 'multer';
+const storage = multer.memoryStorage(); // We'll need buffer for S3 later
+const upload = multer({ storage });
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { v4 as uuidv4 } from "uuid";
 
 //CRUD
 //GET everyone from the database
@@ -85,15 +93,46 @@ router.post('/', async (req, res) => {
 });
 
 
-// POST a single missing person report (no geocoding)
-router.post('/batch', async (req, res) => {
+//testing image upload with AWS
+router.post("/testImage", upload.single("image"), async (req, res) => {
+  const file = req.file;
+  const caption = req.body.caption;
+
+  if (!file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+
+  const ext = path.extname(file.originalname);
+  const key = `missing-people-photos/${uuidv4()}${ext}`;
+
+  const s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+  });
+
+  const uploadParams = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: key,
+    Body: file.buffer,
+    ContentType: file.mimetype,
+   // ACL: "public-read", // dont turn this one, we have ACL off in our aws
+  };
+
   try {
-    const report = new MissingPerson(req.body);
-    const saved = await report.save();
-    res.status(201).json(saved);
+    await s3.send(new PutObjectCommand(uploadParams));
+    const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+
+    res.json({
+      message: "Upload successful!",
+      imageUrl,
+      caption,
+    });
   } catch (err) {
-    console.error('❌ Error saving missing person report:', err.message);
-    res.status(500).json({ error: err.message });
+    console.error("S3 upload error:", err);
+    res.status(500).json({ error: "Failed to upload image to S3" });
   }
 });
 
@@ -150,6 +189,7 @@ router.put("/:id", async (req, res) => {
   });
 
 
+
 //input: reporterName, the id of the request
 router.delete('/:id', async (req, res) => {
   const { reporterName } = req.body;
@@ -180,3 +220,21 @@ router.delete('/:id', async (req, res) => {
 
 
 export default router;
+
+
+
+
+
+// admin purposes only
+// POST a single missing person report (no geocoding)
+/*
+router.post('/batch', async (req, res) => {
+  try {
+    const report = new MissingPerson(req.body);
+    const saved = await report.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    console.error('❌ Error saving missing person report:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});*/
