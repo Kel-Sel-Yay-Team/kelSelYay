@@ -473,24 +473,40 @@ function Mapbox() {
                 'content',
                 'width=device-width, initial-scale=1.0, maximum-scale=1.0'
               );
-      
+              
+              mapRef.current.flyTo({
+                center: [coords.lng, coords.lat],
+                zoom: 15,
+                speed: 1.2,
+                curve: 1.3,
+                essential: true
+              });
+              
               setTimeout(() => {
-                // Restore original zoom behavior
                 meta.setAttribute(
                   'content',
-                  'width=device-width, initial-scale=1.0'
+                  originalContent || 'width=device-width, initial-scale=1.0'
                 );
-                mapRef.current.flyTo({
-                    center: [coords.lng, coords.lat],
-                    zoom: 15,
-                    speed: 1.2,
-                    curve: 1.3,
-                    essential: true
-                  });
-                  setTimeout(() => {
-                    setRecievedNewPost(false);
-                  }, 500);
-              }, 300);
+                setRecievedNewPost(false);
+              }, 800); // match the flyTo duration
+      
+            //   setTimeout(() => {
+            //     // Restore original zoom behavior
+            //     meta.setAttribute(
+            //       'content',
+            //       originalContent || 'width=device-width, initial-scale=1.0'
+            //     );
+            //     mapRef.current.flyTo({
+            //         center: [coords.lng, coords.lat],
+            //         zoom: 15,
+            //         speed: 1.2,
+            //         curve: 1.3,
+            //         essential: true
+            //       });
+            //       setTimeout(() => {
+            //         setRecievedNewPost(false);
+            //       }, 500);
+            //   }, 300);
             } 
             else 
             {
