@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
+  metadataBase: new URL('https://kelselyay.com'),
   title: {
     default: 'Kel Sel Yay',
     template: '%s | Kel Sel Yay',
