@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import { cloudinaryImageUpload } from "@/utils/cloudinaryHelper";
 import { postNewReports, existCoor } from "@/utils/mongoHelper";
+import { uploadAwsImage } from "@/utils/awsHelper";
 
 export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
   const [formData, setFormData] = useState({
@@ -123,7 +124,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       let finalImageUrl = "";
 
       if (imageFile) {
-        finalImageUrl = await cloudinaryImageUpload(imageFile);
+        finalImageUrl = await uploadAwsImage(imageFile, "Missing person image");
       } else {
         finalImageUrl = "https://res.cloudinary.com/dpmhxppeg/image/upload/v1743667345/Missing%20People%20Pictures/iiz12qayrwjtkoczh2rq.png";
       }

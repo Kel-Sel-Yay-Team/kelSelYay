@@ -1,10 +1,10 @@
 export async function uploadAwsImage(file, caption) {
     try {
         const formData = new FormData();
-        formData.append('image', file);  // 'image' must match the field name in upload.single("image")
+        formData.append('image', file);  
         formData.append('caption', caption || '');
 
-        const response = await fetch('http://localhost:3002/testImage', {
+        const response = await fetch('http://localhost:3002/api/reports/testImage', {
             method: "POST",
             body: formData
         })
