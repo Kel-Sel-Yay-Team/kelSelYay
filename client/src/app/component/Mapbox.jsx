@@ -26,6 +26,7 @@ function Mapbox() {
     const markersRef = useRef(new Map()); // Store markers by ID
     const [recievedNewPost, setRecievedNewPost] = useState(false);
     const [newReportCoords, setNewReportCoords] = useState(null);
+    const [existingReportCoords, setExistingReportCoords] = useState(null);
     const [markerList, setMarkerList] = useState([]);
     const [clusteredData, setClusteredData] = useState(null)
     //for tutorial Box
@@ -134,7 +135,12 @@ function Mapbox() {
                 lat: newReport.lat || 21.9162
             }
         )}
-
+        else{
+            setExistingReportCoords({
+                lng: newReport.lng || 95.9560,
+                lat: newReport.lat || 21.9162
+            })
+        }
         setRecievedNewPost(true);
     }
 
@@ -452,8 +458,10 @@ function Mapbox() {
 
     useEffect(() => {
         const isMobile = window.matchMedia("(max-width: 768px)").matches;
-      
-        if (recievedNewPost && newReportCoords && mapRef.current) {
+        
+        const coords = existingReportCoords || newReportCoords;
+
+        if (recievedNewPost && mapRef.current) {
           if (isMobile) {
             document.activeElement?.blur(); // blur input
       
@@ -473,7 +481,7 @@ function Mapbox() {
                   originalContent || 'width=device-width, initial-scale=1.0'
                 );
                 mapRef.current.flyTo({
-                    center: [newReportCoords.lng, newReportCoords.lat],
+                    center: [coords.lng, coords.lat],
                     zoom: 15,
                     speed: 1.2,
                     curve: 1.3,
@@ -487,7 +495,7 @@ function Mapbox() {
             else 
             {
               // Fallback if no meta tag found
-              mapRef.current.setCenter([newReportCoords.lng, newReportCoords.lat]);
+              mapRef.current.setCenter([coords.lng, coords.lat]);
               setRecievedNewPost(false);
             }
 
@@ -496,7 +504,7 @@ function Mapbox() {
           {
             // Desktop flyTo
             mapRef.current.flyTo({
-              center: [newReportCoords.lng, newReportCoords.lat],
+              center: [coords.lng, coords.lat],
               zoom: 15,
               speed: 1.2,
               curve: 1.3,
@@ -507,7 +515,7 @@ function Mapbox() {
             }, 500);
           }
         }
-      }, [recievedNewPost, newReportCoords]);
+      }, [recievedNewPost, newReportCoords, existingReportCoords]);
 
     useEffect(() => {
         // Disable scrolling on body
@@ -554,7 +562,6 @@ function Mapbox() {
                 titleMessage={`${clusterModalPeople[0].locationOfMissingPerson} ${t("Missing People")}` || `${lat}, ${lng}`}
                 onSelectPerson={(person) => {
                   setSelectedPerson(person);
-                  setClusterModalPeople([]); // close modal
                 }}
               />
             )}

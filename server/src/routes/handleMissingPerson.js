@@ -59,7 +59,7 @@ router.post('/', async (req, res) => {
         }
 
         let lat, lng;
-        const customCoords = checkForCustomLocation(locationOfMissingPerson);
+        // const customCoords = checkForCustomLocation(locationOfMissingPerson);
 
         if (customCoords) {
           ({ lat, lng } = customCoords);
