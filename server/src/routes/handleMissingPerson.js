@@ -118,7 +118,7 @@ router.post("/testImage", upload.single("image"), async (req, res) => {
     Key: key,
     Body: file.buffer,
     ContentType: file.mimetype,
-   // ACL: "public-read", // makes the image viewable by URL
+   // ACL: "public-read", // dont turn this one, we have ACL off in our aws
   };
 
   try {

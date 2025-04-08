@@ -4,7 +4,7 @@ export async function uploadAwsImage(file, caption) {
         formData.append('image', file);  
         formData.append('caption', caption || '');
 
-        const response = await fetch('http://localhost:3002/api/reports/testImage', {
+        const response = await fetch('https://www.kelselyay.com/api/reports/testImage', {
             method: "POST",
             body: formData
         })
