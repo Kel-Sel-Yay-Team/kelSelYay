@@ -461,7 +461,7 @@ function Mapbox() {
         
         const coords = existingReportCoords || newReportCoords;
 
-        if (recievedNewPost && mapRef.current) {
+        if (recievedNewPost && mapRef.current && coords) {
           if (isMobile) {
             document.activeElement?.blur(); // blur input
       
@@ -517,17 +517,17 @@ function Mapbox() {
         }
       }, [recievedNewPost, newReportCoords, existingReportCoords]);
 
-    useEffect(() => {
-        // Disable scrolling on body
-        document.body.style.overflow = 'hidden';
-        document.documentElement.style.overflow = 'hidden';
+    // useEffect(() => {
+    //     // Disable scrolling on body
+    //     document.body.style.overflow = 'hidden';
+    //     document.documentElement.style.overflow = 'hidden';
         
-        // Re-enable scrolling when component unmounts
-        return () => {
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
-        };
-    }, []);
+    //     // Re-enable scrolling when component unmounts
+    //     return () => {
+    //         document.body.style.overflow = '';
+    //         document.documentElement.style.overflow = '';
+    //     };
+    // }, []);
 
     return (
         <>
