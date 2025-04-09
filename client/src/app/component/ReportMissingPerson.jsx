@@ -230,7 +230,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                     type="number"
                   />
                 </div> */}
-                {/* Mobile version */}
+                {/* Only visible on Mobile version */}
                 <div className="time-mobile-wrapper">
                   <div className={`form-input input-with-unit time-mobile-wrapper-box ${fieldErrors.dateMissing ? 'input-error' : ''}`}>
                     <input
@@ -297,7 +297,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                     onChange={handleChange}
                     placeholder={t("YYYY-DD-MM")}
                     pattern="\d{4}-\d{2}-\d{2}"
-                    className="bg-gray text-black rounded"
+                    className="formt-input"
                     type="text"
                   />
                   <span className="unit-label">{t("Date")}</span>
