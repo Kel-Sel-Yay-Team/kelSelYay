@@ -6,6 +6,7 @@ import ValidationModal from "./ValidationModal";
 import DetailRow from "./DetailRow";
 import ImageSection from "./ImageSection";
 import { useLanguage } from "../context/LanguageContext";
+import { uploadAwsImage } from "@/utils/awsHelper";
 
 const getCoordinates = async (query) => {
     const res = await fetch(`https://kelselyay.onrender.com/api/reports/geocode?address=${encodeURIComponent(query)}`);
@@ -180,33 +181,8 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             
             // Upload new image if available
             if (newImageFile) {
-                const formData = new FormData();
-                formData.append('file', newImageFile);
-                
-                // Check if environment variables are accessible
-                const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-                const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-                
-                
-                if (!uploadPreset || !cloudName) {
-                    throw new Error('Missing Cloudinary configuration');
-                }
-                
-                formData.append('upload_preset', uploadPreset);
-                formData.append('folder', 'Missing People Pictures');
-                
-                const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-                    method: 'POST',
-                    body: formData,
-                });
-          
-                if (!res.ok) {
-                    const errorData = await res.json().catch(() => ({}));
-                    throw new Error(`Failed to upload image: ${res.status} ${res.statusText}`);
-                }
-          
-                const data = await res.json();
-                updatedImageUrl = data.secure_url;
+            
+                updatedImageUrl = await uploadAwsImage(newImageFile, "Missing person image")
             } else if (newImageUrl) {
                 updatedImageUrl = newImageUrl;
             }
