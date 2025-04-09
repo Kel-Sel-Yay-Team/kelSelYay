@@ -154,7 +154,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       
       const data_finalized = {
         ...data,
-        dateMissing: new Date(formData.dateMissing),  //convert String to Date
+        dateMissing: new Date(payload.dateMissing),  //convert String to Date
         dateReported: new Date()
       }
 
@@ -297,7 +297,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                     onChange={handleChange}
                     placeholder={t("YYYY-DD-MM")}
                     pattern="\d{4}-\d{2}-\d{2}"
-                    className="bg-transparent text-black rounded border border-gray-300"
+                    className="bg-gray text-black rounded"
                     type="text"
                   />
                   <span className="unit-label">{t("Date")}</span>
