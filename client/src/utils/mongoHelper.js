@@ -1,6 +1,6 @@
 export async function postNewReports(payload) {
     try {
-        const response = await fetch("https://kelselyay.onrender.com/api/reports", {
+        const response = await fetch("http://localhost:3002/api/reports", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),

@@ -67,7 +67,9 @@ const burmese = {
   'Description' : 'ဖော်ပြချက်',
   'Submit':'တင်မည်',
   'Close':'ပိတ်မည်',
-
+  'Date' : 'ရက်စွဲ',
+  'YYYY-MM-DD' : '',
+  
   //units
   'Days' : 'ရက်',
 
@@ -123,6 +125,8 @@ const burmese = {
   'Missing' : 'ပျောက်ဆုံး',
   'All': 'အားလုံး',
   'Apply': 'ရှာမည်'
+
+
 };
   
   

@@ -17,7 +17,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
     locationOfMissingPerson: "",
     locationStreet: "",
     locationCity:"",
-    timeSinceMissing: "",
+    dateMissing: "",
     imageUrl: "", // optional, use imagePreview if needed
   });
 
@@ -29,7 +29,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
     locationStreet: false,
     locationCity: false,
     missingImage: false,
-    timeSinceMissing: false
+    dateMissing: false,
   });
   
   const [imageFile, setImageFile] = useState(null);
@@ -92,7 +92,7 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       'phoneNumber', 
       'locationStreet',
       'locationCity',
-      `timeSinceMissing`
+      `dateMissing`
     ];
 
     let hasErrors = false;
@@ -121,6 +121,17 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
         return
       }
 
+       // Validate date format YYYY-MM-DD
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(formData.dateMissing)) {
+        setFieldErrors(prev => ({
+          ...prev,
+          dateMissing: "Please enter a valid date.",
+        }));
+        setIsSaving(false);
+        return;
+      }
+
       let finalImageUrl = "";
 
       if (imageFile) {
@@ -135,18 +146,29 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
       const payload = { 
         ...rest, 
         locationOfMissingPerson: `${locationStreet}, ${locationCity}`.trim(),
-        imageUrl: finalImageUrl };
+        imageUrl: finalImageUrl, 
+      };
       
       // Submitting the post to DB and double check for marker
       const data = await postNewReports(payload);
-      const lat = data.lat;
-      const lng = data.lng;
+      
+      const data_finalized = {
+        ...data,
+        dateMissing: new Date(formData.dateMissing),  //convert String to Date
+        dateReported: new Date()
+      }
+
+      const lat = data_finalized.lat;
+      const lng = data_finalized.lng;
       const existedCoor = await existCoor(lat, lng);
       
       // if not existed, add maker with counter 1;
 
-      if(onSubmitSuccess){  
-        onSubmitSuccess(data, existedCoor)
+      if(onSubmitSuccess){ 
+        
+        console.log("finalized", data_finalized);
+        
+        onSubmitSuccess(data_finalized, existedCoor)
       }
       
       onClose();
@@ -210,19 +232,20 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                 </div> */}
                 {/* Mobile version */}
                 <div className="time-mobile-wrapper">
-                  <div className={`form-input input-with-unit time-mobile-wrapper-box ${fieldErrors.timeSinceMissing ? 'input-error' : ''}`}>
+                  <div className={`form-input input-with-unit time-mobile-wrapper-box ${fieldErrors.dateMissing ? 'input-error' : ''}`}>
                     <input
-                      name="timeSinceMissing"
-                      value={formData.timeSinceMissing}
+                      name="dateMissing"
+                      value={formData.dateMissing}
                       onChange={handleChange}
-                      placeholder={t("Time Since Missing")}
+                      placeholder={t("YYYY-MM-DD")}
+                      pattern="\d{4}-\d{2}-\d{2}"
                       className="inner-time-input"
-                      type="number"
+                      type="text"
                     />
                     <span className="unit-label">{t("Days")}</span>
                   </div>
-                  {fieldErrors.timeSinceMissing && (
-                    <div className="field-error-message">{t("Time since missing is required")}</div>
+                  {fieldErrors.dateMissing && (
+                    <div className="field-error-message">{t(fieldErrors.dateMissing)}</div>
                   )}
                 </div>
               </div>
@@ -267,19 +290,20 @@ export default function ReportMissingPerson({ onClose, onSubmitSuccess }) {
                   className="form-input"
                 />
                 {/* Only visible on desktop */}
-                <div className={`form-input input-with-unit time-desktop-wrapper ${fieldErrors.timeSinceMissing ? 'input-error' : ''}`}>
+                <div className={`form-input input-with-unit time-desktop-wrapper ${fieldErrors.dateMissing ? 'input-error' : ''}`}>
                   <input
-                    name="timeSinceMissing"
-                    value={formData.timeSinceMissing}
+                    name="dateMissing"
+                    value={formData.dateMissing}
                     onChange={handleChange}
-                    placeholder={t("Time Since Missing (e.g. 24)")}
-                    className={`inner-time-input`}
-                    type="number"
+                    placeholder={t("YYYY-DD-MM")}
+                    pattern="\d{4}-\d{2}-\d{2}"
+                    className="bg-transparent text-black rounded border border-gray-300"
+                    type="text"
                   />
-                  <span className="unit-label">{t("Days")}</span>
+                  <span className="unit-label">{t("Date")}</span>
                 </div>
-                {fieldErrors.timeSinceMissing && (
-                  <div className="field-error-message">{t("Time since missing is required")}</div>
+                {fieldErrors.dateMissing && (
+                  <div className="field-error-message">{t(fieldErrors.dateMissing)}</div>
                 )}  
               </div>
             </div>
