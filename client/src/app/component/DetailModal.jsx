@@ -25,7 +25,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
     const [description, setDescription] = useState(detail.missingPersonDescription);
     const [relationship, setRelationship] = useState(detail.relationshipToReporter);
     const [location, setLocation] = useState(detail.locationOfMissingPerson);
-    const [time, setTime] = useState(detail.timeSinceMissing);
+    const [time, setTime] = useState(detail.dateMissing);
     const [imageUrl, setImageUrl] = useState(null);
     const [imageError, setImageError] = useState(false);
     const [isEditing, setIsEditing] = useState(false); 
@@ -42,7 +42,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
         { label: 'Name', key: 'missingPersonName', stateSetter: setName, stateValue: name, isTextarea: false },
         { label: 'Description', key: 'missingPersonDescription', stateSetter: setDescription, stateValue: description, isTextarea: true },
         { label: 'Last Known Location', key: 'locationOfMissingPerson', stateSetter: setLocation, stateValue: location, isTextarea: false },
-        { label: 'Missing Since', key: 'timeSinceMissing', stateSetter: setTime, stateValue: time, isTextarea: false },
+        { label: 'Date of Missing', key: 'dateMissing', stateSetter: setTime, stateValue: time, isTextarea: false },
         { label: 'Contact Number', key: 'phoneNumber', stateSetter: setPhoneNumber, stateValue: phoneNumber, isTextarea: false },
     ]);
 
@@ -59,7 +59,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
             { label: 'Name', key: 'missingPersonName', stateSetter: setName, stateValue: name, isTextarea: false },
             { label: 'Description', key: 'missingPersonDescription', stateSetter: setDescription, stateValue: description, isTextarea: true },
             { label: 'Last Known Location', key: 'locationOfMissingPerson', stateSetter: setLocation, stateValue: location, isTextarea: false },
-            { label: 'Missing Since', key: 'timeSinceMissing', stateSetter: setTime, stateValue: time, isTextarea: false },
+            { label: 'Missing Since', key: 'dateMissing', stateSetter: setTime, stateValue: time, isTextarea: false },
             { label: 'Contact Number', key: 'phoneNumber', stateSetter: setPhoneNumber, stateValue: phoneNumber, isTextarea: false },
         ]);
     }, [name, description, location, time, relationship, phoneNumber]);
@@ -135,7 +135,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
         setDescription(detail.missingPersonDescription);
         setRelationship(detail.relationshipToReporter);
         setLocation(detail.locationOfMissingPerson);
-        setTime(detail.timeSinceMissing);
+        setTime(detail.dateMissing);
         setIsEditing(false);
     };
 
@@ -194,7 +194,7 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                 phoneNumber: phoneNumber,
                 missingPersonDescription: description,
                 relationshipToReporter: relationship,
-                timeSinceMissing: time,
+                dateMissing: time,
                 imageUrl: updatedImageUrl,
             };
             
@@ -268,17 +268,25 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     />
                     
                     <div className={`details-section ${isEditing ? 'editing' : ''}`}>
-                        {detailSection.map((section, index) => (
-                            <DetailRow
-                                key={index}
-                                label={t(section.label)}
-                                value={section.stateValue}
-                                isEditing={isEditing}
-                                onChange={section.stateSetter}
-                                placeholder={t(`Enter ${section.label}`)}
-                                isTextarea={section.isTextarea}
-                            />
-                        ))}
+                        {detailSection.map((section, index) => {
+                            return(
+                                <DetailRow
+                                    key={index}
+                                    label={t(section.label)}
+                                    value={section.key === 'dateMissing' && !isEditing
+                                        ? new Date(section.stateValue).toLocaleDateString("en-US", {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                          }) // or "my-MM"
+                                        : section.stateValue}
+                                    isEditing={isEditing}
+                                    onChange={section.stateSetter}
+                                    placeholder={t(`Enter ${section.label}`)}
+                                    isTextarea={section.isTextarea}
+                                />
+                            )
+                        })}
                     </div>
                 </div>
                 
