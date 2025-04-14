@@ -548,15 +548,13 @@ function Mapbox() {
                 />
             )} 
             {/* <DonateButton /> */}
-            {clusterModalPeople.length > 0 ? (
-              <CloseButton onClose={() => setClusterModalPeople([])} />
-            ) : (
+            {clusterModalPeople.length === 0 &&
               <SearchButton 
                 data={missingPeople} 
                 isOpen={searchMode} 
                 setIsOpen={setSearchMode} 
               />
-            )}
+            }
             {/* <SearchButton data={missingPeople} isOpen={searchMode} setIsOpen={setSearchMode}/> */}
             {clusterModalPeople.length > 0 && (
               <MissingListModal 
@@ -566,6 +564,7 @@ function Mapbox() {
                 onSelectPerson={(person) => {
                   setSelectedPerson(person);
                 }}
+                onClose={() => setClusterModalPeople([])}
               />
             )}
             <HelpButton/>
