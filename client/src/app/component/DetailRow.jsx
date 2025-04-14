@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 
 function DetailRow({ 
   label, 
@@ -9,26 +10,51 @@ function DetailRow({
   isTextarea = false,
   rows = 3
 }) {
+  const [localValue, setLocalValue] = useState(value || "");
+
+  useEffect(() => {
+    setLocalValue(value || "");
+  }, [value]);
+
+  const handleChange = (e) => {
+    const newValue = e.target.value;
+    setLocalValue(newValue);
+    onChange(newValue);
+  };
   return (
     <div className={`detail-row ${isEditing ? 'editing' : ''}`}>
       <h3 className="model-label">{label}</h3>
       {isEditing ? (
         isTextarea ? (
-          <textarea 
-            value={value || ""}
-            onChange={(e) => onChange(e.target.value)}
-            className="edit-input"
-            rows={rows}
-            placeholder={placeholder || label}
-          />
+          // <textarea 
+          //   value={value || ""}
+          //   onChange={(e) => onChange(e.target.value)}
+          //   className="edit-input"
+          //   rows={rows}
+          //   placeholder={placeholder || label}
+          // />
+          <textarea
+          value={localValue}
+          onChange={handleChange}
+          className="edit-input"
+          rows={rows}
+          placeholder={placeholder || label}
+        />
         ) : (
-          <input 
+          <input
             type="text"
-            value={value || ""} 
-            onChange={(e) => onChange(e.target.value)}
+            value={localValue}
+            onChange={handleChange}
             className="edit-input"
             placeholder={placeholder || label}
           />
+          // <input 
+          //   type="text"
+          //   value={value || ""} 
+          //   onChange={(e) => onChange(e.target.value)}
+          //   className="edit-input"
+          //   placeholder={placeholder || label}
+          // />
         )
       ) : (
         <p>{value || (label === "Description" ? "No description provided" : "Unknown")}</p>
