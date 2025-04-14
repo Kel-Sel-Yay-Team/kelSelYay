@@ -160,7 +160,7 @@ export default function MissingListModal({ data = [], showTitle = true , titleMe
           @media (max-width: 768px) {
             .close-button{  
               top: -11px;
-              right: -10px;
+              right: -11px;
               width: 22px;
               height: 22px;
             }
