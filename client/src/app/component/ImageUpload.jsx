@@ -48,10 +48,10 @@ function ImageUpload({ onUploadComplete, isEditing = False }) {
           width: 100%;
           margin-bottom: 10px;
         }
-
-        .upload-input-wrapper {
-          margin-bottom: 12px;
-        }
+        // not needed by zac
+        // .upload-input-wrapper {
+        //   margin-bottom: 1px;
+        // }
 
         .file-input {
           width: 100%;
@@ -67,6 +67,10 @@ function ImageUpload({ onUploadComplete, isEditing = False }) {
           margin-top: 12px;
           max-width: 100%;
         }
+
+        .preview-container.editing {
+          margin-top: 0px;
+        } 
 
         .image-preview {
           max-width: 100%;
