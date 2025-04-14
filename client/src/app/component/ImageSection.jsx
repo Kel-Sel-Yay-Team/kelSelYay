@@ -26,7 +26,7 @@ function ImageSection({imagePreview, isEditing, imageUrl, imageError, handleImag
                 )}
             </div>
             {isEditing ? (
-                <ImageUpload onUploadComplete={handleImageUpload}></ImageUpload>
+                <ImageUpload onUploadComplete={handleImageUpload} isEditing={isEditing}></ImageUpload>
             ): <div></div>}
 
             <style jsx>
@@ -63,7 +63,8 @@ function ImageSection({imagePreview, isEditing, imageUrl, imageError, handleImag
                     color: rgba(255, 255, 255, 0.4);
                     text-align: center;
                     font-size: 0.9rem;
-                }`}
+                }
+                `}
             </style>
         </div>
     )   

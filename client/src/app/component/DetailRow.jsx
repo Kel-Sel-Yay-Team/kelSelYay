@@ -40,6 +40,9 @@ function DetailRow({
             font-weight: 700; /* Bold text */
             margin-bottom: 6px;
           }
+          .detail-row.editing .model-label{
+            margin-bottom: 1px;
+          }
         `}
       </style>
     </div>

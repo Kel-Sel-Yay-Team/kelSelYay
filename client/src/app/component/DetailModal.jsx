@@ -655,6 +655,8 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     }
                     
                     .modal-footer {
+                        padding-top: 8px;
+                        margin-top: 8px;
                         gap: 6px;
                     }
                     
@@ -669,6 +671,10 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     
                     :global(.detail-row) {
                         margin-bottom: 6px;
+                    }
+
+                    :global(.editing .detail-row) {
+                        margin-bottom: 2px;
                     }
 
                     .details-section{
@@ -705,6 +711,16 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
                     border: 1px solid #d93025;
                     outline: none;
                     box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.2);
+                }
+
+                @media (max-width: 425px) {
+                  :global(.editing .detail-row input),
+                  :global(.editing .detail-row textarea) {
+                    padding: 6px;
+                    font-size: 0.85rem;
+                    border-radius: 4px;
+                    width: 100%;
+                  }
                 }
 
             `}</style>

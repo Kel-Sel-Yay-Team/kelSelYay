@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function ImageUpload({ onUploadComplete }) {
+function ImageUpload({ onUploadComplete, isEditing = False }) {
   const [image, setImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
@@ -29,7 +29,7 @@ function ImageUpload({ onUploadComplete }) {
       </div>
       
       {previewUrl && (
-        <div className="preview-container">
+        <div className={`preview-container ${isEditing ? 'editing' : '' }`}>
           <img 
             src={previewUrl} 
             alt="Preview" 
@@ -74,6 +74,10 @@ function ImageUpload({ onUploadComplete }) {
           border-radius: 4px;
           border: 1px solid #d93025;
           object-fit: contain;
+        }
+
+        .preview-container.editing .image-preview{
+          display: none;
         }
 
         /* Mobile responsive adjustments */
