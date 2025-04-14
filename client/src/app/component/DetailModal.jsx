@@ -228,6 +228,35 @@ function DetailModal({ detail, onClose, onUpdateSuccess, onDeleteSuccess }) {
         }
     };
 
+    useEffect (() => {
+        const isMobile = window.matchMedia("(max-width: 768px)").matches;
+        const meta = document.querySelector('meta[name=viewport]');
+      
+        if (!isMobile || !meta) return;
+      
+        const originalContent = meta.getAttribute('content');
+      
+        if (isEditing) {
+          meta.setAttribute(
+            'content',
+            'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+          );
+        } else {
+          meta.setAttribute(
+            'content',
+            originalContent || 'width=device-width, initial-scale=1.0'
+          );
+        }
+      
+        return () => {
+          // Restore on unmount just in case
+          meta.setAttribute(
+            'content',
+            originalContent || 'width=device-width, initial-scale=1.0'
+          );
+        };
+    }, [isEditing]);
+
     return (
         <div className="modal-overlay">
             {showNameValidation && (
