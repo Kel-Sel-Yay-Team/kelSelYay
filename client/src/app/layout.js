@@ -23,7 +23,6 @@ export const metadata = {
     'A live map to find missing people after the 2025 Myanmar Earthquake. Friends and families can safely and accurately report victims.',
   keywords: ['Kel Sel Yay', 'Myanmar', 'Earthquake'],
   icons: [
-    { rel: 'icon', url: '/favicon.ico', type: 'image/x-icon' },
     { rel: 'icon', url: '/favicon.png', sizes: '32x32', type: 'image/png' },
   ],
   openGraph: {
