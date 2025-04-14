@@ -1,8 +1,10 @@
 "use client";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLanguage } from "../context/LanguageContext";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
-export default function MissingListModal({ data = [], showTitle = true , titleMessage, onSelectPerson}) {
+export default function MissingListModal({ data = [], showTitle = true , titleMessage, onSelectPerson, onClose}) {
   const { t } = useLanguage();
 
   // console.log("Modal rendering!");
@@ -11,10 +13,14 @@ export default function MissingListModal({ data = [], showTitle = true , titleMe
   return (
     // <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-sm">
     <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 backdrop-blur-sm pt-20">
-
       <div className="modal-container">
+      <button className="close-button" onClick={onClose} aria-label="Close">
+          <FontAwesomeIcon icon={faXmark} />
+        </button>
         {showTitle && <span className="top-label">{titleMessage || t("Default Missing People")}</span>}
-
+        <button className="close-button" onClick={onClose} aria-label="Close">
+          <FontAwesomeIcon icon={faXmark} />
+        </button>
         <div className="modal-content">
           <div className="scroll-area">
             {data.length === 0 ? (
@@ -127,7 +133,39 @@ export default function MissingListModal({ data = [], showTitle = true , titleMe
             font-size: 1rem;
             color: #666;
           }
+          
+          .close-button {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 30px;
+            height: 30px;
+            background-color: red;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 1rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          }
+                  
+          .close-button:hover {
+            background-color: #b71c1c;
+          }
 
+          @media (max-width: 768px) {
+            .close-button{  
+              top: -11px;
+              right: -10px;
+              width: 22px;
+              height: 22px;
+            }
+          }
+  
           @media (max-width: 425px) {
             .modal-content {
                   max-height: 60vh;

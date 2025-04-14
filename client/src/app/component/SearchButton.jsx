@@ -64,10 +64,15 @@ export default function SearchButton({ data, isOpen, setIsOpen }) {
 
   return (
     <>
-        <div className={`search-button ${isOpen ? "open" : ""}`} onClick={toggleButton} role="button" tabIndex={0}>
-            <FontAwesomeIcon icon={ isOpen? faTimes: faSearch } className="search-icon" />
-            <span className="search-text">{isOpen? t("Close") : t("Search")}</span>
-
+        {!isOpen && (
+          <div
+            className="search-button"
+            onClick={toggleButton}
+            role="button"
+            tabIndex={0}
+          >
+            <FontAwesomeIcon icon={faSearch} className="search-icon" />
+            <span className="search-text">{t("Search")}</span>
             {/* Debug or test the data prop */}
             {/*\\\\\
             {isOpen && (
@@ -77,7 +82,8 @@ export default function SearchButton({ data, isOpen, setIsOpen }) {
                 {/* <pre>{JSON.stringify(data[0], null, 2)}</pre>
             </div>
             )}*/} 
-        </div>
+          </div>
+        )}
         {isOpen && (
             <div>
                 <SearchBar onInputChange={handleSearchInput} onApplyFilter={handleFilterApply}/>
@@ -87,7 +93,8 @@ export default function SearchButton({ data, isOpen, setIsOpen }) {
                 <MissingListModal data={filteredData} 
                 showTitle={!query} 
                 titleMessage={t("All Missing People")}
-                onSelectPerson={(person) => setSelectedPerson(person)}/>
+                onSelectPerson={(person) => setSelectedPerson(person)}
+                onClose={() => setIsOpen(false)}/>
             </div>
         )}
         

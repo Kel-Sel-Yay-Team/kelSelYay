@@ -32,7 +32,7 @@ export default function LanguageToggle() {
       }
 
       /* for tablets and up */
-      @media (min-width: 640px) {
+      @media (min-width: 769px) {
         .language-toggle {
           top: 2.75rem;
           bottom: auto;
