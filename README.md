@@ -1,4 +1,4 @@
-#  KelSelYay <img src="https://www.kelselyay.com/favicon.ico" alt="KelSelYay Logo" width="40" style="position: relative; top: 10px;"/>
+#  KelSelYay <img src="https://www.kelselyay.com/favicon.ico" alt="KelSelYay Logo" width="40" style="position: absolute; top: 10px;"/>
 
 **A real-time crisis aid platform for Myanmar earthquake victims.**  
 KelSelYay enables families to report missing persons and access urgent resources during a humanitarian crisis. Built for accessibility, clarity, and impact.
