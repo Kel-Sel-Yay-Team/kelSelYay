@@ -33,7 +33,7 @@ KelSelYay enables families to report missing persons and access urgent resources
 **Backend:**
 - MongoDB (for database)
 - Render (for API hosting)
-- AWS EC2 (for saving images)
+- AWS S3 (for saving images)
 ---
 
 ## 📈 Impact
