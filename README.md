@@ -25,7 +25,7 @@ KelSelYay enables families to report missing persons and access urgent resources
 ## 🛠️ Tech Stack
 
 **Frontend:**
-- React.js
+- Next.js
 - Mapbox (for real-time maps)
 - Vercel (for deployment)
 
