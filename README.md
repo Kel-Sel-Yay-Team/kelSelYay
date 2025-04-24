@@ -38,7 +38,7 @@ KelSelYay enables families to report missing persons and access urgent resources
 
 ## 📈 Impact
 
-- 👥 Over **5000 users** actively engaged.
+- 👥 Over **7000 users** actively engaged.
 - 🧭 Helped track **100+ missing individuals** within the first week.
 - 🕊️ Used by volunteers and community organizations to coordinate aid.
 
