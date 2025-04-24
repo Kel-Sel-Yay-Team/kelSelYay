@@ -188,8 +188,6 @@ router.put("/:id", async (req, res) => {
     }
   });
 
-
-
 //input: reporterName, the id of the request
 router.delete('/:id', async (req, res) => {
   const { reporterName } = req.body;
